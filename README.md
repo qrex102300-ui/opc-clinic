@@ -1,5 +1,9 @@
 # OPC 诊室 · OPC Clinic
 
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Version](https://img.shields.io/badge/version-v0.1-lightgrey)
+![Models](https://img.shields.io/badge/models-Claude%20%7C%20ChatGPT%20%7C%20Gemini%20%7C%20DeepSeek-green)
+
 > 一个会**拷问**你的 AI 创业诊断官。不给你"正确但谁都能用"的建议,只逼你看清自己没看清的病因。
 > An AI diagnostician that **interrogates** your one-person-company. It refuses generic advice and digs until it finds the real cause you've been avoiding.
 
