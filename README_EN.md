@@ -24,22 +24,29 @@
 
 ## 60-Second Quick Start
 
-**The simplest way (anyone can use it, no code required)**
+The diagnostic power is a prompt inside [`prompt/diagnostician.md`](prompt/diagnostician.md) — **it's model-agnostic and platform-independent**. Claude / ChatGPT / DeepSeek / Gemini / Kimi / Qwen and more can all run it.
+
+**Method A · Copy & Paste (Any LLM, Simplest)**
 
 1. Copy the entire contents of [`prompt/diagnostician.md`](prompt/diagnostician.md)
-2. Open [Claude](https://claude.ai) (recommended) or ChatGPT and start a new conversation
+2. Open any LLM you use (Claude / ChatGPT / DeepSeek / Gemini / Kimi / Qwen, etc.) and start a new conversation
 3. Paste it in as the first message and send
 4. It'll reply with "The clinic is open — tell me your situation" — then, act like a real case owner: **don't go along with it, push back when you disagree**, and go with it
 
-> 💡 For stabler results: save it as a Claude [Project](https://www.anthropic.com/news/projects) custom instruction, or as a custom GPT in ChatGPT, for one-click access later.
+**Method B · Claude Code Skill (One-Click Reuse)**
 
-> 🌐 **Works with any model**: Claude / ChatGPT / Gemini / DeepSeek / Kimi / Qwen and more can all run it — it's just a prompt, not tied to any specific platform.
-> That said, its soul is "multi-turn interrogation that holds firm against your pushback" — and this is precisely what stresses a model's reasoning and multi-turn ability most. **The stronger the model, the sharper the diagnosis**; use the strongest tier each provider offers, not the lite / fast versions.
+Drop the `skill/` directory into your Claude Code skills folder. After that, saying "diagnose my project" automatically triggers it. See [Installation Guide](README-skill.md) for details.
+
+**Method C · Claude Project Custom Instructions**
+
+Create a new Claude Project, paste `diagnostician.md` into custom instructions. One-click access from then on.
+
+> 🌐 **Works with any model**: It's just a prompt, not tied to any platform. That said, its soul is "multi-turn interrogation that holds firm against your pushback" — and this is precisely what stresses a model's reasoning and multi-turn ability most. **The stronger the model, the sharper the diagnosis**; use the strongest tier each provider offers, not the lite / fast versions.
 
 **Advanced (technical users)**
 
 - Use `prompt/diagnostician.md` as a system prompt in your own API calls
-- Or wrap it as a Claude Code / Cursor skill and invoke it anytime in your dev workflow
+- Or wrap it as a Cursor / other AI coding tool rule and invoke it anytime in your dev workflow
 
 ---
 

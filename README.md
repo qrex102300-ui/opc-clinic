@@ -25,22 +25,29 @@
 
 ## 60 秒快速开始
 
-**最简单的方式(任何人都能用,不需要写代码)**
+诊断能力来自 [`prompt/diagnostician.md`](prompt/diagnostician.md) 里的一段提示词——**它不依赖任何特定模型或平台**,Claude / ChatGPT / DeepSeek / Gemini / Kimi / 通义千问都能跑。
+
+**方式 A · 直接粘贴（任何大模型,最简单）**
 
 1. 复制 [`prompt/diagnostician.md`](prompt/diagnostician.md) 的全部内容
-2. 打开 [Claude](https://claude.ai)(推荐)或 ChatGPT,新建一个对话
+2. 打开你常用的任意大模型（Claude / ChatGPT / DeepSeek / Gemini / Kimi / 通义千问 等）,新建一个对话
 3. 把它粘贴进去作为第一条消息,发送
 4. 它会回你一句"诊室开张,先说你的情况"——然后像真案主一样,**别配合它、该反驳就反驳**,跟它走下去
 
-> 💡 想要更稳定的效果:在 Claude 里把它存成一个 [Project](https://www.anthropic.com/news/projects) 的自定义指令,或在 ChatGPT 里存成一个自定义 GPT,以后一键调用。
+**方式 B · Claude Code Skill 一键复用**
 
-> 🌐 **用哪个模型都行**:Claude / ChatGPT / Gemini / DeepSeek / Kimi / 通义千问 等都能跑——它只是一段提示词,不依赖任何特定平台。
-> 不过它的灵魂是"多轮追问、顶住你反驳不松口",这恰恰最吃模型的推理和多轮能力。**模型越强,效果越狠**;建议用各家最强的那一档,别用精简版 / 快速版。
+把 `skill/` 目录放进你的 Claude Code skills 目录,之后说一句"诊断我的项目"即可自动唤起。详见[多平台安装指南](README-skill.md)。
 
-**进阶方式(技术用户)**
+**方式 C · Claude Project 自定义指令**
+
+在 Claude 里新建一个 Project,把 `diagnostician.md` 的内容粘进自定义指令,以后在该 Project 里一键调用。
+
+> 🌐 **用哪个模型都行**:它只是一段提示词,不绑定任何平台。不过它的灵魂是"多轮追问、顶住你反驳不松口",这恰恰最吃模型的推理和多轮能力。**模型越强,效果越狠**;建议用各家最强的那一档,别用精简版 / 快速版。
+
+**进阶方式（技术用户）**
 
 - 把 `prompt/diagnostician.md` 作为 system prompt 接进你自己的 API 调用
-- 或封装成 Claude Code / Cursor 的一个 skill,在你的开发流里随时唤起
+- 或封装成 Cursor / 其他 AI 编程工具的一个 rule,在你的开发流里随时唤起
 
 ---
 
