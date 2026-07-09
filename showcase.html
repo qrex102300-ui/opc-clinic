@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OPC 诊室 — AI 业务诊断</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#fafaf9;--fg:#1a1a19;--accent:#d4380d;--accent-light:#fff7e6;--card:#fff;--border:#e8e8e3;--muted:#8c8c84;--radius:12px;--shadow:0 2px 12px rgba(0,0,0,.06)}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--fg);line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(250,250,249,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{font-weight:700;font-size:1.05rem;letter-spacing:-.02em}
+.nav-links{display:flex;gap:1.5rem;font-size:.9rem}
+.nav-links a{color:var(--fg);opacity:.7;transition:opacity .2s}
+.nav-links a:hover{opacity:1;text-decoration:none}
+
+/* HERO */
+.hero{padding:8rem 2rem 5rem;text-align:center;max-width:720px;margin:0 auto}
+.hero h1{font-size:2.8rem;font-weight:800;letter-spacing:-.03em;line-height:1.2;margin-bottom:1.2rem}
+.hero h1 span{color:var(--accent)}
+.hero p{font-size:1.15rem;color:var(--muted);max-width:540px;margin:0 auto 2.5rem}
+.btn-primary{display:inline-block;background:var(--accent);color:#fff;padding:.85rem 2.4rem;border-radius:var(--radius);font-size:1.05rem;font-weight:600;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 16px rgba(212,56,13,.25)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(212,56,13,.35);text-decoration:none}
+.btn-secondary{display:inline-block;border:1.5px solid var(--border);color:var(--fg);padding:.7rem 1.8rem;border-radius:var(--radius);font-size:.95rem;margin-left:.8rem;transition:border-color .2s}
+.btn-secondary:hover{border-color:var(--accent);text-decoration:none}
+
+/* SECTIONS */
+section{padding:4.5rem 2rem}
+.section-inner{max-width:960px;margin:0 auto}
+.section-title{font-size:1.8rem;font-weight:700;letter-spacing:-.02em;margin-bottom:.6rem}
+.section-subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:2.5rem}
+
+/* FEATURES */
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem}
+.feature-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.8rem;box-shadow:var(--shadow)}
+.feature-icon{font-size:1.6rem;margin-bottom:.8rem}
+.feature-card h3{font-size:1.05rem;font-weight:700;margin-bottom:.5rem}
+.feature-card p{font-size:.9rem;color:var(--muted);line-height:1.6}
+
+/* DEMO */
+.demo-section{background:#f5f5f0}
+.demo-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:2.5rem;box-shadow:var(--shadow);max-width:720px;margin:0 auto}
+.demo-card .quote{font-size:1rem;line-height:1.8;color:var(--fg);margin-bottom:1.2rem;padding-left:1rem;border-left:3px solid var(--accent)}
+.demo-card .quote-src{font-size:.85rem;color:var(--muted);text-align:right}
+
+/* HOW IT WORKS */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.5rem;counter-reset:step}
+.step{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.8rem;box-shadow:var(--shadow);position:relative}
+.step::before{counter-increment:step;content:counter(step);display:block;width:32px;height:32px;background:var(--accent);color:#fff;border-radius:50%;font-weight:700;font-size:.9rem;line-height:32px;text-align:center;margin-bottom:1rem}
+.step h3{font-size:1rem;font-weight:700;margin-bottom:.4rem}
+.step p{font-size:.88rem;color:var(--muted);line-height:1.6}
+
+/* CTA */
+.cta-section{background:var(--accent-light);text-align:center}
+.cta-section h2{font-size:2rem;font-weight:800;margin-bottom:.8rem}
+.cta-section p{color:var(--muted);margin-bottom:2rem;font-size:1.05rem}
+
+/* FEEDBACK */
+.feedback-section{background:#f5f5f0}
+.feedback-form{max-width:600px;margin:0 auto;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:2.5rem;box-shadow:var(--shadow)}
+.form-group{margin-bottom:1.5rem}
+.form-group label{display:block;font-weight:600;font-size:.95rem;margin-bottom:.5rem}
+.form-group .hint{font-size:.82rem;color:var(--muted);margin-bottom:.5rem}
+.form-group select,.form-group textarea,.form-group input[type="text"]{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:.7rem 1rem;font-size:.95rem;font-family:inherit;background:var(--bg);transition:border-color .2s}
+.form-group select:focus,.form-group textarea:focus,.form-group input:focus{outline:none;border-color:var(--accent)}
+.form-group textarea{resize:vertical;min-height:100px}
+.stars{display:flex;gap:.3rem;font-size:1.8rem;cursor:pointer}
+.stars span{color:var(--border);transition:color .15s}
+.stars span.active{color:#faad14}
+.stars span:hover{color:#faad14}
+.btn-submit{background:var(--accent);color:#fff;border:none;padding:.8rem 2rem;border-radius:var(--radius);font-size:1rem;font-weight:600;cursor:pointer;transition:transform .15s}
+.btn-submit:hover{transform:translateY(-1px)}
+.btn-submit:active{transform:translateY(0)}
+.form-success{display:none;text-align:center;padding:2rem;color:var(--fg)}
+.form-success h3{font-size:1.2rem;margin-bottom:.5rem}
+.form-success p{color:var(--muted);font-size:.95rem}
+
+/* FOOTER */
+footer{text-align:center;padding:2.5rem 2rem;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border)}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .hero h1{font-size:2rem}
+  .hero{padding:6rem 1.5rem 3rem}
+  section{padding:3rem 1.5rem}
+  .nav{padding:0 1rem}
+  .btn-secondary{margin-left:0;margin-top:.8rem}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-brand">OPC 诊室</div>
+  <div class="nav-links">
+    <a href="#features">特色</a>
+    <a href="#demo">案例</a>
+    <a href="#how">流程</a>
+    <a href="#feedback">反馈</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>不哄你的 <span>AI 业务诊断</span></h1>
+  <p>专为一人与小微创业者设计。不说"正确但没用"的废话，只追你的真病因，给你做得到的行动项。</p>
+  <a href="index.html" class="btn-primary">开始诊断</a>
+  <a href="#demo" class="btn-secondary">看真实案例</a>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-inner">
+    <h2 class="section-title">它和通用 AI 有什么不同</h2>
+    <p class="section-subtitle">通用大模型给你"谁都能用"的建议。OPC 诊室只给你——基于你自己说出的事实——能动手的判断。</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>追病因，不追症状</h3>
+        <p>"没流量""转化低"是症状。它会一层层往下追，直到找到那个你一直在回避的真问题。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>钉事实，不套模板</h3>
+        <p>每一句结论都必须挂靠你说过的具体事实。换一个案主还成立的建议，它不说。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💡</div>
+        <h3>提假设，不无限问</h3>
+        <p>不会问个没完。收集够信号后，它会主动提出病因假设，请你验证或反驳。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>不迁就，不安慰</h3>
+        <p>它不会为了让对话舒服而放过逻辑漏洞。只攻击逻辑和事实，不攻击人。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section id="demo" class="demo-section">
+  <div class="section-inner">
+    <h2 class="section-title">真实诊断案例</h2>
+    <p class="section-subtitle">以下是 OPC 诊断官诊断它自己作者创业项目的真实对话节选。它没有因为对方是作者就留情。</p>
+    <div class="demo-card">
+      <div class="quote">
+        你把产品的价值，押在了大模型已经做得比你好、或一样好的两样东西上——"诊断结论"和"案例库"。而你手里唯一真正稀缺的资产——你本人现场追问、一眼看穿糊弄的能力——你不但没把它产品化，反而在用一个静态表单加一个公开案例库去替代它。这几周，你一直在精心打造你唯一护城河的劣质平替。
+      </div>
+      <div class="quote-src">—— OPC 诊断官对其作者的诊断结论</div>
+    </div>
+    <div style="text-align:center;margin-top:2rem">
+      <p style="color:var(--muted);font-size:.95rem">更多案例：
+        <a href="https://github.com/anthropics/courses/blob/master/prompt_engineering_interactive_tutorial/Anthropic%201P/07_Using_Examples_(Multishot_Prompting).ipynb" target="_blank" style="margin:0 .5rem">SaaS创业者诊断</a>·
+        <a href="#" style="margin:0 .5rem">独立电商站主诊断</a>·
+        <a href="#" style="margin:0 .5rem">内容创作者诊断</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-inner">
+    <h2 class="section-title">诊断流程</h2>
+    <p class="section-subtitle">通常 10-20 分钟完成一次完整诊断。你只需要说话，它来负责追问和整理。</p>
+    <div class="steps">
+      <div class="step">
+        <h3>你说情况</h3>
+        <p>描述你在做什么业务、卡在什么地方。越具体越好，但不需要完美。</p>
+      </div>
+      <div class="step">
+        <h3>它追问</h3>
+        <p>它会针对你的回答层层深入，一次只问最关键的一个问题，直到触达核心。</p>
+      </div>
+      <div class="step">
+        <h3>它提假设</h3>
+        <p>收集到足够信号后，它主动提出病因假设——请你确认、修正或反驳。</p>
+      </div>
+      <div class="step">
+        <h3>给行动项</h3>
+        <p>确诊后给出真病因 + 1-3 条行动项，每条具体到你看完整知道第一步做什么。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="section-inner">
+    <h2>准备好被真话打一顿了吗？</h2>
+    <p>免费的。不需要注册。打开就能聊。</p>
+    <a href="index.html" class="btn-primary">进入诊室</a>
+  </div>
+</section>
+
+<!-- FEEDBACK -->
+<section id="feedback" class="feedback-section">
+  <div class="section-inner">
+    <h2 class="section-title">你的反馈很重要</h2>
+    <p class="section-subtitle">用过之后，告诉我们哪里好、哪里烂。每一条真话都比一百条夸奖有用。</p>
+    <div class="feedback-form" id="feedbackForm">
+      <div class="form-group">
+        <label>你的角色</label>
+        <select id="fbRole">
+          <option value="">选择最接近的…</option>
+          <option value="solo">一人公司 / 自由职业</option>
+          <option value="small">小微创业者（≤10人）</option>
+          <option value="side">副业 / 兼职创业</option>
+          <option value="thinking">还在想，没开始做</option>
+          <option value="other">其他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>总体评分</label>
+        <div class="stars" id="starRating">
+          <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>它做对了什么？</label>
+        <div class="hint">哪些追问戳中了你？哪些结论让你觉得"确实是这样"？</div>
+        <textarea id="fbGood" placeholder="说具体的…"></textarea>
+      </div>
+      <div class="form-group">
+        <label>它哪里烂？</label>
+        <div class="hint">哪些话是废话？哪些追问方向不对？哪个环节让你想关掉？</div>
+        <textarea id="fbBad" placeholder="越直接越好…"></textarea>
+      </div>
+      <div class="form-group">
+        <label>联系方式（选填）</label>
+        <div class="hint">微信 / 邮箱，如果你想聊得更深</div>
+        <input type="text" id="fbContact" placeholder="选填">
+      </div>
+      <button class="btn-submit" onclick="submitFeedback()">提交反馈</button>
+    </div>
+    <div class="form-success" id="formSuccess">
+      <h3>反馈已复制到剪贴板</h3>
+      <p>请粘贴发送到我们的反馈群或私信。感谢你的真话。</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>OPC 诊室 v0.3 · 为一人公司与小微创业者而做 · <a href="index.html">开始诊断</a></p>
+</footer>
+
+<script>
+// Star rating
+const stars = document.querySelectorAll('#starRating span');
+let rating = 0;
+stars.forEach(s => {
+  s.addEventListener('click', () => {
+    rating = +s.dataset.v;
+    stars.forEach((ss, i) => ss.classList.toggle('active', i < rating));
+  });
+  s.addEventListener('mouseenter', () => {
+    const v = +s.dataset.v;
+    stars.forEach((ss, i) => { if(i < v) ss.style.color = '#faad14'; });
+  });
+  s.addEventListener('mouseleave', () => {
+    stars.forEach((ss, i) => { ss.style.color = i < rating ? '#faad14' : ''; });
+  });
+});
+
+// Submit feedback via clipboard
+function submitFeedback() {
+  const role = document.getElementById('fbRole').value || '未选择';
+  const good = document.getElementById('fbGood').value.trim();
+  const bad = document.getElementById('fbBad').value.trim();
+  const contact = document.getElementById('fbContact').value.trim();
+
+  if (!rating) { alert('请先打个分'); return; }
+  if (!good && !bad) { alert('至少说点什么——好的或烂的都行'); return; }
+
+  const text = [
+    '【OPC诊室反馈】',
+    `角色：${role}`,
+    `评分：${'★'.repeat(rating)}${'☆'.repeat(5-rating)}`,
+    good ? `做对了：${good}` : '',
+    bad ? `哪里烂：${bad}` : '',
+    contact ? `联系方式：${contact}` : '',
+    `时间：${new Date().toLocaleString('zh-CN')}`
+  ].filter(Boolean).join('\n');
+
+  navigator.clipboard.writeText(text).then(() => {
+    document.getElementById('feedbackForm').style.display = 'none';
+    document.getElementById('formSuccess').style.display = 'block';
+  }).catch(() => {
+    // Fallback: select text
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    document.getElementById('feedbackForm').style.display = 'none';
+    document.getElementById('formSuccess').style.display = 'block';
+  });
+}
+</script>
+</body>
+</html>

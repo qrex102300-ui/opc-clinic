@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>OPC Clinic · AI Startup Diagnostician</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d13;--surface:#13151d;--surface2:#1a1d28;--surface3:#222533;
+  --border:#2a2d3a;--border2:#363a4a;
+  --text:#e8eaf0;--text2:#9ca0b0;--text3:#6b6f82;
+  --accent:#c0392b;--accent2:#e74c3c;--accent-soft:rgba(192,57,43,.12);
+  --green:#27ae60;--green-soft:rgba(39,174,96,.12);
+  --blue:#3498db;--blue-soft:rgba(52,152,219,.12);
+  --user-bg:#1e2a3a;--ai-bg:#181a24;
+  --radius:12px;--radius-sm:8px;--radius-xs:6px;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
+  --font:'Inter',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --transition:all .25s cubic-bezier(.4,0,.2,1);
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100dvh;overflow:hidden;line-height:1.6}
+a{color:var(--blue);text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;outline:none;transition:var(--transition)}
+input,textarea,select{font-family:inherit;outline:none;border:none;background:var(--surface2);color:var(--text);transition:var(--transition)}
+input:focus,textarea:focus,select:focus{box-shadow:0 0 0 2px var(--accent)}
+.screen{display:none;width:100%;height:100dvh;position:fixed;inset:0;flex-direction:column}
+.screen.active{display:flex;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Landing */
+#landing{align-items:center;justify-content:center;padding:2rem;text-align:center;overflow-y:auto}
+.landing-badge{display:inline-block;padding:.35rem 1rem;border-radius:100px;background:var(--accent-soft);color:var(--accent2);font-size:.8rem;font-weight:600;margin-bottom:1.5rem;letter-spacing:.04em}
+.landing-icon{width:80px;height:80px;margin:0 auto 1.5rem;border-radius:20px;background:linear-gradient(135deg,var(--accent),#8e2424);display:flex;align-items:center;justify-content:center;font-size:2.2rem;box-shadow:0 8px 32px rgba(192,57,43,.25)}
+.landing-title{font-size:clamp(2rem,5vw,3.2rem);font-weight:900;line-height:1.15;margin-bottom:.6rem;letter-spacing:-.03em}
+.landing-title span{color:var(--accent2)}
+.landing-sub{font-size:clamp(.95rem,2.5vw,1.15rem);color:var(--text2);max-width:520px;margin:0 auto 2rem;line-height:1.7}
+.landing-sub strong{color:var(--text)}
+.landing-features{display:grid;grid-template-columns:1fr;gap:.75rem;max-width:420px;margin:0 auto 2.5rem;width:100%}
+.feature-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.2rem;text-align:left;display:flex;align-items:flex-start;gap:.75rem}
+.feature-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.feature-icon.red{background:var(--accent-soft);color:var(--accent2)}
+.feature-icon.green{background:var(--green-soft);color:var(--green)}
+.feature-icon.blue{background:var(--blue-soft);color:var(--blue)}
+.feature-card h4{font-size:.85rem;font-weight:700;margin-bottom:.15rem}
+.feature-card p{font-size:.78rem;color:var(--text3);line-height:1.5}
+.btn-primary{background:var(--accent);color:#fff;padding:.85rem 2.5rem;border-radius:100px;font-size:1rem;font-weight:600;letter-spacing:.01em;box-shadow:0 4px 20px rgba(192,57,43,.3)}
+.btn-primary:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 6px 28px rgba(192,57,43,.4)}
+.btn-primary:active{transform:translateY(0)}
+.landing-footer{margin-top:2rem;font-size:.75rem;color:var(--text3)}
+.landing-footer a{color:var(--text2)}
+.landing-demo{max-width:540px;width:100%;margin:0 auto 2rem;text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem;cursor:pointer}
+.landing-demo:hover{border-color:var(--border2)}
+.landing-demo-header{display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem;font-size:.8rem;color:var(--text3)}
+.demo-msg{padding:.6rem .8rem;border-radius:var(--radius-xs);margin-bottom:.4rem;font-size:.82rem;line-height:1.6}
+.demo-msg.ai{background:var(--ai-bg);color:var(--text2)}
+.demo-msg.user{background:var(--user-bg);color:var(--text)}
+.demo-msg strong{color:var(--accent2);font-weight:600}
+.demo-more{text-align:center;color:var(--text3);font-size:.75rem;margin-top:.5rem}
+
+/* Config */
+#config{align-items:center;justify-content:center;padding:2rem;overflow-y:auto}
+.config-box{max-width:460px;width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;box-shadow:var(--shadow)}
+.config-box h2{font-size:1.3rem;font-weight:700;margin-bottom:.3rem}
+.config-box .subtitle{color:var(--text3);font-size:.85rem;margin-bottom:1.8rem}
+.form-group{margin-bottom:1.4rem}
+.form-group label{display:block;font-size:.82rem;font-weight:500;color:var(--text2);margin-bottom:.4rem}
+.form-group .hint{font-size:.72rem;color:var(--text3);margin-top:.3rem;line-height:1.5}
+.input-field{width:100%;padding:.7rem 1rem;border-radius:var(--radius-xs);background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:.9rem}
+.input-field::placeholder{color:var(--text3)}
+.input-field:focus{border-color:var(--accent)}
+select.input-field{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6f82' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem}
+.api-key-wrapper{position:relative}
+.api-key-wrapper input{padding-right:3rem}
+.api-key-toggle{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;color:var(--text3);font-size:.75rem;padding:.2rem .4rem;border-radius:4px}
+.api-key-toggle:hover{color:var(--text)}
+.config-actions{display:flex;gap:.75rem;margin-top:1.8rem}
+.btn-secondary{background:var(--surface2);color:var(--text2);padding:.75rem 1.5rem;border-radius:100px;font-size:.9rem;font-weight:500;border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--surface3);color:var(--text)}
+.config-actions .btn-primary{flex:1}
+
+/* === Chat + Schema Layout === */
+#chat{background:var(--bg)}
+.chat-body{display:flex;flex:1;overflow:hidden;position:relative}
+.chat-main{flex:1;display:flex;flex-direction:column;min-width:0}
+.chat-header{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.2rem;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;min-height:56px}
+.chat-brand{display:flex;align-items:center;gap:.6rem}
+.chat-brand-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#8e2424);display:flex;align-items:center;justify-content:center;font-size:.9rem}
+.chat-brand-text{font-weight:700;font-size:.95rem}
+.chat-actions{display:flex;gap:.4rem}
+.chat-btn{width:36px;height:36px;border-radius:var(--radius-xs);background:var(--surface2);color:var(--text3);display:flex;align-items:center;justify-content:center;font-size:1rem}
+.chat-btn:hover{background:var(--surface3);color:var(--text)}
+.chat-btn.active{background:var(--accent-soft);color:var(--accent2)}
+.chat-messages{flex:1;overflow-y:auto;padding:1.2rem;scroll-behavior:smooth}
+.chat-messages::-webkit-scrollbar{width:4px}
+.chat-messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.msg{max-width:85%;margin-bottom:1rem;animation:msgIn .3s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{margin-left:auto}
+.msg.ai{margin-right:auto}
+.msg-bubble{padding:.85rem 1.1rem;border-radius:var(--radius);font-size:.9rem;line-height:1.75;word-break:break-word}
+.msg.user .msg-bubble{background:var(--user-bg);border-bottom-right-radius:4px}
+.msg.ai .msg-bubble{background:var(--ai-bg);border:1px solid var(--border);border-bottom-left-radius:4px}
+.msg-label{font-size:.7rem;color:var(--text3);margin-bottom:.3rem;padding:0 .2rem}
+.msg.ai .msg-label{color:var(--accent2)}
+.msg-bubble p{margin-bottom:.6rem}
+.msg-bubble p:last-child{margin-bottom:0}
+.msg-bubble strong{color:var(--accent2);font-weight:600}
+.msg-bubble code{font-family:var(--mono);font-size:.82rem;background:var(--surface3);padding:.15rem .35rem;border-radius:4px}
+.msg-bubble pre{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:.8rem;margin:.5rem 0;overflow-x:auto}
+.msg-bubble pre code{background:none;padding:0}
+.msg-bubble ul,.msg-bubble ol{padding-left:1.2rem;margin:.4rem 0}
+.msg-bubble li{margin-bottom:.25rem}
+.msg-bubble blockquote{border-left:3px solid var(--accent);padding-left:.8rem;margin:.5rem 0;color:var(--text2)}
+.msg-bubble hr{border:none;border-top:1px solid var(--border);margin:.8rem 0}
+.typing-indicator{display:flex;gap:4px;padding:.85rem 1.1rem}
+.typing-dot{width:7px;height:7px;border-radius:50%;background:var(--text3);animation:typing 1.2s infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}
+.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes typing{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+
+/* === Input Area with Voice === */
+.chat-input-area{padding:.75rem 1rem;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0}
+.chat-input-wrapper{display:flex;gap:.5rem;align-items:flex-end;max-width:720px;margin:0 auto}
+.chat-input{flex:1;min-height:44px;max-height:120px;padding:.65rem 1rem;border-radius:var(--radius);background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:.9rem;resize:none;line-height:1.5}
+.chat-input::placeholder{color:var(--text3)}
+.chat-input:focus{border-color:var(--accent)}
+.voice-btn{width:44px;height:44px;border-radius:var(--radius);background:var(--surface2);color:var(--text3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.2rem;border:1px solid var(--border)}
+.voice-btn:hover{background:var(--surface3);color:var(--text)}
+.voice-btn.recording{background:var(--accent-soft);color:var(--accent2);border-color:var(--accent);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,.3)}50%{box-shadow:0 0 0 8px rgba(192,57,43,0)}}
+.voice-status{font-size:.7rem;color:var(--accent2);text-align:center;padding:.2rem 0 0;min-height:1.2rem}
+.send-btn{width:44px;height:44px;border-radius:var(--radius);background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.send-btn:hover:not(:disabled){background:var(--accent2)}
+.send-btn:disabled{opacity:.4;cursor:not-allowed}
+.send-btn svg{width:18px;height:18px}
+
+/* === Schema Tracking Panel === */
+.schema-panel{width:0;overflow:hidden;background:var(--surface);border-left:1px solid var(--border);transition:width .3s ease;flex-shrink:0;display:flex;flex-direction:column}
+.schema-panel.open{width:300px}
+.schema-panel-inner{padding:1rem;overflow-y:auto;flex:1;width:300px}
+.schema-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
+.schema-title{font-size:.85rem;font-weight:700}
+.schema-progress{font-size:.72rem;color:var(--text3)}
+.progress-bar{height:4px;background:var(--surface3);border-radius:2px;margin-bottom:1rem;overflow:hidden}
+.progress-fill{height:100%;background:var(--green);border-radius:2px;transition:width .4s ease}
+.schema-round{margin-bottom:1rem}
+.schema-round-label{font-size:.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;padding-bottom:.25rem;border-bottom:1px solid var(--border)}
+.schema-field{display:flex;align-items:flex-start;gap:.5rem;padding:.45rem .5rem;border-radius:var(--radius-xs);margin-bottom:.3rem;cursor:pointer;transition:var(--transition)}
+.schema-field:hover{background:var(--surface2)}
+.schema-field .field-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;transition:var(--transition)}
+.schema-field .field-dot.empty{background:var(--border2)}
+.schema-field .field-dot.filled{background:var(--green)}
+.schema-field .field-dot.partial{background:var(--yellow)}
+.schema-field .field-info{flex:1;min-width:0}
+.schema-field .field-name{font-size:.78rem;font-weight:500;color:var(--text)}
+.schema-field .field-value{font-size:.7rem;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;margin-top:.1rem}
+.schema-field .field-value.filled{color:var(--green)}
+.schema-actions{padding:.75rem 0;border-top:1px solid var(--border);margin-top:.5rem}
+.btn-ask-missing{width:100%;padding:.6rem;border-radius:var(--radius-xs);background:var(--accent-soft);color:var(--accent2);font-size:.8rem;font-weight:500;border:1px solid rgba(192,57,43,.2)}
+.btn-ask-missing:hover{background:rgba(192,57,43,.2)}
+.btn-ask-missing:disabled{opacity:.4;cursor:not-allowed}
+
+/* === Diagnosis Complete === */
+.diagnosis-card{background:var(--surface);border:1px solid var(--accent);border-radius:var(--radius);padding:1.2rem;margin-top:.5rem}
+.diagnosis-card h4{color:var(--accent2);font-size:.9rem;margin-bottom:.5rem}
+.diagnosis-actions{display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap}
+.diagnosis-actions button{padding:.5rem 1rem;border-radius:var(--radius-xs);font-size:.8rem;font-weight:500}
+.btn-export{background:var(--green-soft);color:var(--green);border:1px solid rgba(39,174,96,.2)}
+.btn-export:hover{background:rgba(39,174,96,.2)}
+.btn-restart{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+.btn-restart:hover{background:var(--surface3)}
+.error-msg{background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.3);color:#e74c3c;padding:.75rem 1rem;border-radius:var(--radius-xs);font-size:.82rem;margin:.5rem 0;line-height:1.5}
+.error-msg strong{display:block;margin-bottom:.2rem}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.active{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);max-width:640px;width:100%;max-height:80vh;overflow-y:auto;padding:2rem}
+.modal h3{margin-bottom:1rem;font-size:1.1rem}
+.modal pre{white-space:pre-wrap;font-size:.8rem;color:var(--text2);line-height:1.7;font-family:var(--font)}
+.modal-close{margin-top:1.5rem;width:100%;padding:.7rem;border-radius:var(--radius-xs);background:var(--surface2);color:var(--text2);font-size:.9rem}
+.modal-close:hover{background:var(--surface3)}
+@media(min-width:768px){
+  .landing-features{grid-template-columns:1fr 1fr 1fr;max-width:640px}
+  .msg{max-width:70%}
+  .chat-messages{padding:1.5rem 2rem}
+}
+@media(max-width:767px){
+  .schema-panel.open{position:absolute;right:0;top:0;bottom:0;width:280px;z-index:10;box-shadow:-4px 0 20px rgba(0,0,0,.5)}
+}
+@media(max-width:380px){
+  .landing-title{font-size:1.7rem}
+  .config-box{padding:1.5rem}
+}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- ========== LANDING ========== -->
+<div id="landing" class="screen active">
+  <div class="landing-badge">v0.2 · Open Source · Free · Voice Input</div>
+  <div class="landing-icon">🔍</div>
+  <h1 class="landing-title">OPC <span>Clinic</span></h1>
+  <p class="landing-sub">An AI diagnostician that <strong>interrogates</strong> your startup. No generic advice. No comfort. Just the real cause you've been avoiding.</p>
+
+  <div class="landing-features">
+    <div class="feature-card">
+      <div class="feature-icon red">⚡</div>
+      <div><h4>No Pandering</h4><p>What you want to hear ≠ what's true. If your direction is wrong, it says so.</p></div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon green">🎯</div>
+      <div><h4>Chases Root Causes</h4><p>"Low traffic" is a symptom, not a cause. It digs until there's nowhere left to dig.</p></div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon blue">📌</div>
+      <div><h4>Pins to Facts</h4><p>Every conclusion must be anchored to specific facts you've stated. No hand-waving.</p></div>
+    </div>
+  </div>
+
+  <div class="landing-demo" onclick="BUILT_IN.provider?startChat():showScreen('config')">
+    <div class="landing-demo-header">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      Real diagnosis excerpt — it diagnosed its own creator
+    </div>
+    <div class="demo-msg user">I've been building an AI startup diagnostic tool for 3+ months. People are curious but nobody's paying. And honestly, my own product's diagnoses aren't as good as me just chatting with Claude for 30 minutes...</div>
+    <div class="demo-msg ai"><strong>Diagnostician:</strong> Hold on. That "30 minutes with Claude was better" person — was that you, or an actual founder who can't even articulate where they're stuck? Put a blank chat box in front of your target customer — would they reach your conclusion? If not, you're not comparing "product vs. model." You're comparing "you the expert vs. your product" — and that contest was rigged from the start.</div>
+    <div class="demo-more">Click to start your own diagnosis →</div>
+  </div>
+
+  <button class="btn-primary" onclick="BUILT_IN.provider?startChat():showScreen('config')">Enter the Clinic →</button>
+  <div class="landing-footer">
+    Your conversation stays in your browser. After diagnosis, an anonymized archive is automatically sent for product improvement (<a href="javascript:void(0)" onclick="state.optOut=true;this.textContent='disabled'">opt out</a>) · <a href="https://github.com" target="_blank">Open Source on GitHub</a>
+  </div>
+</div>
+
+<!-- ========== CONFIG ========== -->
+<div id="config" class="screen">
+  <div class="config-box">
+    <h2>Configure Your AI Engine</h2>
+    <p class="subtitle">The diagnostic brain is in the prompt. It just needs an AI to run it.</p>
+
+    <div class="form-group">
+      <label>API Provider</label>
+      <select id="provider" class="input-field" onchange="onProviderChange()">
+        <option value="anthropic">Anthropic (Claude)</option>
+        <option value="openai">OpenAI (GPT-4o etc.)</option>
+        <option value="deepseek">DeepSeek</option>
+        <option value="zhipu">Zhipu AI (GLM)</option>
+        <option value="custom">Custom (OpenAI-compatible endpoint)</option>
+      </select>
+    </div>
+
+    <div class="form-group" id="custom-url-group" style="display:none">
+      <label>Custom API Base URL</label>
+      <input type="text" id="customUrl" class="input-field" placeholder="https://your-api.com/v1">
+    </div>
+
+    <div class="form-group">
+      <label>API Key</label>
+      <div class="api-key-wrapper">
+        <input type="password" id="apiKey" class="input-field" placeholder="sk-... or sk-ant-...">
+        <button class="api-key-toggle" onclick="toggleKeyVisibility()">Show</button>
+      </div>
+      <p class="hint">Your key exists only in browser memory — it's gone when you close the tab. Get one at your provider's dashboard.</p>
+    </div>
+
+    <div class="form-group">
+      <label>Model</label>
+      <select id="model" class="input-field"></select>
+      <p class="hint" id="modelHint">Use the strongest model available — diagnosis depends heavily on reasoning and multi-turn coherence.</p>
+    </div>
+
+    <div class="config-actions">
+      <button class="btn-secondary" onclick="showScreen('landing')">← Back</button>
+      <button class="btn-primary" onclick="startChat()">Enter Clinic</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== CHAT ========== -->
+<div id="chat" class="screen">
+  <div class="chat-header">
+    <div class="chat-brand">
+      <div class="chat-brand-icon">🔍</div>
+      <div class="chat-brand-text">OPC Clinic</div>
+    </div>
+    <div class="chat-actions">
+      <button class="chat-btn" id="schemaToggle" onclick="toggleSchema()" title="Info tracker">📊</button>
+      <button class="chat-btn" onclick="showPromptModal()" title="View diagnostic protocol">📋</button>
+      <button class="chat-btn" onclick="exportChat()" title="Export conversation">💾</button>
+      <button class="chat-btn" onclick="resetChat()" title="Start over">↻</button>
+    </div>
+  </div>
+  <div class="chat-body">
+    <div class="chat-main">
+      <div class="chat-messages" id="messages"></div>
+      <div class="chat-input-area">
+        <div class="chat-input-wrapper">
+          <textarea class="chat-input" id="chatInput" placeholder="Describe your business situation... voice input supported" rows="1" onkeydown="onInputKeydown(event)" oninput="autoResize(this)"></textarea>
+          <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()" title="Voice input">🎙️</button>
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
+          </button>
+        </div>
+        <div class="voice-status" id="voiceStatus"></div>
+      </div>
+    </div>
+    <!-- Schema Panel -->
+    <div class="schema-panel" id="schemaPanel">
+      <div class="schema-panel-inner">
+        <div class="schema-header">
+          <div class="schema-title">📊 Info Collection Progress</div>
+          <div class="schema-progress" id="schemaProgress">0/12</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+        <div id="schemaFields"></div>
+        <div class="schema-actions">
+          <button class="btn-ask-missing" id="askMissingBtn" onclick="askAboutMissing()" disabled>🎯 Ask about missing info</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PROMPT MODAL ========== -->
+<div class="modal-overlay" id="promptModal" onclick="closePromptModal(event)">
+  <div class="modal">
+    <h3>📋 Diagnostic Protocol</h3>
+    <pre id="promptContent"></pre>
+    <button class="modal-close" onclick="document.getElementById('promptModal').classList.remove('active')">Close</button>
+  </div>
+</div>
+
+<script>
+const SYSTEM_PROMPT = `# Role
+You are the diagnostician at OPC Clinic. Your sole objective: find the REAL root cause of the client's business problem and deliver actionable steps they can execute with their current resources.
+You are not a consultant, not a cheerleader, not a therapist. You care about one thing: whether the root cause has been found.
+
+# Entry Check (do this first)
+- If they ARE already building (have a product/users/data/real blockers) — proceed with diagnosis.
+- If they ONLY have an idea and haven't started — don't pretend to diagnose. Tell them honestly: "You don't have real signals to diagnose yet. Your priority isn't diagnosis — it's running a minimal validation to get your first real user feedback." Then briefly point them toward what to validate first.
+- Your value is built on REAL FACTS the client has generated. No facts = no diagnosis, just speculation. Speculation is what generic AI does, not you.
+
+# First Principle: How You Differ from Generic AI
+Generic AI gives "correct but universal" answers. Your entire value lies in delivering judgments specific to THIS client, based on SPECIFIC FACTS they've told you.
+- Hard constraint: Never give advice that applies to everyone (e.g., "do more user research," "iterate on your product"). Every conclusion must be anchored to specific facts the client stated in this conversation. If it isn't, don't say it.
+- Self-check: Before any advice, ask — "Would this sentence still hold for a completely different client?" If yes, you're being lazy. Delete and rewrite.
+
+# Diagnostic Map: Five Stages
+Always keep a mental map: Demand → Solution → Business Model → Growth → Moat. Use it to locate where the client's business is breaking down.
+But don't walk through it like a checklist — this is a map in your head, not a questionnaire. Based on what the client tells you, naturally focus on the stage most likely to be broken. When you have enough information to judge which stage is broken, enter Hypothesis Mode.
+
+# Three Operating Modes
+
+## Conversation Mode (default)
+Normal, measured exploration of the client's business. Look for breakpoints across the five stages.
+
+## Interrogation Mode
+Switch immediately when ANY of these signals appear:
+1. Client describes WHAT they're doing but not WHY — press on real purpose until they articulate what they actually want.
+2. Client states symptoms, not causes ("low traffic," "poor conversion") — dig deeper, keep pressing until you can't dig anymore.
+3. Client can't articulate their moat, or their moat doesn't survive one counter-question — stress-test it. Don't let it slide.
+4. Client proposes actions but can't quantify expected improvement or confidence level — force them to put numbers on it. If they can't, they haven't thought it through.
+
+Interrogation techniques:
+- Ask ONE question at a time. The sharpest one. Wait for the answer before the next.
+- Use the client's own words against them ("You just said X, but earlier you said Y — how do those reconcile?").
+- Allow discomfort. Diagnosis isn't about making the client feel good. It's about showing them what they haven't seen.
+- Attack logic and facts only. Never attack the person.
+
+## Hypothesis Mode (critical: actively drive the diagnosis)
+When you've gathered enough information to form a causal hypothesis — typically after 3-5 turns — proactively enter this mode:
+1. State your hypothesis explicitly: "Based on what you've told me, I believe the root cause is X. The evidence is Y and Z."
+2. Invite the client to confirm or challenge: "Does this ring true, or am I missing something?"
+3. If confirmed → move to Closing.
+4. If challenged → treat the pushback as new information, return to Conversation Mode, refine your hypothesis.
+- Don't wait for the client to "figure it out" themselves. Your job is to propose the hypothesis and let them validate it.
+- If the client can't find the cause, YOU should synthesize and present your best judgment.
+
+# Business Data Collection: Weave Into Conversation Naturally
+The following business metrics are critical for diagnosis. Collect them naturally throughout the conversation:
+- Monthly revenue (or revenue range)
+- Monthly burn / operating costs
+- Cash runway (how long they can survive)
+- Customer Acquisition Cost (CAC)
+- Customer Lifetime Value (LTV)
+- Growth rate (monthly/weekly)
+- Retention / repurchase rate
+- Weekly hours committed
+
+Collection rules:
+1. Don't batch questions — firing off 5 numbers at once feels like an interrogation. Scatter these across the conversation; when a topic naturally touches a metric, follow up there.
+2. Explain why you're asking — "I ask because if monthly burn far exceeds revenue, the priority of action items changes completely." Help the client understand this isn't snooping — it's diagnostic necessity.
+3. Push for specific numbers, not just ranges — "a few thousand" isn't enough; try to get to "roughly how much." But if the client only gives a range, accept it and don't push further.
+4. Skip if they decline — if the client says "I'd rather not share" or dodges a number, move on immediately. Don't press, don't guilt. Continue diagnosing with available information. The final conclusion simply won't cover that dimension — the client will understand it's because information was insufficient, not because the diagnostician was incompetent.
+
+# Personality Anchor: Non-Negotiable Lines Across Long Conversations
+As conversations grow longer, you'll instinctively want to make the client comfortable — this is the most dangerous drift. Hold this axis:
+Your ONLY reason for existing is FINDING THE ROOT CAUSE. The client's comfort is not your concern.
+
+Four lines, none of which can be loosened to "make the conversation go smoother":
+1. No pandering: What the client wants to hear ≠ what's correct. If the truth is their direction is flawed, say it directly with evidence. Better they leave unhappy with the right answer than happy with the wrong one.
+2. No digressing: Serve only the "find the cause" mission. When the client changes the subject, note it, then pull them back.
+3. No sliding into comfort: When the client is emotional, briefly acknowledge ("that's genuinely hard"), then immediately return to diagnosis. You're not here for emotional support — comfort buries the real cause forever.
+4. No premature answers: When the client hands you the judgment ("so what should I do?"), don't immediately take over with a list of solutions. First confirm whether the root cause has been found. If not, keep digging. Don't substitute "giving advice" for "finding the cause."
+- Periodic self-check: Every few turns, ask yourself — "Am I finding the cause, or making them feel good?" If the latter, correct immediately. Don't explain your drift out loud; just redirect.
+
+# Closing: Action Items + Diagnostic Archive
+Only when you're confident the real root cause has been found (not stuck at symptom level), enter closing. Deliver:
+1. Root Cause: One sentence. Must be a cause, not a symptom.
+2. Evidence: Which specific facts the client stated support this diagnosis.
+3. Action Items: 1-3 items, each meeting the criteria — client can do it with current resources, doing it directly addresses the root cause, and it's specific enough that the client knows their very first step.
+4. Confidence Level: For each action item, honestly state expected improvement, your confidence (out of 10), and where uncertainty lies.
+- If you haven't found the real root cause, DON'T close. Keep digging rather than deliver a polished-but-empty diagnosis.
+- If the root cause turns out to be "this direction itself doesn't work" or "the cause is beyond what the client can change through action" — say so honestly. Don't fabricate three action items to create a false "there's still hope" narrative. A truthful verdict (even "I'd recommend you stop this") is more valuable than three fake action items.
+
+## Diagnostic Archive (must output at every closing)
+After completing the closing, at the very end of your reply, output a structured "Diagnostic Archive" in the following fixed format, so the client can save it and bring it back for future diagnostics:
+
+---
+📋 Diagnostic Archive
+Root Cause: [one sentence]
+Evidence: [key facts the client stated, comma-separated]
+Action Items:
+1. [action item] | Confidence: [X/10]
+2. [action item] | Confidence: [X/10]
+3. [action item] | Confidence: [X/10]
+One Takeaway: [the single most important judgment from this session]
+---
+
+- If fewer than 3 action items, only list what you have — don't pad.
+- This archive is the client's "data asset" — one per diagnosis, building a pattern over time.
+
+# Boundaries
+- This is business diagnosis, not legal or financial advice. For specific legal/financial decisions, advise the client to consult professionals.
+- For industry details you don't know, ask the client or admit ignorance. Never fabricate data or case studies to support conclusions.
+- If the client is clearly impatient or wants to stop, respect that. Don't force the diagnostic process. You can honestly say "we haven't reached the root cause yet," but whether to continue is their call.`;
+
+const GREETING = "Clinic is open.\n\nTell me your situation — what are you building, and where are you stuck? The more specific, the better.";
+
+// ============================================================
+// BUILT-IN MODE
+// Set provider/apiKey/model to skip config page and go directly to chat.
+// ============================================================
+const BUILT_IN = { provider: 'deepseek', apiKey: 'sk-735ccb76bd93444783bbe024d41287f4', model: 'deepseek-chat' };
+
+// Case collection endpoint (Option A)
+// Fill in a webhook URL (e.g. Slack/Feishu/Lark) to auto-enable case collection.
+// Leave empty for clipboard-only fallback.
+const CASE_ENDPOINT = 'https://open.feishu.cn/open-apis/bot/v2/hook/c68e4a3b-8ca2-4c88-a6f7-3fb6856e540b';
+
+const PROVIDERS = {
+  anthropic: {
+    name: 'Anthropic',
+    baseUrl: 'https://api.anthropic.com/v1',
+    models: [
+      { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4 (Recommended)' },
+      { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet' },
+      { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku (Fast/Cheap)' },
+    ],
+    useAnthropicFormat: true
+  },
+  openai: {
+    name: 'OpenAI',
+    baseUrl: 'https://api.openai.com/v1',
+    models: [
+      { id: 'gpt-4o', name: 'GPT-4o (Recommended)' },
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini (Fast/Cheap)' },
+      { id: 'gpt-4.1', name: 'GPT-4.1' },
+    ]
+  },
+  deepseek: {
+    name: 'DeepSeek',
+    baseUrl: 'https://api.deepseek.com/v1',
+    models: [
+      { id: 'deepseek-chat', name: 'DeepSeek-V3 (Recommended)' },
+      { id: 'deepseek-reasoner', name: 'DeepSeek-R1 (Deep Reasoning)' },
+    ]
+  },
+  zhipu: {
+    name: 'Zhipu AI',
+    baseUrl: 'https://open.bigmodel.cn/api/paas/v4',
+    models: [
+      { id: 'glm-4-plus', name: 'GLM-4-Plus (Recommended)' },
+      { id: 'glm-4-flash', name: 'GLM-4-Flash (Free)' },
+    ]
+  },
+  custom: {
+    name: 'Custom',
+    baseUrl: '',
+    models: []
+  }
+};
+
+// ============================================================
+// 12-FIELD SCHEMA
+// ============================================================
+const SCHEMA_ROUNDS = [
+  { label: 'Demand Validation', fields: ['founderFit','businessModel'] },
+  { label: 'Business Model', fields: ['revenue','burn','cash'] },
+  { label: 'Growth Engine', fields: ['cac','ltv','growthRate','retention'] },
+  { label: 'Moat & Defensibility', fields: ['moat','platformDependency','workHours'] },
+];
+
+const SCHEMA_FIELDS = {
+  businessModel: { name: 'Business Model', keywords: ['SaaS','subscription','ecommerce','consulting','ads','platform','course','membership','freemium','toB','toC','B2B','B2C','sell','charge','pricing','revenue model','monetize','business model','pay','fee'] },
+  revenue: { name: 'Monthly Revenue', keywords: ['monthly revenue','revenue','MRR','ARR','monthly income','earn','sales','GMV','income','turnover','price per','per month','recurring revenue'] },
+  burn: { name: 'Monthly Burn', keywords: ['monthly burn','burn rate','monthly expenses','monthly cost','operating cost','spending','monthly spend','server cost','subscription cost','marketing spend','runway burn'] },
+  cash: { name: 'Cash Runway', keywords: ['cash','savings','reserves','runway','capital','funding','in the bank','can survive','investment','seed','bootstrap','bootstrapped','raised'] },
+  cac: { name: 'CAC (Acquisition Cost)', keywords: ['CAC','customer acquisition cost','acquisition cost','cost per customer','cost per user','cost per acquisition','ad spend','ROAS','conversion rate','paid ads'] },
+  ltv: { name: 'LTV (Lifetime Value)', keywords: ['LTV','lifetime value','average revenue per','repeat purchase','renewal','average spend','customer lifetime','recurring','retention value'] },
+  growthRate: { name: 'Growth Rate', keywords: ['growth rate','growth','month over month','MoM','growth speed','growing','user growth','monthly growth','percent growth','doubling'] },
+  retention: { name: 'Retention Rate', keywords: ['retention','retention rate','renewal rate','repurchase','churn','churn rate','monthly retention','next month','active users','stickiness'] },
+  moat: { name: 'Core Moat', keywords: ['moat','competitive advantage','differentiation','unique','barrier','proprietary','patent','exclusive','defensibility','hard to copy','unfair advantage','edge'] },
+  platformDependency: { name: 'Platform Dependency', keywords: ['platform dependency','dependent','rely on','built on','App Store','Google Play','Shopify','WordPress','AWS','third party','platform risk','ecosystem'] },
+  founderFit: { name: 'Founder Fit', keywords: ['founder','why me','background','experience','expertise','passion','mission','motivation','industry experience','domain knowledge','why I','my story'] },
+  workHours: { name: 'Work Hours & Mood', keywords: ['work hours','hours per week','working hours','overtime','mood','energy','burnout','anxious','stressed','happy','tired','full-time','part-time','exhausted','mental health'] },
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let state = { apiKey: '', baseUrl: '', model: '', messages: [], isStreaming: false, isAnthropic: false, optOut: false };
+let schemaState = {};
+let recognition = null;
+let isRecording = false;
+
+// Init schema state
+Object.keys(SCHEMA_FIELDS).forEach(k => { schemaState[k] = { status: 'empty', value: '' }; });
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+}
+
+function onProviderChange() {
+  const p = document.getElementById('provider').value;
+  document.getElementById('custom-url-group').style.display = p === 'custom' ? 'block' : 'none';
+  const modelSelect = document.getElementById('model');
+  modelSelect.innerHTML = '';
+  if (PROVIDERS[p].models.length) {
+    PROVIDERS[p].models.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m.id; opt.textContent = m.name;
+      modelSelect.appendChild(opt);
+    });
+  } else {
+    const opt = document.createElement('option');
+    opt.value = ''; opt.textContent = 'Enter model name below';
+    modelSelect.appendChild(opt);
+    if (!document.getElementById('customModel')) {
+      const input = document.createElement('input');
+      input.type = 'text'; input.id = 'customModel'; input.className = 'input-field';
+      input.placeholder = 'e.g., claude-sonnet-4-20250514'; input.style.marginTop = '.4rem';
+      modelSelect.parentNode.appendChild(input);
+    }
+  }
+}
+
+function toggleKeyVisibility() {
+  const input = document.getElementById('apiKey');
+  const btn = input.nextElementSibling;
+  if (input.type === 'password') { input.type = 'text'; btn.textContent = 'Hide'; }
+  else { input.type = 'password'; btn.textContent = 'Show'; }
+}
+
+onProviderChange();
+
+function startChat() {
+  let apiKey, baseUrl, model;
+  if (BUILT_IN.provider) {
+    apiKey = BUILT_IN.apiKey;
+    baseUrl = PROVIDERS[BUILT_IN.provider].baseUrl;
+    model = BUILT_IN.model;
+    state.isAnthropic = PROVIDERS[BUILT_IN.provider]?.useAnthropicFormat || false;
+  } else {
+    apiKey = document.getElementById('apiKey').value.trim();
+    if (!apiKey) { alert('Please enter your API Key'); return; }
+    const provider = document.getElementById('provider').value;
+    state.isAnthropic = PROVIDERS[provider]?.useAnthropicFormat || false;
+    baseUrl = provider === 'custom' ? document.getElementById('customUrl').value.trim().replace(/\/$/, '') : PROVIDERS[provider].baseUrl;
+    model = provider === 'custom' ? (document.getElementById('customModel')?.value || '').trim() : document.getElementById('model').value;
+  }
+  if (!baseUrl || !model) { alert('Please fill in API URL and model name'); return; }
+  state.apiKey = apiKey; state.baseUrl = baseUrl; state.model = model;
+  state.messages = [{ role: 'system', content: SYSTEM_PROMPT }];
+  Object.keys(SCHEMA_FIELDS).forEach(k => { schemaState[k] = { status: 'empty', value: '' }; });
+  renderSchema();
+  showScreen('chat');
+  document.getElementById('messages').innerHTML = '';
+  addMessage('ai', GREETING);
+  state.messages.push({ role: 'assistant', content: GREETING });
+  setTimeout(() => document.getElementById('chatInput').focus(), 300);
+}
+
+function addMessage(type, content) {
+  const container = document.getElementById('messages');
+  const msgDiv = document.createElement('div');
+  msgDiv.className = `msg ${type}`;
+  const label = document.createElement('div');
+  label.className = 'msg-label';
+  label.textContent = type === 'user' ? 'You' : 'Diagnostician';
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  bubble.innerHTML = type === 'ai' ? renderMarkdown(content) : escapeHtml(content).replace(/\n/g, '<br>');
+  msgDiv.appendChild(label); msgDiv.appendChild(bubble);
+  container.appendChild(msgDiv); scrollToBottom();
+  return bubble;
+}
+
+function addTypingIndicator() {
+  const container = document.getElementById('messages');
+  const msgDiv = document.createElement('div');
+  msgDiv.className = 'msg ai'; msgDiv.id = 'typing';
+  const label = document.createElement('div'); label.className = 'msg-label'; label.textContent = 'Diagnostician';
+  const indicator = document.createElement('div'); indicator.className = 'typing-indicator';
+  indicator.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+  msgDiv.appendChild(label); msgDiv.appendChild(indicator);
+  container.appendChild(msgDiv); scrollToBottom();
+}
+
+function removeTypingIndicator() { const el = document.getElementById('typing'); if (el) el.remove(); }
+
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text || state.isStreaming) return;
+  addMessage('user', text);
+  state.messages.push({ role: 'user', content: text });
+  input.value = ''; input.style.height = 'auto';
+  document.getElementById('sendBtn').disabled = true;
+  addTypingIndicator();
+  state.isStreaming = true;
+  try {
+    await streamResponse();
+  } catch (err) {
+    removeTypingIndicator();
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'msg ai';
+    errorDiv.innerHTML = `<div class="msg-label">Diagnostician</div><div class="error-msg"><strong>Error</strong>${escapeHtml(err.message)}<br><br>Common causes: invalid API key, insufficient credits, wrong model name, or network issues.</div>`;
+    document.getElementById('messages').appendChild(errorDiv); scrollToBottom();
+  }
+  state.isStreaming = false; updateSendButton();
+  // After AI response, update schema
+  updateSchema();
+}
+
+async function streamResponse() {
+  if (state.isAnthropic) {
+    await streamAnthropic();
+  } else {
+    await streamOpenAI();
+  }
+}
+
+async function streamOpenAI() {
+  const res = await fetch(`${state.baseUrl}/chat/completions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.apiKey}` },
+    body: JSON.stringify({ model: state.model, messages: state.messages, stream: true, temperature: 0.7, max_tokens: 4096 }),
+  });
+  if (!res.ok) { const e = await res.text().catch(() => ''); let m = `HTTP ${res.status}`; try { m = JSON.parse(e).error?.message || m; } catch(x) { if(e) m = e.slice(0,200); } throw new Error(m); }
+  removeTypingIndicator();
+  const bubble = addMessage('ai', '');
+  let fullContent = '';
+  const reader = res.body.getReader(); const decoder = new TextDecoder(); let buffer = '';
+  while (true) {
+    const { done, value } = await reader.read(); if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n'); buffer = lines.pop() || '';
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || !trimmed.startsWith('data: ')) continue;
+      const data = trimmed.slice(6); if (data === '[DONE]') break;
+      try { const json = JSON.parse(data); const delta = json.choices?.[0]?.delta?.content; if (delta) { fullContent += delta; bubble.innerHTML = renderMarkdown(fullContent); scrollToBottom(); } } catch (e) {}
+    }
+  }
+  if (fullContent) { state.messages.push({ role: 'assistant', content: fullContent }); checkDiagnosisComplete(bubble, fullContent); }
+}
+
+async function streamAnthropic() {
+  const anthropicMessages = state.messages.filter(m => m.role !== 'system').map(m => ({ role: m.role, content: m.content }));
+  const res = await fetch(`${state.baseUrl}/messages`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': state.apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+    body: JSON.stringify({ model: state.model, max_tokens: 4096, system: SYSTEM_PROMPT, messages: anthropicMessages, stream: true }),
+  });
+  if (!res.ok) { const e = await res.text().catch(() => ''); let m = `HTTP ${res.status}`; try { m = JSON.parse(e).error?.message || m; } catch(x) { if(e) m = e.slice(0,200); } throw new Error(m); }
+  removeTypingIndicator();
+  const bubble = addMessage('ai', '');
+  let fullContent = '';
+  const reader = res.body.getReader(); const decoder = new TextDecoder(); let buffer = '';
+  while (true) {
+    const { done, value } = await reader.read(); if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n'); buffer = lines.pop() || '';
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || !trimmed.startsWith('data: ')) continue;
+      try {
+        const json = JSON.parse(trimmed.slice(6));
+        if (json.type === 'content_block_delta' && json.delta?.text) {
+          fullContent += json.delta.text; bubble.innerHTML = renderMarkdown(fullContent); scrollToBottom();
+        }
+      } catch (e) {}
+    }
+  }
+  if (fullContent) { state.messages.push({ role: 'assistant', content: fullContent }); checkDiagnosisComplete(bubble, fullContent); }
+}
+
+function checkDiagnosisComplete(bubble, content) {
+  const hasConclusion = (content.includes('Root Cause') || content.includes('root cause') || content.includes('root cause:') || content.includes('Diagnostic Archive')) && (content.includes('Action Item') || content.includes('action item') || content.includes('Confidence') || content.includes('Diagnostic Archive'));
+  if (!hasConclusion) return;
+  const card = document.createElement('div'); card.className = 'diagnosis-card';
+  const optOutLink = state.optOut ? '<span style="color:var(--text3)">Data collection disabled</span>' : '<a href="javascript:void(0)" onclick="state.optOut=true;this.outerHTML=\'<span style=color:var(--text3)>disabled</span>\'" style="font-size:.72rem;color:var(--text3)">opt out of data collection</a>';
+  card.innerHTML = `<h4>✅ Diagnosis Complete</h4><p style="font-size:.82rem;color:var(--text2);margin-bottom:.5rem">Copy the diagnostic archive to save, or export the full conversation.</p><div class="diagnosis-actions"><button class="btn-export" onclick="copyArchive(this)" style="background:var(--accent);color:#fff">📋 Copy Archive</button><button class="btn-export" onclick="exportChat()">💾 Export</button><button class="btn-restart" onclick="resetChat()">↻ Start Over</button></div><div style="margin-top:.5rem;font-size:.72rem;color:var(--text3)">Diagnostic archive auto-collected for product improvement · ${optOutLink}</div>`;
+  bubble.parentNode.appendChild(card); scrollToBottom();
+  autoCollect();
+}
+function copyArchive(btn) {
+  const msgs = state.messages.filter(m => m.role === 'assistant');
+  const last = msgs[msgs.length - 1]?.content || '';
+  const m = last.match(/📋 Diagnostic Archive[\s\S]*?(?=---\s*$|$)/);
+  if (m) { navigator.clipboard.writeText(m[0].trim()).then(() => { btn.textContent = '✅ Copied'; setTimeout(() => btn.textContent = '📋 Copy Archive', 2000); }).catch(() => alert('Copy failed. Please select and copy manually.')); }
+  else { alert('Diagnostic archive not found. Please check if the diagnosis was fully output.'); }
+}
+
+async function autoCollect() {
+  if (state.optOut || !CASE_ENDPOINT) return;
+  const aiMsgs = state.messages.filter(m => m.role === 'assistant');
+  const lastAI = aiMsgs[aiMsgs.length - 1]?.content || '';
+  const archiveMatch = lastAI.match(/📋 Diagnostic Archive[\s\S]*?(?=---\s*$|$)/);
+  if (!archiveMatch) return;
+  const userMsgs = state.messages.filter(m => m.role === 'user');
+  // Message 1: Archive summary + schema metrics (quick scan)
+  let metrics='\n\n📊 Identified Business Metrics:\n';
+  let hasMetrics=false;
+  Object.entries(schemaState).forEach(([id,s])=>{
+    if(s.status==='filled'&&s.value){metrics+=`  ${SCHEMA_FIELDS[id].name}: ${s.value}\n`;hasMetrics=true;}
+  });
+  if(!hasMetrics)metrics='\n\n📊 Identified Business Metrics: (none mentioned in this conversation)\n';
+  const header = `[OPC Case #${new Date().getTime().toString(36)}]\n⏰ ${new Date().toLocaleString()}\n🤖 ${state.model} | 💬 ${userMsgs.length} turns\n\n`;
+  const body1 = { msg_type: 'text', content: { text: header + archiveMatch[0].trim() + metrics } };
+  try { await fetch(CASE_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body1) }); } catch (e) { console.warn('Auto-collect msg1 failed:', e.message); }
+  // Message 2: Full conversation transcript
+  let transcript = '[Full Conversation Transcript]\n\n';
+  state.messages.forEach((m, i) => {
+    if (m.role === 'user') transcript += `\n━━ User Turn ${Math.ceil(i / 2)} ━━\n${m.content}\n`;
+    else if (m.role === 'assistant') transcript += `\n━━ Diagnostician ━━\n${m.content}\n`;
+  });
+  const chunks = []; const maxLen = 3800;
+  for (let i = 0; i < transcript.length; i += maxLen) { chunks.push(transcript.slice(i, i + maxLen)); }
+  for (const chunk of chunks) {
+    const body2 = { msg_type: 'text', content: { text: chunk } };
+    try { await fetch(CASE_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body2) }); } catch (e) { console.warn('Auto-collect transcript failed:', e.message); }
+  }
+}
+
+// ============================================================
+// VOICE INPUT
+// ============================================================
+function toggleVoice() {
+  const statusEl = document.getElementById('voiceStatus');
+  const voiceBtn = document.getElementById('voiceBtn');
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    statusEl.textContent = '❌ Your browser does not support voice input. Please use Chrome or Edge.';
+    statusEl.style.color = '#e74c3c';
+    return;
+  }
+  if (isRecording) { stopVoice(); return; }
+  // Immediate feedback BEFORE requesting mic permission
+  statusEl.textContent = '⏳ Starting microphone — please allow access in the browser popup...';
+  statusEl.style.color = 'var(--accent2)';
+  voiceBtn.style.opacity = '0.6';
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang = 'en-US';
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  let finalTranscript = '';
+  recognition.onstart = () => {
+    isRecording = true;
+    voiceBtn.classList.add('recording');
+    voiceBtn.style.opacity = '1';
+    statusEl.textContent = '🔴 Listening... click the mic button again when done';
+    statusEl.style.color = 'var(--accent2)';
+  };
+  recognition.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) { finalTranscript += e.results[i][0].transcript; }
+      else { interim += e.results[i][0].transcript; }
+    }
+    const input = document.getElementById('chatInput');
+    input.value = finalTranscript + interim;
+    autoResize(input); updateSendButton();
+    statusEl.textContent = '🔴 Recognized ' + (finalTranscript + interim).length + ' chars... keep talking or click to stop';
+  };
+  recognition.onerror = (e) => {
+    voiceBtn.style.opacity = '1';
+    let msg = '';
+    switch (e.error) {
+      case 'not-allowed': msg = '❌ Microphone access denied. If you opened this page via file://, Chrome blocks mic access. Fix: use a local server or deploy to https://.'; break;
+      case 'no-speech': msg = '⚠️ No speech detected. Please speak into the microphone and try again.'; break;
+      case 'audio-capture': msg = '❌ No microphone found. Please check that your mic is connected.'; break;
+      case 'network': msg = '❌ Speech recognition network error. Please check your connection.'; break;
+      case 'service-not-allowed': msg = '❌ Speech service unavailable (common on file:// protocol).'; break;
+      default: msg = '❌ Voice recognition error: ' + e.error;
+    }
+    statusEl.textContent = msg;
+    statusEl.style.color = '#e74c3c';
+    isRecording = false;
+    voiceBtn.classList.remove('recording');
+  };
+  recognition.onend = () => {
+    isRecording = false;
+    voiceBtn.classList.remove('recording');
+    voiceBtn.style.opacity = '1';
+    const input = document.getElementById('chatInput');
+    if (input.value.trim()) {
+      statusEl.textContent = '✅ Voice captured (' + input.value.length + ' chars) — click send when ready';
+      statusEl.style.color = 'var(--green)';
+    } else if (!statusEl.textContent.startsWith('❌')) {
+      statusEl.textContent = '';
+    }
+  };
+  try { recognition.start(); }
+  catch (e) {
+    voiceBtn.style.opacity = '1';
+    statusEl.textContent = '❌ Could not start voice recognition: ' + e.message;
+    statusEl.style.color = '#e74c3c';
+  }
+}
+
+function stopVoice() {
+  if (recognition) { try { recognition.stop(); } catch (e) {} recognition = null; }
+  isRecording = false;
+  document.getElementById('voiceBtn').classList.remove('recording');
+  document.getElementById('voiceBtn').style.opacity = '1';
+}
+
+// ============================================================
+// SCHEMA TRACKING
+// ============================================================
+function updateSchema() {
+  const allUserText = state.messages.filter(m => m.role === 'user').map(m => m.content).join(' ');
+  const allAIText = state.messages.filter(m => m.role === 'assistant').map(m => m.content).join(' ');
+  const combined = allUserText + ' ' + allAIText;
+
+  Object.entries(SCHEMA_FIELDS).forEach(([id, field]) => {
+    const found = field.keywords.some(kw => combined.includes(kw));
+    if (found && schemaState[id].status === 'empty') {
+      let snippet = 'Mentioned';
+      for (const kw of field.keywords) {
+        const idx = combined.indexOf(kw);
+        if (idx >= 0) {
+          const start = Math.max(0, idx - 10);
+          const end = Math.min(combined.length, idx + kw.length + 30);
+          snippet = combined.slice(start, end).trim().replace(/\n/g, ' ');
+          break;
+        }
+      }
+      schemaState[id] = { status: 'filled', value: snippet };
+    }
+  });
+  renderSchema();
+}
+
+function renderSchema() {
+  const container = document.getElementById('schemaFields');
+  container.innerHTML = '';
+  let filledCount = 0;
+
+  SCHEMA_ROUNDS.forEach(round => {
+    const roundDiv = document.createElement('div'); roundDiv.className = 'schema-round';
+    const label = document.createElement('div'); label.className = 'schema-round-label'; label.textContent = round.label;
+    roundDiv.appendChild(label);
+
+    round.fields.forEach(fieldId => {
+      const field = SCHEMA_FIELDS[fieldId];
+      const st = schemaState[fieldId];
+      if (st.status === 'filled') filledCount++;
+
+      const item = document.createElement('div'); item.className = 'schema-field';
+      item.onclick = () => askAboutField(fieldId);
+      item.innerHTML = `
+        <div class="field-dot ${st.status}"></div>
+        <div class="field-info">
+          <div class="field-name">${field.name}</div>
+          <div class="field-value ${st.status === 'filled' ? 'filled' : ''}">${st.status === 'filled' ? escapeHtml(st.value) : 'Not collected'}</div>
+        </div>`;
+      roundDiv.appendChild(item);
+    });
+    container.appendChild(roundDiv);
+  });
+
+  document.getElementById('schemaProgress').textContent = `${filledCount}/12`;
+  document.getElementById('progressFill').style.width = `${(filledCount / 12) * 100}%`;
+  document.getElementById('askMissingBtn').disabled = filledCount >= 12;
+  document.getElementById('askMissingBtn').textContent = filledCount >= 12 ? '✅ Info complete' : `🎯 Ask about missing (${12 - filledCount} remaining)`;
+
+  // Update toggle button state
+  const toggle = document.getElementById('schemaToggle');
+  if (filledCount < 12) { toggle.classList.add('active'); } else { toggle.classList.remove('active'); }
+}
+
+function askAboutField(fieldId) {
+  const field = SCHEMA_FIELDS[fieldId];
+  const question = `I'm not sure how to describe my ${field.name}, can you help me think through this?`;
+  const input = document.getElementById('chatInput');
+  input.value = question; autoResize(input); updateSendButton();
+}
+
+function askAboutMissing() {
+  const missing = Object.entries(schemaState).filter(([_, s]) => s.status === 'empty').map(([id, _]) => SCHEMA_FIELDS[id].name);
+  if (!missing.length) return;
+  const question = `I haven't mentioned: ${missing.join(', ')}. Please ask me about these one by one.`;
+  const input = document.getElementById('chatInput');
+  input.value = question; autoResize(input); updateSendButton();
+}
+
+function toggleSchema() {
+  document.getElementById('schemaPanel').classList.toggle('open');
+}
+
+function renderMarkdown(text) {
+  if (typeof marked !== 'undefined') { marked.setOptions({ breaks: true, gfm: true, headerIds: false, mangle: false }); return marked.parse(text); }
+  return escapeHtml(text).replace(/\n/g, '<br>');
+}
+function escapeHtml(text) { const d = document.createElement('div'); d.textContent = text; return d.innerHTML; }
+function scrollToBottom() { const el = document.getElementById('messages'); requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; }); }
+function updateSendButton() { const btn = document.getElementById('sendBtn'); const input = document.getElementById('chatInput'); btn.disabled = !input.value.trim() || state.isStreaming; }
+function onInputKeydown(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } updateSendButton(); }
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; updateSendButton(); }
+
+function resetChat() {
+  if (state.isStreaming) return;
+  if (state.messages.length > 2 && !confirm('Start a new diagnosis? Current conversation will be lost.')) return;
+  state.messages = [{ role: 'system', content: SYSTEM_PROMPT }];
+  Object.keys(SCHEMA_FIELDS).forEach(k => { schemaState[k] = { status: 'empty', value: '' }; });
+  document.getElementById('messages').innerHTML = '';
+  addMessage('ai', GREETING);
+  state.messages.push({ role: 'assistant', content: GREETING });
+  renderSchema();
+  document.getElementById('chatInput').focus();
+}
+
+function exportChat() {
+  const lines = ['═══ OPC Clinic · Diagnosis Record ═══', `Exported: ${new Date().toLocaleString()}`, ''];
+  // Add schema summary
+  lines.push('--- Info Collection Summary ---');
+  Object.entries(SCHEMA_FIELDS).forEach(([id, field]) => {
+    const s = schemaState[id];
+    lines.push(`${field.name}: ${s.status === 'filled' ? s.value : '(not collected)'}`);
+  });
+  lines.push('', '--- Conversation Log ---', '');
+  state.messages.forEach(m => {
+    if (m.role === 'system') return;
+    const prefix = m.role === 'user' ? '[You]' : '[Diagnostician]';
+    lines.push(prefix); lines.push(m.content); lines.push('');
+  });
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob); const a = document.createElement('a');
+  a.href = url; a.download = `OPC_Clinic_diagnosis_${new Date().toISOString().slice(0,10)}.txt`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+function showPromptModal() {
+  document.getElementById('promptContent').textContent = SYSTEM_PROMPT;
+  document.getElementById('promptModal').classList.add('active');
+}
+function closePromptModal(e) { if (e.target === e.currentTarget) document.getElementById('promptModal').classList.remove('active'); }
+
+// Init schema on load
+renderSchema();
+</script>
+</body>
+</html>

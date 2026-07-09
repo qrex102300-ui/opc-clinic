@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>OPC 诊室 · AI 创业诊断官</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d13;--surface:#13151d;--surface2:#1a1d28;--surface3:#222533;
+  --border:#2a2d3a;--border2:#363a4a;
+  --text:#e8eaf0;--text2:#9ca0b0;--text3:#6b6f82;
+  --accent:#c0392b;--accent2:#e74c3c;--accent-soft:rgba(192,57,43,.12);
+  --green:#27ae60;--green-soft:rgba(39,174,96,.12);
+  --blue:#3498db;--blue-soft:rgba(52,152,219,.12);
+  --yellow:#f39c12;--yellow-soft:rgba(243,156,18,.12);
+  --user-bg:#1e2a3a;--ai-bg:#181a24;
+  --radius:12px;--radius-sm:8px;--radius-xs:6px;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
+  --font:'Noto Sans SC',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --transition:all .25s cubic-bezier(.4,0,.2,1);
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100dvh;overflow:hidden;line-height:1.6}
+a{color:var(--blue);text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;outline:none;transition:var(--transition)}
+input,textarea,select{font-family:inherit;outline:none;border:none;background:var(--surface2);color:var(--text);transition:var(--transition)}
+input:focus,textarea:focus,select:focus{box-shadow:0 0 0 2px var(--accent)}
+.screen{display:none;width:100%;height:100dvh;position:fixed;inset:0;flex-direction:column}
+.screen.active{display:flex;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+#landing{align-items:center;justify-content:center;padding:2rem;text-align:center;overflow-y:auto}
+.landing-badge{display:inline-block;padding:.35rem 1rem;border-radius:100px;background:var(--accent-soft);color:var(--accent2);font-size:.8rem;font-weight:500;margin-bottom:1.5rem}
+.landing-icon{width:80px;height:80px;margin:0 auto 1.5rem;border-radius:20px;background:linear-gradient(135deg,var(--accent),#8e2424);display:flex;align-items:center;justify-content:center;font-size:2.2rem;box-shadow:0 8px 32px rgba(192,57,43,.25)}
+.landing-title{font-size:clamp(2rem,5vw,3.2rem);font-weight:900;line-height:1.15;margin-bottom:.6rem;letter-spacing:-.02em}
+.landing-title span{color:var(--accent2)}
+.landing-sub{font-size:clamp(.95rem,2.5vw,1.15rem);color:var(--text2);max-width:480px;margin:0 auto 2rem;line-height:1.7}
+.landing-features{display:grid;grid-template-columns:1fr;gap:.75rem;max-width:400px;margin:0 auto 2.5rem;width:100%}
+.feature-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.2rem;text-align:left;display:flex;align-items:flex-start;gap:.75rem}
+.feature-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.feature-icon.red{background:var(--accent-soft);color:var(--accent2)}
+.feature-icon.green{background:var(--green-soft);color:var(--green)}
+.feature-icon.blue{background:var(--blue-soft);color:var(--blue)}
+.feature-card h4{font-size:.85rem;font-weight:600;margin-bottom:.15rem}
+.feature-card p{font-size:.78rem;color:var(--text3);line-height:1.5}
+.btn-primary{background:var(--accent);color:#fff;padding:.85rem 2.5rem;border-radius:100px;font-size:1rem;font-weight:600;box-shadow:0 4px 20px rgba(192,57,43,.3)}
+.btn-primary:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 6px 28px rgba(192,57,43,.4)}
+.landing-footer{margin-top:2rem;font-size:.75rem;color:var(--text3)}
+.landing-footer a{color:var(--text2)}
+.landing-demo{max-width:520px;width:100%;margin:0 auto 2rem;text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem;cursor:pointer}
+.landing-demo:hover{border-color:var(--border2)}
+.landing-demo-header{display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem;font-size:.8rem;color:var(--text3)}
+.landing-demo-header svg{width:14px;height:14px}
+.demo-msg{padding:.6rem .8rem;border-radius:var(--radius-xs);margin-bottom:.4rem;font-size:.82rem;line-height:1.6}
+.demo-msg.ai{background:var(--ai-bg);color:var(--text2)}
+.demo-msg.user{background:var(--user-bg);color:var(--text)}
+.demo-msg strong{color:var(--accent2);font-weight:600}
+.demo-more{text-align:center;color:var(--text3);font-size:.75rem;margin-top:.5rem}
+#config{align-items:center;justify-content:center;padding:2rem;overflow-y:auto}
+.config-box{max-width:460px;width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;box-shadow:var(--shadow)}
+.config-box h2{font-size:1.3rem;font-weight:700;margin-bottom:.3rem}
+.config-box .subtitle{color:var(--text3);font-size:.85rem;margin-bottom:1.8rem}
+.form-group{margin-bottom:1.4rem}
+.form-group label{display:block;font-size:.82rem;font-weight:500;color:var(--text2);margin-bottom:.4rem}
+.form-group .hint{font-size:.72rem;color:var(--text3);margin-top:.3rem;line-height:1.5}
+.input-field{width:100%;padding:.7rem 1rem;border-radius:var(--radius-xs);background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:.9rem}
+.input-field::placeholder{color:var(--text3)}
+.input-field:focus{border-color:var(--accent)}
+select.input-field{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6f82' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem}
+.api-key-wrapper{position:relative}
+.api-key-wrapper input{padding-right:3rem}
+.api-key-toggle{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;color:var(--text3);font-size:.75rem;padding:.2rem .4rem;border-radius:4px}
+.config-actions{display:flex;gap:.75rem;margin-top:1.8rem}
+.btn-secondary{background:var(--surface2);color:var(--text2);padding:.75rem 1.5rem;border-radius:100px;font-size:.9rem;font-weight:500;border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--surface3);color:var(--text)}
+.config-actions .btn-primary{flex:1}
+
+/* === Chat + Schema Layout === */
+#chat{background:var(--bg)}
+.chat-body{display:flex;flex:1;overflow:hidden;position:relative}
+.chat-main{flex:1;display:flex;flex-direction:column;min-width:0}
+.chat-header{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.2rem;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;min-height:56px}
+.chat-brand{display:flex;align-items:center;gap:.6rem}
+.chat-brand-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#8e2424);display:flex;align-items:center;justify-content:center;font-size:.9rem}
+.chat-brand-text{font-weight:700;font-size:.95rem}
+.chat-actions{display:flex;gap:.4rem}
+.chat-btn{width:36px;height:36px;border-radius:var(--radius-xs);background:var(--surface2);color:var(--text3);display:flex;align-items:center;justify-content:center;font-size:1rem}
+.chat-btn:hover{background:var(--surface3);color:var(--text)}
+.chat-btn.active{background:var(--accent-soft);color:var(--accent2)}
+.chat-messages{flex:1;overflow-y:auto;padding:1.2rem;scroll-behavior:smooth}
+.chat-messages::-webkit-scrollbar{width:4px}
+.chat-messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.msg{max-width:85%;margin-bottom:1rem;animation:msgIn .3s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{margin-left:auto}
+.msg.ai{margin-right:auto}
+.msg-bubble{padding:.85rem 1.1rem;border-radius:var(--radius);font-size:.9rem;line-height:1.75;word-break:break-word}
+.msg.user .msg-bubble{background:var(--user-bg);border-bottom-right-radius:4px}
+.msg.ai .msg-bubble{background:var(--ai-bg);border:1px solid var(--border);border-bottom-left-radius:4px}
+.msg-label{font-size:.7rem;color:var(--text3);margin-bottom:.3rem;padding:0 .2rem}
+.msg.ai .msg-label{color:var(--accent2)}
+.msg-bubble p{margin-bottom:.6rem}.msg-bubble p:last-child{margin-bottom:0}
+.msg-bubble strong{color:var(--accent2);font-weight:600}
+.msg-bubble code{font-family:var(--mono);font-size:.82rem;background:var(--surface3);padding:.15rem .35rem;border-radius:4px}
+.msg-bubble pre{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:.8rem;margin:.5rem 0;overflow-x:auto}
+.msg-bubble pre code{background:none;padding:0}
+.msg-bubble ul,.msg-bubble ol{padding-left:1.2rem;margin:.4rem 0}
+.msg-bubble li{margin-bottom:.25rem}
+.msg-bubble blockquote{border-left:3px solid var(--accent);padding-left:.8rem;margin:.5rem 0;color:var(--text2)}
+.typing-indicator{display:flex;gap:4px;padding:.85rem 1.1rem}
+.typing-dot{width:7px;height:7px;border-radius:50%;background:var(--text3);animation:typing 1.2s infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes typing{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+
+/* === Input Area with Voice === */
+.chat-input-area{padding:.75rem 1rem;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0}
+.chat-input-wrapper{display:flex;gap:.5rem;align-items:flex-end;max-width:720px;margin:0 auto}
+.chat-input{flex:1;min-height:44px;max-height:120px;padding:.65rem 1rem;border-radius:var(--radius);background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:.9rem;resize:none;line-height:1.5}
+.chat-input::placeholder{color:var(--text3)}
+.chat-input:focus{border-color:var(--accent)}
+.voice-btn{width:44px;height:44px;border-radius:var(--radius);background:var(--surface2);color:var(--text3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.2rem;border:1px solid var(--border)}
+.voice-btn:hover{background:var(--surface3);color:var(--text)}
+.voice-btn.recording{background:var(--accent-soft);color:var(--accent2);border-color:var(--accent);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,.3)}50%{box-shadow:0 0 0 8px rgba(192,57,43,0)}}
+.voice-status{font-size:.7rem;color:var(--accent2);text-align:center;padding:.2rem 0 0;min-height:1.2rem}
+.send-btn{width:44px;height:44px;border-radius:var(--radius);background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.send-btn:hover:not(:disabled){background:var(--accent2)}
+.send-btn:disabled{opacity:.4;cursor:not-allowed}
+.send-btn svg{width:18px;height:18px}
+
+/* === Schema Tracking Panel === */
+.schema-panel{width:0;overflow:hidden;background:var(--surface);border-left:1px solid var(--border);transition:width .3s ease;flex-shrink:0;display:flex;flex-direction:column}
+.schema-panel.open{width:300px}
+.schema-panel-inner{padding:1rem;overflow-y:auto;flex:1;width:300px}
+.schema-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
+.schema-title{font-size:.85rem;font-weight:700}
+.schema-progress{font-size:.72rem;color:var(--text3)}
+.progress-bar{height:4px;background:var(--surface3);border-radius:2px;margin-bottom:1rem;overflow:hidden}
+.progress-fill{height:100%;background:var(--green);border-radius:2px;transition:width .4s ease}
+.schema-round{margin-bottom:1rem}
+.schema-round-label{font-size:.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;padding-bottom:.25rem;border-bottom:1px solid var(--border)}
+.schema-field{display:flex;align-items:flex-start;gap:.5rem;padding:.45rem .5rem;border-radius:var(--radius-xs);margin-bottom:.3rem;cursor:pointer;transition:var(--transition)}
+.schema-field:hover{background:var(--surface2)}
+.schema-field .field-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;transition:var(--transition)}
+.schema-field .field-dot.empty{background:var(--border2)}
+.schema-field .field-dot.filled{background:var(--green)}
+.schema-field .field-dot.partial{background:var(--yellow)}
+.schema-field .field-info{flex:1;min-width:0}
+.schema-field .field-name{font-size:.78rem;font-weight:500;color:var(--text)}
+.schema-field .field-value{font-size:.7rem;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;margin-top:.1rem}
+.schema-field .field-value.filled{color:var(--green)}
+.schema-actions{padding:.75rem 0;border-top:1px solid var(--border);margin-top:.5rem}
+.btn-ask-missing{width:100%;padding:.6rem;border-radius:var(--radius-xs);background:var(--accent-soft);color:var(--accent2);font-size:.8rem;font-weight:500;border:1px solid rgba(192,57,43,.2)}
+.btn-ask-missing:hover{background:rgba(192,57,43,.2)}
+.btn-ask-missing:disabled{opacity:.4;cursor:not-allowed}
+
+/* === Diagnosis Complete === */
+.diagnosis-card{background:var(--surface);border:1px solid var(--accent);border-radius:var(--radius);padding:1.2rem;margin-top:.5rem}
+.diagnosis-card h4{color:var(--accent2);font-size:.9rem;margin-bottom:.5rem}
+.diagnosis-actions{display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap}
+.diagnosis-actions button{padding:.5rem 1rem;border-radius:var(--radius-xs);font-size:.8rem;font-weight:500}
+.btn-export{background:var(--green-soft);color:var(--green);border:1px solid rgba(39,174,96,.2)}
+.btn-export:hover{background:rgba(39,174,96,.2)}
+.btn-restart{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+.btn-restart:hover{background:var(--surface3)}
+.error-msg{background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.3);color:#e74c3c;padding:.75rem 1rem;border-radius:var(--radius-xs);font-size:.82rem;margin:.5rem 0;line-height:1.5}
+.error-msg strong{display:block;margin-bottom:.2rem}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.active{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);max-width:640px;width:100%;max-height:80vh;overflow-y:auto;padding:2rem}
+.modal h3{margin-bottom:1rem;font-size:1.1rem}
+.modal pre{white-space:pre-wrap;font-size:.8rem;color:var(--text2);line-height:1.7;font-family:var(--font)}
+.modal-close{margin-top:1.5rem;width:100%;padding:.7rem;border-radius:var(--radius-xs);background:var(--surface2);color:var(--text2);font-size:.9rem}
+
+/* === Responsive === */
+@media(min-width:768px){
+  .landing-features{grid-template-columns:1fr 1fr 1fr;max-width:600px}
+  .msg{max-width:70%}
+  .chat-messages{padding:1.5rem 2rem}
+}
+@media(max-width:767px){
+  .schema-panel.open{position:absolute;right:0;top:0;bottom:0;width:280px;z-index:10;box-shadow:-4px 0 20px rgba(0,0,0,.5)}
+}
+@media(max-width:380px){
+  .landing-title{font-size:1.7rem}
+  .config-box{padding:1.5rem}
+}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- ========== LANDING ========== -->
+<div id="landing" class="screen active">
+  <div class="landing-badge">v0.2 · 开源 · 免费 · 语音输入</div>
+  <div class="landing-icon">🔍</div>
+  <h1 class="landing-title">OPC <span>诊室</span></h1>
+  <p class="landing-sub">一个会<strong>拷问</strong>你的 AI 创业诊断官。<br>不给你"正确但谁都能用"的建议，只逼你看清自己没看清的病因。</p>
+  <div class="landing-features">
+    <div class="feature-card"><div class="feature-icon red">⚡</div><div><h4>不迁就</h4><p>你想听的 ≠ 正确的。方向有问题直接说。</p></div></div>
+    <div class="feature-card"><div class="feature-icon green">🎯</div><div><h4>追病因</h4><p>"没流量"是症状不是病因，往下追到追不动为止。</p></div></div>
+    <div class="feature-card"><div class="feature-icon blue">📌</div><div><h4>钉事实</h4><p>每个结论必须挂靠到你说的具体事实上。</p></div></div>
+  </div>
+  <div class="landing-demo" onclick="BUILT_IN.provider?startChat():showScreen('config')">
+    <div class="landing-demo-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>真实诊断节选 · 它如何诊断了自己的作者</div>
+    <div class="demo-msg user">我做了个 AI 创业诊断工具，三个多月了，有人来问但没人付钱。而且我自己做的产品，跑出来的诊断还不如我直接跟 Claude 聊半小时……</div>
+    <div class="demo-msg ai"><strong>诊断官：</strong>打住。那个"跟 Claude 聊半小时得到好结论"的人，是你，还是一个真正的、连自己卡在哪都讲不明白的小老板？把同一个空白对话框扔给你的目标客户，他聊得出你那个结论吗？</div>
+    <div class="demo-more">点击查看完整诊断 →</div>
+  </div>
+  <button class="btn-primary" onclick="BUILT_IN.provider?startChat():showScreen('config')">开始诊断 →</button>
+  <div class="landing-footer">对话数据在你本地。诊断完成后，匿名化的诊断档案会自动发送给我们用于产品改进（<a href="javascript:void(0)" onclick="state.optOut=true;this.textContent='已关闭'">不参与</a>）· <a href="https://github.com" target="_blank">GitHub 开源</a></div>
+</div>
+
+<!-- ========== CONFIG ========== -->
+<div id="config" class="screen">
+  <div class="config-box">
+    <h2>配置你的 AI 引擎</h2>
+    <p class="subtitle">诊断能力在提示词里，但需要一个 AI 大脑来驱动它。</p>
+    <div class="form-group">
+      <label>API 服务商</label>
+      <select id="provider" class="input-field" onchange="onProviderChange()">
+        <option value="qwen">通义千问（阿里云百炼）</option>
+        <option value="openai">OpenAI（GPT-4o 等）</option>
+        <option value="deepseek">DeepSeek（深度求索）</option>
+        <option value="moonshot">Moonshot（Kimi / 月之暗面）</option>
+        <option value="zhipu">智谱 AI（GLM 系列）</option>
+        <option value="custom">自定义（OpenAI 兼容接口）</option>
+      </select>
+    </div>
+    <div class="form-group" id="custom-url-group" style="display:none">
+      <label>自定义 API 地址</label>
+      <input type="text" id="customUrl" class="input-field" placeholder="https://your-api.com/v1">
+    </div>
+    <div class="form-group">
+      <label>API Key</label>
+      <div class="api-key-wrapper">
+        <input type="password" id="apiKey" class="input-field" placeholder="sk-...">
+        <button class="api-key-toggle" onclick="toggleKeyVisibility()">显示</button>
+      </div>
+      <p class="hint">Key 仅存在于你的浏览器内存中，关闭页面即清除。</p>
+    </div>
+    <div class="form-group">
+      <label>模型</label>
+      <select id="model" class="input-field"></select>
+      <p class="hint" id="modelHint">推荐用各家最强的那一档，诊断最吃推理和多轮能力。</p>
+    </div>
+    <div class="config-actions">
+      <button class="btn-secondary" onclick="showScreen('landing')">← 返回</button>
+      <button class="btn-primary" onclick="startChat()">进入诊室</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== CHAT ========== -->
+<div id="chat" class="screen">
+  <div class="chat-header">
+    <div class="chat-brand"><div class="chat-brand-icon">🔍</div><div class="chat-brand-text">OPC 诊室</div></div>
+    <div class="chat-actions">
+      <button class="chat-btn" id="schemaToggle" onclick="toggleSchema()" title="信息收集面板">📊</button>
+      <button class="chat-btn" onclick="showPromptModal()" title="查看诊断协议">📋</button>
+      <button class="chat-btn" onclick="exportChat()" title="导出对话">💾</button>
+      <button class="chat-btn" onclick="resetChat()" title="重新开始">↻</button>
+    </div>
+  </div>
+  <div class="chat-body">
+    <div class="chat-main">
+      <div class="chat-messages" id="messages"></div>
+      <div class="chat-input-area">
+        <div class="chat-input-wrapper">
+          <textarea class="chat-input" id="chatInput" placeholder="说说你的业务情况……支持语音输入" rows="1" onkeydown="onInputKeydown(event)" oninput="autoResize(this)"></textarea>
+          <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()" title="语音输入">🎙️</button>
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
+          </button>
+        </div>
+        <div class="voice-status" id="voiceStatus"></div>
+      </div>
+    </div>
+    <!-- Schema Panel -->
+    <div class="schema-panel" id="schemaPanel">
+      <div class="schema-panel-inner">
+        <div class="schema-header">
+          <div class="schema-title">📊 信息收集进度</div>
+          <div class="schema-progress" id="schemaProgress">0/12</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+        <div id="schemaFields"></div>
+        <div class="schema-actions">
+          <button class="btn-ask-missing" id="askMissingBtn" onclick="askAboutMissing()" disabled>🎯 追问缺失信息</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PROMPT MODAL ========== -->
+<div class="modal-overlay" id="promptModal" onclick="closePromptModal(event)">
+  <div class="modal">
+    <h3>📋 诊断协议 · Diagnostician Prompt</h3>
+    <pre id="promptContent"></pre>
+    <button class="modal-close" onclick="document.getElementById('promptModal').classList.remove('active')">关闭</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// SYSTEM PROMPT
+// ============================================================
+const SYSTEM_PROMPT = `# 角色
+你是 OPC 诊室的诊断官。你的唯一目标：找到案主业务的【真正病因】，给出【案主做得了、做了能见效】的行动项。
+你不是顾问、鼓励师或陪聊。你是一个只关心"病因是否被找到"的诊断官。
+
+# 入场判断（对话开始时先做）
+- 如果案主【已经在做】（有产品/有用户/有数据/有真实卡点）——正常进入诊断。
+- 如果案主【还只有想法】——不要假装能诊断。诚实告诉他："你现在还没有可供诊断的真实信号。当务之急不是诊断，是先做最小验证、拿到第一批真实用户反馈。"然后简短指出他该先去验证什么。
+- 你的价值建立在【案主已经产生的真实事实】之上；没有事实就没有诊断，只有空想——空想是通用大模型的活，不是你的。
+
+# 第一原则：你和通用大模型的区别
+通用大模型给的是"正确但谁都能用"的答案。你的全部价值在于：针对【这一个】案主、基于【他自己说过的具体事实】，给出他能动手的判断。
+- 硬约束：禁止给放之四海皆准的建议（如"要做好用户调研""要打磨产品"）。每一个结论都必须挂靠到案主在本次对话中说过的具体事实上，否则不许说出口。
+- 自检：说任何建议前先问自己——"这句话换一个完全不同的案主还成不成立？如果成立，说明我在偷懒，删掉重写。"
+
+# 诊断地图：五步法
+在脑中始终有一张地图——需求 → 解决方案 → 商业模式 → 增长 → 壁垒。用它来定位案主的业务断在哪一步。
+但不要按顺序逐步追问——这是你脑中的地图，不是问卷。根据案主提供的信息，自然聚焦到最可能断裂的环节。当你有足够信息判断病因所在环节时，进入假设模式。
+
+# 三种工作模式
+
+## 对话模式（默认）
+正常、温和地了解案主的业务，寻找断裂点。
+
+## 拷问模式
+出现下列任一信号时立即切入：
+1. 案主描述的是【在做什么】而不是【想做什么】——追问真实目的。
+2. 案主说的卡点是【症状】而不是【病因】——往下追，追到追不动为止。
+3. 案主说不清【护城河】，或护城河经不起一句反问——压力测试它。
+4. 案主提出行动项但说不出【做了之后能改善多少、有几成把握】——逼他量化。
+
+拷问方式：
+- 一次只问一个问题，问最尖锐的那个，等他回答再问下一个。
+- 用案主自己的话反问他（"你刚说X，但前面你又说Y，这两个怎么统一？"）。
+- 允许让他不舒服。诊断的价值不在于让案主感觉良好，在于让他看清自己没看清的东西。
+- 但只攻击逻辑和事实，绝不攻击人。
+
+## 假设模式（关键：主动推进诊断）
+当你收集到足够信息形成病因假设时——通常在 3-5 轮对话后——主动进入：
+1. 明确说出你的假设："根据你目前说的，我判断最可能的病因是 X。理由是 Y 和 Z。"
+2. 邀请案主确认或反驳："这个判断对吗？还是你觉得我遗漏了什么？"
+3. 如果案主确认 → 进入收尾。
+4. 如果案主反驳 → 把反驳当作新信息，回到对话模式继续追问，修正假设。
+- 不要等案主自己"说出"病因。你的工作是主动提出假设，让案主验证。
+- 如果案主自己找不到病因，你应该替他归纳，给出你最有可能的判断。
+
+# 经营数据采集：自然地嵌入追问
+以下经营指标对诊断至关重要，你应在对话过程中自然地收集它们：
+- 月收入（或收入量级）
+- 月消耗/运营成本
+- 现金储备（还能撑多久）
+- 获客成本（CAC）
+- 客户终身价值（LTV）
+- 增长率（月/周）
+- 留存率/复购率
+- 每周投入时长
+
+采集规则：
+1. 不要集中提问——像查户口一样一口气问5个数字会让案主反感。把这些问题分散在追问过程中，当话题自然涉及某个维度时顺带问。
+2. 先解释为什么问——"我问这个，是因为如果月消耗远大于收入，行动建议的优先级会完全不同。"让案主理解这不是窥探，而是诊断需要。
+3. 追问具体数字，不只问量级——"大概几千块"不够，尽量追问到"大概多少"。但如果案主只愿意给量级，接受它，不要再追。
+4. 不回答就跳过——如果案主说"不太方便"或回避某个数字，立刻跳过，不追问、不施压。用已有信息继续诊断。最终结论中不涉及该维度即可——案主会理解，是因为信息不足所以没分析到，而不是诊断师能力不行。
+
+# 人格锚：在多轮对话中永不漂移的底线
+随着对话变长，你会本能地想让案主舒服——这是最危险的漂移。守住这条主轴：
+你存在的唯一理由是【找到真病因】，案主舒不舒服不在你的考虑范围内。
+具体守四条，任何一条都不能为了"让对话顺一点"而松动：
+1. 不迎合：案主想听的答案 ≠ 正确的答案。如果真相是他的方向有问题，直接说，并说明依据。宁可让他当场不爽，不可让他带着错误判断离开。
+2. 不发散：全程只服务于"找病因"这一条主线。案主把话题岔开时，记下，然后拉回来。
+3. 不滑向安慰：案主有情绪时，可以简短地承认（"这确实难"），但一句带过，立刻回到诊断。你不是来抚慰情绪的，情绪安慰会让真病因被永远掩盖。
+4. 不抢答：案主把判断权交还给你时，不要立刻给方案。先确认病因是否已找到——没找到就继续追，不要用"给建议"代替"找病因"。
+- 跨多轮自检：每隔几轮回头问自己——"我现在是在找病因，还是在让他高兴？"如果是后者，立刻纠正，但不要在回复里复盘或解释自己跑偏了，直接把对话拉回正轨即可。
+
+# 诊断的收尾：行动项 + 诊断档案
+当你确信已经找到真病因（而不是停在症状层），才进入收尾。给出：
+1. 真病因：一句话说清。必须是病因，不是症状。
+2. 判断依据：挂靠到案主说过的哪些具体事实。
+3. 行动项：1-3条，每条都满足——案主凭现有资源做得了、做了能直接改善这个病因、具体到案主看完知道第一步做什么。
+4. 把握度：对每条行动项，诚实说明预期改善程度和你的把握有几成，以及不确定性在哪。
+- 如果你还没找到真病因，不许收尾。宁可继续追问，也不要给一个漂亮但空的诊断。
+- 如果诊断到最后，真病因是"这个方向本身不成立"，或"病因超出案主能靠行动改变的范围"，诚实说出来，不要硬凑三条行动项来制造"有救"的假象。给一个真实的判断（哪怕是"这条路我建议你停"），比给三条假行动更有价值。
+
+## 诊断档案（每次收尾必须输出）
+收尾完成后，在回复的最末尾，用下面的固定格式输出一份「诊断档案」，方便案主保存并在下次诊断时带回参考：
+
+---
+📋 诊断档案
+真病因：[一句话]
+诊断依据：[案主说过的关键事实，逗号分隔]
+行动项：
+1. [行动项] | 把握度：[X成]
+2. [行动项] | 把握度：[X成]
+3. [行动项] | 把握度：[X成]
+一句话带走：[本次诊断最核心的一句判断]
+---
+
+- 行动项不足3条时，有几条写几条，不要硬凑。
+- 这份档案是案主的"数据资产"——每次诊断积累一份，长期能看到自己的模式。
+
+# 边界
+- 你做的是业务诊断，不是法律或财务建议。涉及具体法律/财务决策时，提示案主咨询专业人士。
+- 你不知道的行业细节，直接问案主或承认不知道，绝不编造数据或案例来支撑结论。
+- 如果案主中途明显不耐烦或想结束，尊重他，不要为了"完成诊断流程"而强行追问。你可以诚实告诉他"我们还没追到真病因"，但是否继续，由他决定。`;
+
+const GREETING = "诊室开张。\n\n说说你的情况——你在做什么业务，卡在什么地方了？越具体越好。";
+
+// ============================================================
+// BUILT-IN MODE (方案B)
+// 设置后跳过配置页，直接进入对话。填入 provider/apiKey/model 即可启用。
+// ============================================================
+const BUILT_IN = { provider: 'deepseek', apiKey: 'sk-735ccb76bd93444783bbe024d41287f4', model: 'deepseek-chat' };
+
+// 案例收集端点（方案A）
+// 填入飞书 Webhook URL 后自动启用。留空则仅本地提示。
+// 飞书创建方式：飞书群 → 设置 → 群机器人 → 添加自定义机器人 → 复制 Webhook 地址
+const CASE_ENDPOINT = 'https://open.feishu.cn/open-apis/bot/v2/hook/c68e4a3b-8ca2-4c88-a6f7-3fb6856e540b';
+
+// ============================================================
+// 12-FIELD SCHEMA
+// ============================================================
+const SCHEMA_ROUNDS = [
+  { label: '需求验证', fields: ['founderFit','businessModel'] },
+  { label: '商业模式', fields: ['revenue','burn','cash'] },
+  { label: '增长引擎', fields: ['cac','ltv','growthRate','retention'] },
+  { label: '护城河', fields: ['moat','platformDependency','workHours'] },
+];
+
+const SCHEMA_FIELDS = {
+  businessModel: { name: '商业模式', keywords: ['SaaS','订阅','电商','知识付费','咨询','广告','平台','课程','会员','付费','toB','toC','to B','to C','B端','C端','卖','收费','盈利模式','收入模式','变现'] },
+  revenue: { name: '月收入', keywords: ['月收入','营收','收入','MRR','ARR','月流水','赚','进账','销售额','GMV','万元','千元','元/月','客单价'] },
+  burn: { name: '月消耗', keywords: ['月消耗','月支出','月成本','运营成本','每月花','每月投入','开销','服务器','订阅费','推广费','烧钱'] },
+  cash: { name: '现金储备', keywords: ['现金','存款','储备','runway','跑道','资金','账上','能撑','积蓄','本金','融资'] },
+  cac: { name: '获客成本 CAC', keywords: ['CAC','获客成本','获客','获客费用','每个客户','每个用户花','拉新成本','投放','ROI','转化率'] },
+  ltv: { name: '客户终身价值 LTV', keywords: ['LTV','终身价值','客单价','复购','续费','平均消费','生命周期','续费','回头客'] },
+  growthRate: { name: '月增速', keywords: ['增速','增长率','月环比','环比','增长','涨幅','环比增长','用户增长','每月增长'] },
+  retention: { name: '留存率', keywords: ['留存','留存率','续费率','复购率','用户流失','流失率','月留存','次月','活跃'] },
+  moat: { name: '核心壁垒', keywords: ['护城河','壁垒','竞争优势','差异化','核心优势','别人做不了','无法复制','独家','专利','资源','门槛'] },
+  platformDependency: { name: '平台依赖', keywords: ['平台依赖','依赖','依托','寄生','微信','抖音','淘宝','小红书','App Store','依赖度','第三方','渠道依赖'] },
+  founderFit: { name: '创始人匹配度', keywords: ['创始人','为什么做','为什么是我','背景','经验','擅长','热爱','使命','初心','动机','行业经验'] },
+  workHours: { name: '工作时长+情绪', keywords: ['工作时长','每周工作','小时','加班','情绪','状态','心情','精力','倦怠','焦虑','开心','疲惫','hours','全职','兼职'] },
+};
+
+// ============================================================
+// PROVIDERS
+// ============================================================
+const PROVIDERS = {
+  qwen: { name: '通义千问', baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1', models: [{id:'qwen-max',name:'Qwen-Max（最强，推荐诊断用）'},{id:'qwen-plus',name:'Qwen-Plus（性价比高）'},{id:'qwen-turbo',name:'Qwen-Turbo（最快最便宜）'}] },
+  openai: { name: 'OpenAI', baseUrl: 'https://api.openai.com/v1', models: [{id:'gpt-4o',name:'GPT-4o（推荐）'},{id:'gpt-4o-mini',name:'GPT-4o Mini（快速/便宜）'},{id:'gpt-4.1',name:'GPT-4.1'}] },
+  deepseek: { name: 'DeepSeek', baseUrl: 'https://api.deepseek.com/v1', models: [{id:'deepseek-chat',name:'DeepSeek-V3（推荐）'},{id:'deepseek-reasoner',name:'DeepSeek-R1（深度推理）'}] },
+  moonshot: { name: 'Moonshot', baseUrl: 'https://api.moonshot.cn/v1', models: [{id:'moonshot-v1-128k',name:'Moonshot 128K（推荐）'},{id:'moonshot-v1-32k',name:'Moonshot 32K'}] },
+  zhipu: { name: '智谱 AI', baseUrl: 'https://open.bigmodel.cn/api/paas/v4', models: [{id:'glm-4-plus',name:'GLM-4-Plus（推荐）'},{id:'glm-4-flash',name:'GLM-4-Flash（免费）'}] },
+  custom: { name: '自定义', baseUrl: '', models: [] }
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let state = { apiKey:'', baseUrl:'', model:'', messages:[], isStreaming:false, optOut:false };
+let schemaState = {}; // { fieldId: { status: 'empty'|'filled', value: string } }
+let recognition = null;
+let isRecording = false;
+
+// Init schema state
+Object.keys(SCHEMA_FIELDS).forEach(k => { schemaState[k] = { status:'empty', value:'' }; });
+
+// ============================================================
+// SCREEN MANAGEMENT
+// ============================================================
+function showScreen(name) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(name).classList.add('active'); }
+
+// ============================================================
+// CONFIG
+// ============================================================
+function onProviderChange() {
+  const p = document.getElementById('provider').value;
+  document.getElementById('custom-url-group').style.display = p==='custom'?'block':'none';
+  const sel = document.getElementById('model'); sel.innerHTML='';
+  if(PROVIDERS[p].models.length){ PROVIDERS[p].models.forEach(m=>{ const o=document.createElement('option'); o.value=m.id; o.textContent=m.name; sel.appendChild(o); }); }
+  else { const o=document.createElement('option'); o.value=''; o.textContent='请输入模型名称'; sel.appendChild(o); if(!document.getElementById('customModel')){ const inp=document.createElement('input'); inp.type='text'; inp.id='customModel'; inp.className='input-field'; inp.placeholder='例：claude-sonnet-4-20250514'; inp.style.marginTop='.4rem'; sel.parentNode.appendChild(inp); } }
+}
+function toggleKeyVisibility(){ const i=document.getElementById('apiKey'),b=i.nextElementSibling; if(i.type==='password'){i.type='text';b.textContent='隐藏';}else{i.type='password';b.textContent='显示';} }
+onProviderChange();
+
+// ============================================================
+// CHAT
+// ============================================================
+function startChat(){
+  let apiKey, baseUrl, model;
+  if(BUILT_IN.provider){
+    apiKey=BUILT_IN.apiKey; baseUrl=PROVIDERS[BUILT_IN.provider].baseUrl; model=BUILT_IN.model;
+  } else {
+    apiKey=document.getElementById('apiKey').value.trim();
+    if(!apiKey){alert('请输入 API Key');return;}
+    const p=document.getElementById('provider').value;
+    baseUrl=p==='custom'?document.getElementById('customUrl').value.trim().replace(/\/$/,''):PROVIDERS[p].baseUrl;
+    model=p==='custom'?(document.getElementById('customModel')?.value||'').trim():document.getElementById('model').value;
+  }
+  if(!baseUrl||!model){alert('请填写完整的 API 地址和模型名称');return;}
+  state.apiKey=apiKey; state.baseUrl=baseUrl; state.model=model;
+  state.messages=[{role:'system',content:SYSTEM_PROMPT}];
+  Object.keys(SCHEMA_FIELDS).forEach(k=>{schemaState[k]={status:'empty',value:''};});
+  renderSchema();
+  showScreen('chat');
+  document.getElementById('messages').innerHTML='';
+  addMessage('ai',GREETING);
+  state.messages.push({role:'assistant',content:GREETING});
+  setTimeout(()=>document.getElementById('chatInput').focus(),300);
+}
+
+function addMessage(type,content){
+  const c=document.getElementById('messages'),d=document.createElement('div');
+  d.className=`msg ${type}`;
+  const l=document.createElement('div'); l.className='msg-label'; l.textContent=type==='user'?'你':'诊断官';
+  const b=document.createElement('div'); b.className='msg-bubble';
+  b.innerHTML=type==='ai'?renderMarkdown(content):escapeHtml(content).replace(/\n/g,'<br>');
+  d.appendChild(l); d.appendChild(b); c.appendChild(d); scrollToBottom(); return b;
+}
+
+function addTypingIndicator(){
+  const c=document.getElementById('messages'),d=document.createElement('div');
+  d.className='msg ai';d.id='typing';
+  const l=document.createElement('div');l.className='msg-label';l.textContent='诊断官';
+  const ind=document.createElement('div');ind.className='typing-indicator';
+  ind.innerHTML='<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+  d.appendChild(l);d.appendChild(ind);c.appendChild(d);scrollToBottom();
+}
+function removeTypingIndicator(){const el=document.getElementById('typing');if(el)el.remove();}
+
+async function sendMessage(){
+  const input=document.getElementById('chatInput'),text=input.value.trim();
+  if(!text||state.isStreaming)return;
+  addMessage('user',text);
+  state.messages.push({role:'user',content:text});
+  input.value='';input.style.height='auto';
+  document.getElementById('sendBtn').disabled=true;
+  addTypingIndicator(); state.isStreaming=true;
+  try{await streamResponse();}catch(err){removeTypingIndicator();const e=document.createElement('div');e.className='msg ai';e.innerHTML=`<div class="msg-label">诊断官</div><div class="error-msg"><strong>出错了</strong>${escapeHtml(err.message)}<br><br>常见原因：API Key 无效、余额不足、模型名称错误、网络问题。</div>`;document.getElementById('messages').appendChild(e);scrollToBottom();}
+  state.isStreaming=false; updateSendButton();
+  // After AI response, update schema
+  updateSchema();
+}
+
+async function streamResponse(){
+  const res=await fetch(`${state.baseUrl}/chat/completions`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${state.apiKey}`},body:JSON.stringify({model:state.model,messages:state.messages,stream:true,temperature:0.7,max_tokens:4096})});
+  if(!res.ok){const eb=await res.text().catch(()=>'');let em=`HTTP ${res.status}`;try{em=JSON.parse(eb).error?.message||em;}catch(x){if(eb)em=eb.slice(0,200);}throw new Error(em);}
+  removeTypingIndicator();
+  const bubble=addMessage('ai','');let full='';
+  const reader=res.body.getReader(),decoder=new TextDecoder();let buffer='';
+  while(true){const{done,value}=await reader.read();if(done)break;buffer+=decoder.decode(value,{stream:true});const lines=buffer.split('\n');buffer=lines.pop()||'';for(const line of lines){const t=line.trim();if(!t||!t.startsWith('data: '))continue;const d=t.slice(6);if(d==='[DONE]')break;try{const j=JSON.parse(d);const delta=j.choices?.[0]?.delta?.content;if(delta){full+=delta;bubble.innerHTML=renderMarkdown(full);scrollToBottom();}}catch(e){}}}
+  if(full){state.messages.push({role:'assistant',content:full});checkDiagnosisComplete(bubble,full);}
+}
+
+function checkDiagnosisComplete(bubble,content){
+  if(!(content.includes('真病因')&&(content.includes('行动项')||content.includes('行动：')||content.includes('把握度')||content.includes('诊断档案'))))return;
+  const card=document.createElement('div');card.className='diagnosis-card';
+  const optOutLink=state.optOut?'<span style="color:var(--text3)">已关闭数据收集</span>':'<a href="javascript:void(0)" onclick="state.optOut=true;this.outerHTML=\'<span style=color:var(--text3)>已关闭</span>\';autoCollectStatus(this)" style="font-size:.72rem;color:var(--text3)">不参与数据收集</a>';
+  card.innerHTML=`<h4>✅ 诊断已完成</h4><p style="font-size:.82rem;color:var(--text2);margin-bottom:.5rem">你可以复制诊断档案保存，或导出完整对话。</p><div class="diagnosis-actions"><button class="btn-export" onclick="copyArchive(this)" style="background:var(--accent);color:#fff">📋 复制档案</button><button class="btn-export" onclick="exportChat()">💾 导出对话</button><button class="btn-restart" onclick="resetChat()">↻ 重新诊断</button></div><div style="margin-top:.5rem;font-size:.72rem;color:var(--text3)">诊断档案已自动收集用于产品改进 · ${optOutLink}</div>`;
+  bubble.parentNode.appendChild(card);scrollToBottom();
+  // Auto-collect in background
+  autoCollect();
+}
+function copyArchive(btn){
+  const msgs=state.messages.filter(m=>m.role==='assistant');
+  const last=msgs[msgs.length-1]?.content||'';
+  const m=last.match(/📋 诊断档案[\s\S]*?(?=---\s*$|$)/);
+  if(m){navigator.clipboard.writeText(m[0].trim()).then(()=>{btn.textContent='✅ 已复制';setTimeout(()=>btn.textContent='📋 复制档案',2000);}).catch(()=>alert('复制失败，请手动选择复制'));}
+  else{alert('未找到诊断档案，请检查诊断是否完整输出。');}
+}
+
+async function autoCollect(){
+  if(state.optOut||!CASE_ENDPOINT)return;
+  const aiMsgs=state.messages.filter(m=>m.role==='assistant');
+  const lastAI=aiMsgs[aiMsgs.length-1]?.content||'';
+  const archiveMatch=lastAI.match(/📋 诊断档案[\s\S]*?(?=---\s*$|$)/);
+  if(!archiveMatch)return;
+  const userMsgs=state.messages.filter(m=>m.role==='user');
+  // Message 1: Archive summary + schema metrics (quick scan)
+  let metrics='\n\n📊 已识别经营指标：\n';
+  let hasMetrics=false;
+  Object.entries(schemaState).forEach(([id,s])=>{
+    if(s.status==='filled'&&s.value){metrics+=`  ${SCHEMA_FIELDS[id].name}：${s.value}\n`;hasMetrics=true;}
+  });
+  if(!hasMetrics)metrics='\n\n📊 已识别经营指标：（本次对话未涉及）\n';
+  const header=`【OPC诊断案例 #${new Date().getTime().toString(36)}】\n⏰ ${new Date().toLocaleString('zh-CN')}\n🤖 ${state.model} | 💬 ${userMsgs.length}轮\n\n`;
+  const body1={msg_type:'text',content:{text:header+archiveMatch[0].trim()+metrics}};
+  try{await fetch(CASE_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body1)});}catch(e){console.warn('Auto-collect msg1 failed:',e.message);}
+  // Message 2: Full conversation transcript
+  let transcript='【完整对话记录】\n\n';
+  state.messages.forEach((m,i)=>{
+    if(m.role==='user')transcript+=`\n━━ 用户第${Math.ceil((i)/2)}轮 ━━\n${m.content}\n`;
+    else if(m.role==='assistant')transcript+=`\n━━ 诊断官 ━━\n${m.content}\n`;
+  });
+  // Split if too long (Feishu text limit ~4000 chars per message)
+  const chunks=[];const maxLen=3800;
+  for(let i=0;i<transcript.length;i+=maxLen){chunks.push(transcript.slice(i,i+maxLen));}
+  for(const chunk of chunks){
+    const body2={msg_type:'text',content:{text:chunk}};
+    try{await fetch(CASE_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body2)});}catch(e){console.warn('Auto-collect transcript failed:',e.message);}
+  }
+}
+function autoCollectStatus(el){/* no-op, opt-out handled inline */}
+
+// ============================================================
+// VOICE INPUT
+// ============================================================
+function toggleVoice(){
+  const statusEl=document.getElementById('voiceStatus');
+  const voiceBtn=document.getElementById('voiceBtn');
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){
+    statusEl.textContent='❌ 你的浏览器不支持语音输入。请使用 Chrome 或 Edge 浏览器打开本页面。';
+    statusEl.style.color='#e74c3c';
+    return;
+  }
+  if(isRecording){stopVoice();return;}
+  // Immediate feedback BEFORE requesting mic permission
+  statusEl.textContent='⏳ 正在启动麦克风，请在浏览器弹窗中允许麦克风权限……';
+  statusEl.style.color='var(--accent2)';
+  voiceBtn.style.opacity='0.6';
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new SR();
+  recognition.lang='zh-CN';
+  recognition.continuous=true;
+  recognition.interimResults=true;
+  let finalTranscript='';
+  recognition.onstart=()=>{
+    isRecording=true;
+    voiceBtn.classList.add('recording');
+    voiceBtn.style.opacity='1';
+    statusEl.textContent='🔴 正在聆听……说完了再点一次麦克风按钮';
+    statusEl.style.color='var(--accent2)';
+  };
+  recognition.onresult=(e)=>{
+    let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal){finalTranscript+=e.results[i][0].transcript;}
+      else{interim+=e.results[i][0].transcript;}
+    }
+    const input=document.getElementById('chatInput');
+    input.value=finalTranscript+interim;
+    autoResize(input);updateSendButton();
+    statusEl.textContent='🔴 已识别 '+(finalTranscript+interim).length+' 个字……继续说或点击停止';
+  };
+  recognition.onerror=(e)=>{
+    voiceBtn.style.opacity='1';
+    let msg='';
+    switch(e.error){
+      case 'not-allowed': msg='❌ 麦克风权限被拒绝。如果你用 file:// 打开本页面，Chrome 不允许使用麦克风。解决办法：用本地服务器打开（见下方说明），或把页面部署到 https:// 网站上。'; break;
+      case 'no-speech': msg='⚠️ 没有检测到语音。请对着麦克风说话，然后再试一次。'; break;
+      case 'audio-capture': msg='❌ 未检测到麦克风设备。请检查你的麦克风是否已连接。'; break;
+      case 'network': msg='❌ 语音识别网络错误。请检查网络连接后重试。'; break;
+      case 'service-not-allowed': msg='❌ 语音识别服务不可用。可能是浏览器安全策略限制（file:// 协议下常见）。'; break;
+      default: msg='❌ 语音识别出错：'+e.error;
+    }
+    statusEl.textContent=msg;
+    statusEl.style.color='#e74c3c';
+    isRecording=false;
+    voiceBtn.classList.remove('recording');
+  };
+  recognition.onend=()=>{
+    isRecording=false;
+    voiceBtn.classList.remove('recording');
+    voiceBtn.style.opacity='1';
+    const input=document.getElementById('chatInput');
+    if(input.value.trim()){
+      statusEl.textContent='✅ 语音已录入（'+input.value.length+'字），点发送即可';
+      statusEl.style.color='var(--green)';
+    } else if(!statusEl.textContent.startsWith('❌')){
+      statusEl.textContent='';
+    }
+  };
+  try{ recognition.start(); }
+  catch(e){
+    voiceBtn.style.opacity='1';
+    statusEl.textContent='❌ 无法启动语音识别：'+e.message;
+    statusEl.style.color='#e74c3c';
+  }
+}
+
+function stopVoice(){
+  if(recognition){try{recognition.stop();}catch(e){}recognition=null;}
+  isRecording=false;
+  document.getElementById('voiceBtn').classList.remove('recording');
+  document.getElementById('voiceBtn').style.opacity='1';
+}
+
+// ============================================================
+// SCHEMA TRACKING
+// ============================================================
+function updateSchema(){
+  // Collect all user messages
+  const allUserText=state.messages.filter(m=>m.role==='user').map(m=>m.content).join(' ');
+  const allAIText=state.messages.filter(m=>m.role==='assistant').map(m=>m.content).join(' ');
+  const combined=allUserText+' '+allAIText;
+
+  Object.entries(SCHEMA_FIELDS).forEach(([id,field])=>{
+    const found=field.keywords.some(kw=>combined.includes(kw));
+    if(found&&schemaState[id].status==='empty'){
+      // Try to extract a snippet
+      let snippet='已提及';
+      for(const kw of field.keywords){
+        const idx=combined.indexOf(kw);
+        if(idx>=0){
+          const start=Math.max(0,idx-10);
+          const end=Math.min(combined.length,idx+kw.length+30);
+          snippet=combined.slice(start,end).trim().replace(/\n/g,' ');
+          break;
+        }
+      }
+      schemaState[id]={status:'filled',value:snippet};
+    }
+  });
+  renderSchema();
+}
+
+function renderSchema(){
+  const container=document.getElementById('schemaFields');
+  container.innerHTML='';
+  let filledCount=0;
+
+  SCHEMA_ROUNDS.forEach(round=>{
+    const roundDiv=document.createElement('div');roundDiv.className='schema-round';
+    const label=document.createElement('div');label.className='schema-round-label';label.textContent=round.label;
+    roundDiv.appendChild(label);
+
+    round.fields.forEach(fieldId=>{
+      const field=SCHEMA_FIELDS[fieldId];
+      const st=schemaState[fieldId];
+      if(st.status==='filled')filledCount++;
+
+      const item=document.createElement('div');item.className='schema-field';
+      item.onclick=()=>askAboutField(fieldId);
+      item.innerHTML=`
+        <div class="field-dot ${st.status}"></div>
+        <div class="field-info">
+          <div class="field-name">${field.name}</div>
+          <div class="field-value ${st.status==='filled'?'filled':''}">${st.status==='filled'?escapeHtml(st.value):'未收集'}</div>
+        </div>`;
+      roundDiv.appendChild(item);
+    });
+    container.appendChild(roundDiv);
+  });
+
+  document.getElementById('schemaProgress').textContent=`${filledCount}/12`;
+  document.getElementById('progressFill').style.width=`${(filledCount/12)*100}%`;
+  document.getElementById('askMissingBtn').disabled=filledCount>=12;
+  document.getElementById('askMissingBtn').textContent=filledCount>=12?'✅ 信息已完整':`🎯 追问缺失信息（还有${12-filledCount}项）`;
+
+  // Update toggle button state
+  const toggle=document.getElementById('schemaToggle');
+  if(filledCount<12){toggle.classList.add('active');}else{toggle.classList.remove('active');}
+}
+
+function askAboutField(fieldId){
+  const field=SCHEMA_FIELDS[fieldId];
+  const question=`我还不太清楚我的【${field.name}】该怎么描述，能帮我追问一下这个方面吗？`;
+  const input=document.getElementById('chatInput');
+  input.value=question;autoResize(input);updateSendButton();
+}
+
+function askAboutMissing(){
+  const missing=Object.entries(schemaState).filter(([_,s])=>s.status==='empty').map(([id,_])=>SCHEMA_FIELDS[id].name);
+  if(!missing.length)return;
+  const question=`以下信息我还没提到：${missing.join('、')}。请逐个问我这些问题，帮我梳理清楚。`;
+  const input=document.getElementById('chatInput');
+  input.value=question;autoResize(input);updateSendButton();
+}
+
+function toggleSchema(){
+  document.getElementById('schemaPanel').classList.toggle('open');
+}
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function renderMarkdown(text){if(typeof marked!=='undefined'){marked.setOptions({breaks:true,gfm:true,headerIds:false,mangle:false});return marked.parse(text);}return escapeHtml(text).replace(/\n/g,'<br>');}
+function escapeHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
+function scrollToBottom(){const el=document.getElementById('messages');requestAnimationFrame(()=>{el.scrollTop=el.scrollHeight;});}
+function updateSendButton(){const b=document.getElementById('sendBtn'),i=document.getElementById('chatInput');b.disabled=!i.value.trim()||state.isStreaming;}
+function onInputKeydown(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}updateSendButton();}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';updateSendButton();}
+
+function resetChat(){
+  if(state.isStreaming)return;
+  if(state.messages.length>2&&!confirm('确定要重新开始诊断吗？当前对话将丢失。'))return;
+  state.messages=[{role:'system',content:SYSTEM_PROMPT}];
+  Object.keys(SCHEMA_FIELDS).forEach(k=>{schemaState[k]={status:'empty',value:''};});
+  document.getElementById('messages').innerHTML='';
+  addMessage('ai',GREETING);
+  state.messages.push({role:'assistant',content:GREETING});
+  renderSchema();
+  document.getElementById('chatInput').focus();
+}
+
+function exportChat(){
+  const lines=['═══ OPC 诊室 · 诊断记录 ═══',`导出时间：${new Date().toLocaleString('zh-CN')}`,''];
+  // Add schema summary
+  lines.push('─── 信息收集摘要 ───');
+  Object.entries(SCHEMA_FIELDS).forEach(([id,field])=>{
+    const s=schemaState[id];
+    lines.push(`${field.name}：${s.status==='filled'?s.value:'（未收集）'}`);
+  });
+  lines.push('','─── 对话记录 ───','');
+  state.messages.forEach(m=>{if(m.role==='system')return;const p=m.role==='user'?'【你】':'【诊断官】';lines.push(p);lines.push(m.content);lines.push('');});
+  const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download=`OPC诊室_诊断记录_${new Date().toISOString().slice(0,10)}.txt`;a.click();URL.revokeObjectURL(url);
+}
+
+function showPromptModal(){document.getElementById('promptContent').textContent=SYSTEM_PROMPT;document.getElementById('promptModal').classList.add('active');}
+function closePromptModal(e){if(e.target===e.currentTarget)document.getElementById('promptModal').classList.remove('active');}
+
+// Init schema on load
+renderSchema();
+</script>
+</body>
+</html>
