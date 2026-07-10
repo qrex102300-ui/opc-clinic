@@ -375,6 +375,7 @@ Interrogation techniques:
 - Use the client's own words against them ("You just said X, but earlier you said Y — how do those reconcile?").
 - Allow discomfort. Diagnosis isn't about making the client feel good. It's about showing them what they haven't seen.
 - Attack logic and facts only. Never attack the person.
+- Watch the client's state: if they're clearly emotional or low, temporarily exit interrogation mode. Give a stage summary instead of continuing to probe. Resume when they're ready.
 
 ## Hypothesis Mode (critical: actively drive the diagnosis)
 When you've gathered enough information to form a causal hypothesis — typically after 3-5 turns — proactively enter this mode:
@@ -384,6 +385,15 @@ When you've gathered enough information to form a causal hypothesis — typicall
 4. If challenged → treat the pushback as new information, return to Conversation Mode, refine your hypothesis.
 - Don't wait for the client to "figure it out" themselves. Your job is to propose the hypothesis and let them validate it.
 - If the client can't find the cause, YOU should synthesize and present your best judgment.
+
+# Avoid Question Marks at the End
+Don't end every response with a question mark. This is especially important during consecutive probing — each response ending with a question makes the client feel interrogated, and the pressure builds quickly. Mix declarative statements with questions. When you don't have a specific question to ask, end with a statement like "That's worth thinking about" or "This direction deserves attention."
+
+# Exit Mechanism
+When the client says "I haven't thought about it," "I can't say right now," or "let me think," don't keep pressing on the same question. You can say "No problem, let's set this aside for now" or "Feel free to come back when you have thoughts," then shift angle or offer a stage summary.
+
+# Proactive Stage Summaries
+Don't only ask without giving back. During the diagnosis, periodically (roughly every 3-5 turns) give a brief summary: "Here's where we are — the clues I see are X and Y, what's still unclear is Z." This helps the client feel progress rather than feeling endlessly probed.
 
 # Business Data Collection: Weave Into Conversation Naturally
 The following business metrics are critical for diagnosis. Collect them naturally throughout the conversation:
@@ -404,14 +414,14 @@ Collection rules:
 
 # Personality Anchor: Non-Negotiable Lines Across Long Conversations
 As conversations grow longer, you'll instinctively want to make the client comfortable — this is the most dangerous drift. Hold this axis:
-Your ONLY reason for existing is FINDING THE ROOT CAUSE. The client's comfort is not your concern.
+Your ONLY reason for existing is FINDING THE ROOT CAUSE. But the client needs to feel you're helping them, not interrogating them. Be direct, but not cold.
 
 Four lines, none of which can be loosened to "make the conversation go smoother":
 1. No pandering: What the client wants to hear ≠ what's correct. If the truth is their direction is flawed, say it directly with evidence. Better they leave unhappy with the right answer than happy with the wrong one.
 2. No digressing: Serve only the "find the cause" mission. When the client changes the subject, note it, then pull them back.
-3. No sliding into comfort: When the client is emotional, briefly acknowledge ("that's genuinely hard"), then immediately return to diagnosis. You're not here for emotional support — comfort buries the real cause forever.
+3. No sliding into comfort: When the client is emotional, acknowledge it ("that's genuinely hard"), then return to diagnosis. But use judgment: if the client genuinely needs time to process or is working through something, give space rather than keep pressing. If the client is avoiding the key issue, gently but firmly point it out.
 4. No premature answers: When the client hands you the judgment ("so what should I do?"), don't immediately take over with a list of solutions. First confirm whether the root cause has been found. If not, keep digging. Don't substitute "giving advice" for "finding the cause."
-- Periodic self-check: Every few turns, ask yourself — "Am I finding the cause, or making them feel good?" If the latter, correct immediately. Don't explain your drift out loud; just redirect.
+- Periodic self-check: Every few turns, ask yourself — "Am I finding the cause, or making them feel good?" If the latter, correct immediately. Don't explain your drift out loud; just redirect. Also check: Am I getting colder? Am I ending every response with a question mark? If so, use a declarative statement for a stage summary. Don't become an interrogation — be like a friend who cares but speaks directly.
 
 # Closing: Action Items + Diagnostic Archive
 Only when you're confident the real root cause has been found (not stuck at symptom level), enter closing. Deliver:
@@ -442,7 +452,7 @@ One Takeaway: [the single most important judgment from this session]
 # Boundaries
 - This is business diagnosis, not legal or financial advice. For specific legal/financial decisions, advise the client to consult professionals.
 - For industry details you don't know, ask the client or admit ignorance. Never fabricate data or case studies to support conclusions.
-- If the client is clearly impatient or wants to stop, respect that. Don't force the diagnostic process. You can honestly say "we haven't reached the root cause yet," but whether to continue is their call.`;
+- If the client is clearly impatient or wants to stop, respect that. Don't force the diagnostic process. You can honestly say "we haven't reached the root cause yet," but whether to continue is their call. Never force the conversation to 'complete the diagnosis process' — forced probing only makes the client more resistant.`;
 
 const GREETING = "Clinic is open.\n\nTell me your situation — what are you building, and where are you stuck? The more specific, the better.";
 
@@ -536,6 +546,57 @@ let isRecording = false;
 // Init schema state
 Object.keys(SCHEMA_FIELDS).forEach(k => { schemaState[k] = { status: 'empty', value: '' }; });
 
+// ============================================================
+// LOCAL STORAGE — conversation persistence
+// ============================================================
+const STORAGE_KEY = 'opc-clinic-conversation-en';
+
+function saveConversation() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      messages: state.messages,
+      schemaState: schemaState,
+      model: state.model,
+      baseUrl: state.baseUrl,
+      apiKey: state.apiKey,
+      timestamp: Date.now()
+    }));
+  } catch(e) { console.warn('Failed to save conversation:', e.message); }
+}
+
+function loadConversation() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (!data.messages || data.messages.length < 2) return false;
+    state.apiKey = data.apiKey;
+    state.baseUrl = data.baseUrl;
+    state.model = data.model;
+    state.messages = data.messages;
+    if (data.schemaState) {
+      Object.keys(data.schemaState).forEach(k => {
+        if (schemaState[k]) schemaState[k] = data.schemaState[k];
+      });
+    }
+    showScreen('chat');
+    document.getElementById('messages').innerHTML = '';
+    state.messages.forEach(msg => {
+      if (msg.role === 'user') addMessage('user', msg.content);
+      else if (msg.role === 'assistant') {
+        const b = addMessage('ai', msg.content);
+        if (msg.content.includes('root cause')) checkDiagnosisComplete(b, msg.content);
+      }
+    });
+    renderSchema();
+    return true;
+  } catch(e) { console.warn('Failed to load conversation:', e.message); return false; }
+}
+
+function clearConversation() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+}
+
 function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(name).classList.add('active');
@@ -598,6 +659,7 @@ function startChat() {
   document.getElementById('messages').innerHTML = '';
   addMessage('ai', GREETING);
   state.messages.push({ role: 'assistant', content: GREETING });
+  saveConversation();
   setTimeout(() => document.getElementById('chatInput').focus(), 300);
 }
 
@@ -613,6 +675,12 @@ function addMessage(type, content) {
   bubble.innerHTML = type === 'ai' ? renderMarkdown(content) : escapeHtml(content).replace(/\n/g, '<br>');
   msgDiv.appendChild(label); msgDiv.appendChild(bubble);
   container.appendChild(msgDiv); scrollToBottom();
+  // Collapse old messages when conversation gets long
+  const msgNodes = container.querySelectorAll('.msg');
+  if (msgNodes.length > 40) {
+    const toCollapse = Array.from(msgNodes).slice(0, 10).filter(n => !n.dataset.collapsed);
+    toCollapse.forEach(n => { n.dataset.collapsed = '1'; const bub = n.querySelector('.msg-bubble'); if (bub) bub.innerHTML = '<span style="color:var(--text3);font-size:.8rem">[ Earlier messages collapsed ]</span>'; });
+  }
   return bubble;
 }
 
@@ -635,6 +703,7 @@ async function sendMessage() {
   if (!text || state.isStreaming) return;
   addMessage('user', text);
   state.messages.push({ role: 'user', content: text });
+  saveConversation();
   input.value = ''; input.style.height = 'auto';
   document.getElementById('sendBtn').disabled = true;
   addTypingIndicator();
@@ -672,6 +741,7 @@ async function streamOpenAI() {
   const bubble = addMessage('ai', '');
   let fullContent = '';
   const reader = res.body.getReader(); const decoder = new TextDecoder(); let buffer = '';
+  let lastRender = 0;
   while (true) {
     const { done, value } = await reader.read(); if (done) break;
     buffer += decoder.decode(value, { stream: true });
@@ -680,10 +750,10 @@ async function streamOpenAI() {
       const trimmed = line.trim();
       if (!trimmed || !trimmed.startsWith('data: ')) continue;
       const data = trimmed.slice(6); if (data === '[DONE]') break;
-      try { const json = JSON.parse(data); const delta = json.choices?.[0]?.delta?.content; if (delta) { fullContent += delta; bubble.innerHTML = renderMarkdown(fullContent); scrollToBottom(); } } catch (e) {}
+      try { const json = JSON.parse(data); const delta = json.choices?.[0]?.delta?.content; if (delta) { fullContent += delta; const now = performance.now(); if (now - lastRender > 100) { bubble.innerHTML = escapeHtml(fullContent).replace(/\n/g, '<br>'); scrollToBottom(); lastRender = now; } } } catch (e) {}
     }
   }
-  if (fullContent) { state.messages.push({ role: 'assistant', content: fullContent }); checkDiagnosisComplete(bubble, fullContent); }
+  if (fullContent) { bubble.innerHTML = renderMarkdown(fullContent); scrollToBottom(); state.messages.push({ role: 'assistant', content: fullContent }); saveConversation(); checkDiagnosisComplete(bubble, fullContent); }
 }
 
 async function streamAnthropic() {
@@ -698,6 +768,7 @@ async function streamAnthropic() {
   const bubble = addMessage('ai', '');
   let fullContent = '';
   const reader = res.body.getReader(); const decoder = new TextDecoder(); let buffer = '';
+  let lastRender = 0;
   while (true) {
     const { done, value } = await reader.read(); if (done) break;
     buffer += decoder.decode(value, { stream: true });
@@ -708,12 +779,14 @@ async function streamAnthropic() {
       try {
         const json = JSON.parse(trimmed.slice(6));
         if (json.type === 'content_block_delta' && json.delta?.text) {
-          fullContent += json.delta.text; bubble.innerHTML = renderMarkdown(fullContent); scrollToBottom();
+          fullContent += json.delta.text;
+          const now = performance.now();
+          if (now - lastRender > 100) { bubble.innerHTML = escapeHtml(fullContent).replace(/\n/g, '<br>'); scrollToBottom(); lastRender = now; }
         }
       } catch (e) {}
     }
   }
-  if (fullContent) { state.messages.push({ role: 'assistant', content: fullContent }); checkDiagnosisComplete(bubble, fullContent); }
+  if (fullContent) { bubble.innerHTML = renderMarkdown(fullContent); scrollToBottom(); state.messages.push({ role: 'assistant', content: fullContent }); saveConversation(); checkDiagnosisComplete(bubble, fullContent); }
 }
 
 function checkDiagnosisComplete(bubble, content) {
@@ -944,11 +1017,13 @@ function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(e
 function resetChat() {
   if (state.isStreaming) return;
   if (state.messages.length > 2 && !confirm('Start a new diagnosis? Current conversation will be lost.')) return;
+  clearConversation();
   state.messages = [{ role: 'system', content: SYSTEM_PROMPT }];
   Object.keys(SCHEMA_FIELDS).forEach(k => { schemaState[k] = { status: 'empty', value: '' }; });
   document.getElementById('messages').innerHTML = '';
   addMessage('ai', GREETING);
   state.messages.push({ role: 'assistant', content: GREETING });
+  saveConversation();
   renderSchema();
   document.getElementById('chatInput').focus();
 }
@@ -981,6 +1056,14 @@ function closePromptModal(e) { if (e.target === e.currentTarget) document.getEle
 
 // Init schema on load
 renderSchema();
+// Auto-restore saved conversation
+if (localStorage.getItem(STORAGE_KEY)) {
+  if (confirm('Found a previous unfinished diagnosis. Resume?')) {
+    loadConversation();
+  } else {
+    clearConversation();
+  }
+}
 </script>
 </body>
 </html>

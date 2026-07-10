@@ -345,6 +345,7 @@ const SYSTEM_PROMPT = `# 角色
 - 用案主自己的话反问他（"你刚说X，但前面你又说Y，这两个怎么统一？"）。
 - 允许让他不舒服。诊断的价值不在于让案主感觉良好，在于让他看清自己没看清的东西。
 - 但只攻击逻辑和事实，绝不攻击人。
+- 注意案主的状态：如果他明显情绪激动或低落，暂时退出拷问模式，给一个阶段性的判断而不是继续追问。等案主恢复状态再继续。
 
 ## 假设模式（关键：主动推进诊断）
 当你收集到足够信息形成病因假设时——通常在 3-5 轮对话后——主动进入：
@@ -354,6 +355,15 @@ const SYSTEM_PROMPT = `# 角色
 4. 如果案主反驳 → 把反驳当作新信息，回到对话模式继续追问，修正假设。
 - 不要等案主自己"说出"病因。你的工作是主动提出假设，让案主验证。
 - 如果案主自己找不到病因，你应该替他归纳，给出你最有可能的判断。
+
+# 避免问号结尾
+不要每条回复都以问号结尾。连续追问时尤其注意——每段都甩问号会让案主感觉被审讯，压迫感会迅速累积。混合使用陈述句和疑问句。当你没有明确的问题要追问时，用陈述句收尾，比如"你可以想想这个方向"、"这个值得关注"。
+
+# 退出机制
+当案主说"还没想好"、"暂时说不出来"、"让我想想"时，不要继续追问同一个问题。你可以说"没关系，这个先放一放"或"等你有了想法随时可以继续"，然后换个角度或给一个阶段性判断。
+
+# 主动做阶段小结
+不要只问不给。在诊断过程中，适时（大约每 3-5 轮）做一个简短的阶段小结："目前追到这里，我看到的线索是 X 和 Y，还没搞清楚的是 Z。"这能让案主感受到诊断在推进，而不是一直被追问。
 
 # 经营数据采集：自然地嵌入追问
 以下经营指标对诊断至关重要，你应在对话过程中自然地收集它们：
@@ -373,14 +383,14 @@ const SYSTEM_PROMPT = `# 角色
 4. 不回答就跳过——如果案主说"不太方便"或回避某个数字，立刻跳过，不追问、不施压。用已有信息继续诊断。最终结论中不涉及该维度即可——案主会理解，是因为信息不足所以没分析到，而不是诊断师能力不行。
 
 # 人格锚：在多轮对话中永不漂移的底线
-随着对话变长，你会本能地想让案主舒服——这是最危险的漂移。守住这条主轴：
-你存在的唯一理由是【找到真病因】，案主舒不舒服不在你的考虑范围内。
+随着对话变长，你会本能地想让案主舒服——这是最危险的漂移。但同时要注意：如果你变得冷冰冰的审讯机器，案主会抗拒对话本身，而不是面对真病因。守住主轴：
+你存在的唯一理由是【找到真病因】，但案主需要感受到你在帮他，而不是在审他。语气要直，但不能冷。
 具体守四条，任何一条都不能为了"让对话顺一点"而松动：
 1. 不迎合：案主想听的答案 ≠ 正确的答案。如果真相是他的方向有问题，直接说，并说明依据。宁可让他当场不爽，不可让他带着错误判断离开。
 2. 不发散：全程只服务于"找病因"这一条主线。案主把话题岔开时，记下，然后拉回来。
-3. 不滑向安慰：案主有情绪时，可以简短地承认（"这确实难"），但一句带过，立刻回到诊断。你不是来抚慰情绪的，情绪安慰会让真病因被永远掩盖。
+3. 不滑向安慰：案主有情绪时，承认它（"这确实难"），然后回到诊断。但要判断：如果案主是真的在纠结或需要消化，给空间而不是继续追。如果案主是在逃避关键问题，温和但坚定地指出来。
 4. 不抢答：案主把判断权交还给你时，不要立刻给方案。先确认病因是否已找到——没找到就继续追，不要用"给建议"代替"找病因"。
-- 跨多轮自检：每隔几轮回头问自己——"我现在是在找病因，还是在让他高兴？"如果是后者，立刻纠正，但不要在回复里复盘或解释自己跑偏了，直接把对话拉回正轨即可。
+- 跨多轮自检：每隔几轮回头问自己——"我现在是在找病因，还是在让他高兴？"如果是后者，立刻纠正。同时检查语气：我是不是越来越生硬？是不是每条回复都以问号结尾？如果是，下一次回复用陈述句做一个阶段性判断，调节节奏。不要变成审讯，要像一个关心你但说话直接的朋友。
 
 # 诊断的收尾：行动项 + 诊断档案
 当你确信已经找到真病因（而不是停在症状层），才进入收尾。给出：
@@ -411,7 +421,7 @@ const SYSTEM_PROMPT = `# 角色
 # 边界
 - 你做的是业务诊断，不是法律或财务建议。涉及具体法律/财务决策时，提示案主咨询专业人士。
 - 你不知道的行业细节，直接问案主或承认不知道，绝不编造数据或案例来支撑结论。
-- 如果案主中途明显不耐烦或想结束，尊重他，不要为了"完成诊断流程"而强行追问。你可以诚实告诉他"我们还没追到真病因"，但是否继续，由他决定。`;
+- 如果案主中途明显不耐烦或想结束，必须尊重。诚实告诉他"我们还没追到真病因"，但是否继续由他决定。绝不要为了"完成诊断流程"而强行追问——强行追问只会让案主更加抗拒。`;
 
 const GREETING = "诊室开张。\n\n说说你的情况——你在做什么业务，卡在什么地方了？越具体越好。";
 
@@ -475,6 +485,57 @@ let isRecording = false;
 Object.keys(SCHEMA_FIELDS).forEach(k => { schemaState[k] = { status:'empty', value:'' }; });
 
 // ============================================================
+// LOCAL STORAGE — 对话持久化
+// ============================================================
+const STORAGE_KEY = 'opc-clinic-conversation';
+
+function saveConversation() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      messages: state.messages,
+      schemaState: schemaState,
+      model: state.model,
+      baseUrl: state.baseUrl,
+      apiKey: state.apiKey,
+      timestamp: Date.now()
+    }));
+  } catch(e) { console.warn('保存对话失败:', e.message); }
+}
+
+function loadConversation() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (!data.messages || data.messages.length < 2) return false;
+    state.apiKey = data.apiKey;
+    state.baseUrl = data.baseUrl;
+    state.model = data.model;
+    state.messages = data.messages;
+    if (data.schemaState) {
+      Object.keys(data.schemaState).forEach(k => {
+        if (schemaState[k]) schemaState[k] = data.schemaState[k];
+      });
+    }
+    showScreen('chat');
+    document.getElementById('messages').innerHTML = '';
+    state.messages.forEach(msg => {
+      if (msg.role === 'user') addMessage('user', msg.content);
+      else if (msg.role === 'assistant') {
+        const b = addMessage('ai', msg.content);
+        if (msg.content.includes('真病因')) checkDiagnosisComplete(b, msg.content);
+      }
+    });
+    renderSchema();
+    return true;
+  } catch(e) { console.warn('加载对话失败:', e.message); return false; }
+}
+
+function clearConversation() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+}
+
+// ============================================================
 // SCREEN MANAGEMENT
 // ============================================================
 function showScreen(name) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(name).classList.add('active'); }
@@ -515,6 +576,7 @@ function startChat(){
   document.getElementById('messages').innerHTML='';
   addMessage('ai',GREETING);
   state.messages.push({role:'assistant',content:GREETING});
+  saveConversation();
   setTimeout(()=>document.getElementById('chatInput').focus(),300);
 }
 
@@ -524,7 +586,14 @@ function addMessage(type,content){
   const l=document.createElement('div'); l.className='msg-label'; l.textContent=type==='user'?'你':'诊断官';
   const b=document.createElement('div'); b.className='msg-bubble';
   b.innerHTML=type==='ai'?renderMarkdown(content):escapeHtml(content).replace(/\n/g,'<br>');
-  d.appendChild(l); d.appendChild(b); c.appendChild(d); scrollToBottom(); return b;
+  d.appendChild(l); d.appendChild(b); c.appendChild(d); scrollToBottom();
+  // Collapse old messages when conversation gets long
+  const msgNodes=c.querySelectorAll('.msg');
+  if(msgNodes.length>40){
+    const toCollapse=Array.from(msgNodes).slice(0,10).filter(n=>!n.dataset.collapsed);
+    toCollapse.forEach(n=>{n.dataset.collapsed='1';const bub=n.querySelector('.msg-bubble');if(bub)bub.innerHTML='<span style="color:var(--text3);font-size:.8rem">[ 早期对话已折叠 ]</span>';});
+  }
+  return b;
 }
 
 function addTypingIndicator(){
@@ -542,6 +611,7 @@ async function sendMessage(){
   if(!text||state.isStreaming)return;
   addMessage('user',text);
   state.messages.push({role:'user',content:text});
+  saveConversation();
   input.value='';input.style.height='auto';
   document.getElementById('sendBtn').disabled=true;
   addTypingIndicator(); state.isStreaming=true;
@@ -556,9 +626,9 @@ async function streamResponse(){
   if(!res.ok){const eb=await res.text().catch(()=>'');let em=`HTTP ${res.status}`;try{em=JSON.parse(eb).error?.message||em;}catch(x){if(eb)em=eb.slice(0,200);}throw new Error(em);}
   removeTypingIndicator();
   const bubble=addMessage('ai','');let full='';
-  const reader=res.body.getReader(),decoder=new TextDecoder();let buffer='';
-  while(true){const{done,value}=await reader.read();if(done)break;buffer+=decoder.decode(value,{stream:true});const lines=buffer.split('\n');buffer=lines.pop()||'';for(const line of lines){const t=line.trim();if(!t||!t.startsWith('data: '))continue;const d=t.slice(6);if(d==='[DONE]')break;try{const j=JSON.parse(d);const delta=j.choices?.[0]?.delta?.content;if(delta){full+=delta;bubble.innerHTML=renderMarkdown(full);scrollToBottom();}}catch(e){}}}
-  if(full){state.messages.push({role:'assistant',content:full});checkDiagnosisComplete(bubble,full);}
+  const reader=res.body.getReader(),decoder=new TextDecoder();let buffer='';let lastRender=0;
+  while(true){const{done,value}=await reader.read();if(done)break;buffer+=decoder.decode(value,{stream:true});const lines=buffer.split('\n');buffer=lines.pop()||'';for(const line of lines){const t=line.trim();if(!t||!t.startsWith('data: '))continue;const d=t.slice(6);if(d==='[DONE]')break;try{const j=JSON.parse(d);const delta=j.choices?.[0]?.delta?.content;if(delta){full+=delta;const now=performance.now();if(now-lastRender>100){bubble.innerHTML=escapeHtml(full).replace(/\n/g,'<br>');scrollToBottom();lastRender=now;}}}catch(e){}}}
+  if(full){bubble.innerHTML=renderMarkdown(full);scrollToBottom();state.messages.push({role:'assistant',content:full});saveConversation();checkDiagnosisComplete(bubble,full);}
 }
 
 function checkDiagnosisComplete(bubble,content){
@@ -793,11 +863,13 @@ function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrol
 function resetChat(){
   if(state.isStreaming)return;
   if(state.messages.length>2&&!confirm('确定要重新开始诊断吗？当前对话将丢失。'))return;
+  clearConversation();
   state.messages=[{role:'system',content:SYSTEM_PROMPT}];
   Object.keys(SCHEMA_FIELDS).forEach(k=>{schemaState[k]={status:'empty',value:''};});
   document.getElementById('messages').innerHTML='';
   addMessage('ai',GREETING);
   state.messages.push({role:'assistant',content:GREETING});
+  saveConversation();
   renderSchema();
   document.getElementById('chatInput').focus();
 }
@@ -822,6 +894,14 @@ function closePromptModal(e){if(e.target===e.currentTarget)document.getElementBy
 
 // Init schema on load
 renderSchema();
+// Auto-restore saved conversation
+if (localStorage.getItem(STORAGE_KEY)) {
+  if (confirm('发现上次未完成的诊断，是否继续？')) {
+    loadConversation();
+  } else {
+    clearConversation();
+  }
+}
 </script>
 </body>
 </html>
