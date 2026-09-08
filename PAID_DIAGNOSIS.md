@@ -34,17 +34,14 @@ Typical good-fit symptoms:
 
 ## How ordering works
 
-1. **Reserve a beta slot for free** using the `Reserve Founder Debugging Beta Slot` GitHub issue template.
+1. **Reserve a beta slot for free** using the `Free Founder Bottleneck Triage` GitHub issue template.
 2. The case is checked for fit before any payment is requested.
-3. If accepted, send **59 USDC on Base** to the payment wallet and add the transaction hash to the same issue.
-4. Once payment and context are complete, the founding-beta target is delivery within **24 hours**.
-5. The same issue remains the workroom for research, diagnosis, the 7-day experiment plan, and one follow-up pass.
+3. If accepted and you want the deeper pass, payment instructions for **59 USDC on Base** are posted in the same issue.
+4. Add the transaction hash to the issue after payment so the payment can be verified.
+5. Once payment and context are complete, the founding-beta target is delivery within **24 hours**.
+6. The same issue remains the workroom for research, diagnosis, the 7-day experiment plan, and one follow-up pass.
 
-### Payment wallet
-
-`WALLET_ADDRESS_PENDING`
-
-> Wallet activation is pending. Do not send payment until a valid address replaces the placeholder above. You may reserve a slot before the wallet is live.
+> Do not send funds before your case is accepted. Use only the payment instructions posted in the accepted issue; do not send funds to wallet addresses copied from third-party messages or unrelated comments.
 
 ## What to share
 
