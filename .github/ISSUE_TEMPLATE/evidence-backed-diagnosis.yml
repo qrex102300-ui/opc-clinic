@@ -1,0 +1,87 @@
+name: Evidence-Backed Diagnosis
+about: Order a paid founder diagnosis with external evidence and a 7-day experiment plan.
+title: "[Paid Diagnosis] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Evidence-Backed Founder Diagnosis
+        Founding beta price: **59 USDC on Base**.
+
+        Before submitting, read [PAID_DIAGNOSIS.md](../../PAID_DIAGNOSIS.md).
+        Do not include passwords, API keys, private customer data, or other secrets.
+
+  - type: input
+    id: project
+    attributes:
+      label: Project / product
+      description: What are you building or selling?
+      placeholder: "e.g. AI bookkeeping assistant for small agencies"
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: Public URL
+      description: Website, product page, or public repository if available.
+      placeholder: "https://..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: customer
+    attributes:
+      label: Customer and offer
+      description: Who is the customer, what problem do they have, and what are you asking them to buy?
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: What has actually happened so far?
+      description: Give facts, not hopes — users, revenue, traffic, calls, conversion, experiments, rejections, etc.
+      placeholder: |
+        - 320 visits last 30 days
+        - 18 signups
+        - 0 paid users
+        - 7 founder calls; 4 said X, 3 said Y
+    validations:
+      required: true
+
+  - type: textarea
+    id: stuck
+    attributes:
+      label: Where do you think you are stuck?
+      description: Your current hypothesis is useful even if it turns out to be wrong.
+    validations:
+      required: true
+
+  - type: textarea
+    id: decision
+    attributes:
+      label: What decision must you make in the next 7 days?
+      placeholder: "e.g. keep building onboarding vs stop and change positioning"
+    validations:
+      required: true
+
+  - type: input
+    id: tx
+    attributes:
+      label: USDC payment transaction hash
+      description: Enter the Base transaction hash after payment. Wallet activation must be live before paying.
+      placeholder: "0x..."
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: agreement
+    attributes:
+      label: Agreement
+      options:
+        - label: I have removed secrets and private customer data from this issue.
+          required: true
+        - label: I understand the diagnosis is evidence-based advice, not a guarantee of revenue or business outcome.
+          required: true
