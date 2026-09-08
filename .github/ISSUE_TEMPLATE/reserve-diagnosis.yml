@@ -1,14 +1,16 @@
-name: Reserve Founder Debugging Beta Slot
-about: Reserve a founding-beta slot for an evidence-backed post-launch diagnosis. No payment required to reserve.
-title: "[Beta Reservation] "
+name: Free Founder Bottleneck Triage
+about: Get a free first-pass triage for a launched product with real evidence. No payment required.
+title: "[Free Triage] "
 labels: []
 body:
   - type: markdown
     attributes:
       value: |
-        ## Reserve a Founder Debugging beta slot
+        ## Free Founder Bottleneck Triage
 
-        This is for founders who have already launched or tested something and have real evidence to inspect. Reservation is **free**. If the case is accepted, payment instructions are posted in the issue before work starts.
+        This is for founders who have already launched or tested something and have real evidence to inspect. The free triage gives you a short first pass: **most plausible bottleneck category → what evidence is missing → fit/no-fit for the deeper diagnosis**.
+
+        It is not a full market-research report and no payment is required for the triage. If the case is accepted and you want the deeper evidence-backed pass, payment instructions are posted in the issue before work starts.
 
         Please do not include passwords, API keys, private customer data, or other secrets.
 
@@ -34,7 +36,8 @@ body:
     id: customer
     attributes:
       label: Customer and offer
-      description: Who is the customer, what problem do they have, and what are you asking them to buy?
+      description: Who is the customer and what are you asking them to buy?
+      placeholder: "e.g. US bookkeeping agencies; $29/month assistant that categorizes client expenses"
     validations:
       required: true
 
@@ -54,10 +57,10 @@ body:
   - type: textarea
     id: stuck
     attributes:
-      label: Where do you think you are stuck?
-      description: Your current hypothesis is useful even if it turns out to be wrong.
+      label: Your current hypothesis (optional)
+      description: Where do you think you are stuck? Leave blank if you genuinely do not know.
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: decision
@@ -74,7 +77,7 @@ body:
       options:
         - label: I have removed secrets and private customer data from this issue.
           required: true
-        - label: I understand this reservation is not a payment and does not guarantee acceptance.
+        - label: I understand the free triage is a short first pass, not a full market-research report and not a guarantee of acceptance.
           required: true
         - label: I understand the diagnosis is evidence-based advice, not a guarantee of revenue or business outcome.
           required: true
