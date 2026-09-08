@@ -1,0 +1,80 @@
+name: Reserve Founder Debugging Beta Slot
+about: Reserve a founding-beta slot for an evidence-backed post-launch diagnosis. No payment required to reserve.
+title: "[Beta Reservation] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Reserve a Founder Debugging beta slot
+
+        This is for founders who have already launched or tested something and have real evidence to inspect. Reservation is **free**. If the case is accepted, payment instructions are posted in the issue before work starts.
+
+        Please do not include passwords, API keys, private customer data, or other secrets.
+
+  - type: input
+    id: project
+    attributes:
+      label: Project / product
+      description: What are you building or selling?
+      placeholder: "e.g. AI bookkeeping assistant for small agencies"
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: Public URL
+      description: Website, product page, or public repository if available.
+      placeholder: "https://..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: customer
+    attributes:
+      label: Customer and offer
+      description: Who is the customer, what problem do they have, and what are you asking them to buy?
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: What has actually happened so far?
+      description: Give facts, not hopes — users, revenue, traffic, calls, conversion, experiments, rejections, etc.
+      placeholder: |
+        - 320 visits last 30 days
+        - 18 signups
+        - 0 paid users
+        - 7 founder calls; 4 said X, 3 said Y
+    validations:
+      required: true
+
+  - type: textarea
+    id: stuck
+    attributes:
+      label: Where do you think you are stuck?
+      description: Your current hypothesis is useful even if it turns out to be wrong.
+    validations:
+      required: true
+
+  - type: textarea
+    id: decision
+    attributes:
+      label: What decision must you make in the next 7 days?
+      placeholder: "e.g. keep building onboarding vs stop and change positioning"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: agreement
+    attributes:
+      label: Agreement
+      options:
+        - label: I have removed secrets and private customer data from this issue.
+          required: true
+        - label: I understand this reservation is not a payment and does not guarantee acceptance.
+          required: true
+        - label: I understand the diagnosis is evidence-based advice, not a guarantee of revenue or business outcome.
+          required: true
