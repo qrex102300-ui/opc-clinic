@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Evidence-Backed Founder Diagnosis — OPC Clinic</title>
-  <meta name="description" content="A $59 evidence-backed founder diagnosis: root cause, outside-world evidence, and a 7-day kill-or-scale experiment plan." />
+  <title>Founder Debugging — OPC Clinic</title>
+  <meta name="description" content="Built it, got usage, but nobody pays? OPC Clinic finds the likely bottleneck, checks it against current market evidence, and gives you a 7-day kill-or-continue test." />
   <style>
-    :root{--bg:#090b10;--card:#11151d;--text:#f5f7fb;--muted:#9aa4b2;--line:#252b36;--accent:#ff6b5f;--accent2:#ffd166;--good:#74d99f}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 0%,#171b27 0,#090b10 42%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}.wrap{max-width:1040px;margin:auto;padding:34px 22px 80px}.nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:70px}.brand{font-weight:800;letter-spacing:.02em}.nav a{color:var(--muted);text-decoration:none}.badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:7px 11px;color:var(--muted);font-size:13px}.dot{width:8px;height:8px;border-radius:50%;background:var(--accent2)}.hero{max-width:860px}.eyebrow{color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:.12em;font-size:13px}.hero h1{font-size:clamp(44px,7vw,80px);line-height:.98;letter-spacing:-.045em;margin:16px 0 24px}.hero p{font-size:clamp(19px,2.2vw,25px);color:#c8cfda;max-width:780px}.price{font-size:28px;font-weight:800;margin:34px 0 10px}.price span{color:var(--accent)}.actions{display:flex;gap:12px;flex-wrap:wrap;margin:28px 0 18px}.btn{display:inline-block;padding:14px 20px;border-radius:10px;text-decoration:none;font-weight:800}.primary{background:var(--text);color:#0c0f14}.secondary{border:1px solid var(--line);color:var(--text)}.disabled{opacity:.48;pointer-events:none}.note{font-size:14px;color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:70px}.card{background:linear-gradient(180deg,#121721,#0e1219);border:1px solid var(--line);border-radius:18px;padding:26px}.card h2{margin:0 0 10px;font-size:20px}.card p,.card li{color:#b8c1ce}.card ul{padding-left:20px}.full{grid-column:1/-1}.step{display:grid;grid-template-columns:42px 1fr;gap:14px;margin:18px 0}.num{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#1d2330;font-weight:800;color:var(--accent2)}.wallet{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#090c12;border:1px dashed #3a414f;padding:12px;border-radius:10px;overflow-wrap:anywhere;color:#cfd6e0}.footer{margin-top:70px;border-top:1px solid var(--line);padding-top:24px;color:var(--muted);font-size:14px}@media(max-width:760px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.nav{margin-bottom:48px}}
+    :root{--bg:#090b10;--card:#11151d;--text:#f5f7fb;--muted:#9aa4b2;--line:#252b36;--accent:#ff6b5f;--accent2:#ffd166;--good:#74d99f}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 0%,#171b27 0,#090b10 42%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}.wrap{max-width:1040px;margin:auto;padding:34px 22px 80px}.nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:70px}.brand{font-weight:800;letter-spacing:.02em}.nav a{color:var(--muted);text-decoration:none}.badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:7px 11px;color:var(--muted);font-size:13px}.dot{width:8px;height:8px;border-radius:50%;background:var(--accent2)}.hero{max-width:880px}.eyebrow{color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:.12em;font-size:13px}.hero h1{font-size:clamp(44px,7vw,78px);line-height:.98;letter-spacing:-.045em;margin:16px 0 24px}.hero p{font-size:clamp(19px,2.2vw,25px);color:#c8cfda;max-width:800px}.price{font-size:28px;font-weight:800;margin:34px 0 10px}.price span{color:var(--accent)}.actions{display:flex;gap:12px;flex-wrap:wrap;margin:28px 0 18px}.btn{display:inline-block;padding:14px 20px;border-radius:10px;text-decoration:none;font-weight:800}.primary{background:var(--text);color:#0c0f14}.secondary{border:1px solid var(--line);color:var(--text)}.note{font-size:14px;color:var(--muted)}.proof{margin-top:28px;padding:15px 18px;border-left:3px solid var(--accent2);background:#0e1219;color:#c8cfda}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:70px}.card{background:linear-gradient(180deg,#121721,#0e1219);border:1px solid var(--line);border-radius:18px;padding:26px}.card h2{margin:0 0 10px;font-size:20px}.card p,.card li{color:#b8c1ce}.card ul{padding-left:20px}.full{grid-column:1/-1}.step{display:grid;grid-template-columns:42px 1fr;gap:14px;margin:18px 0}.num{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#1d2330;font-weight:800;color:var(--accent2)}.wallet{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#090c12;border:1px dashed #3a414f;padding:12px;border-radius:10px;overflow-wrap:anywhere;color:#cfd6e0}.footer{margin-top:70px;border-top:1px solid var(--line);padding-top:24px;color:var(--muted);font-size:14px}@media(max-width:760px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.nav{margin-bottom:48px}}
   </style>
 </head>
 <body>
@@ -17,60 +17,62 @@
     </nav>
 
     <section class="hero">
-      <div class="badge"><span class="dot"></span> Founding beta · wallet activation pending</div>
-      <div class="eyebrow">Evidence-backed founder diagnosis</div>
-      <h1>Stop asking whether your startup idea sounds good.</h1>
-      <p>Get one hard diagnosis checked against the outside world: competitors, customer complaints, pricing, substitutes, and current market signals — then turn it into a 7-day test with a kill-or-continue rule.</p>
-      <div class="price"><span>$59 USDC</span> · one diagnosis</div>
+      <div class="badge"><span class="dot"></span> 3 founding-beta slots · reservation open</div>
+      <div class="eyebrow">Post-launch founder debugging</div>
+      <h1>Built it. People try it. Nobody pays.</h1>
+      <p>Do not build another feature yet. Bring the numbers you already have. OPC Clinic finds the most likely bottleneck, checks it against current competitors, customer complaints, pricing and substitutes, then turns the diagnosis into a 7-day test.</p>
+      <div class="price"><span>$59 USDC</span> · one accepted case</div>
       <div class="actions">
-        <a class="btn primary disabled" href="#">Order opens when wallet is live</a>
+        <a class="btn primary" href="https://github.com/qrex102300-ui/opc-clinic/issues/new?template=reserve-diagnosis.yml">Reserve a beta slot — free</a>
         <a class="btn secondary" href="./PAID_DIAGNOSIS.md">Read the exact scope</a>
       </div>
-      <div class="note">No subscription. No 40-page filler report. No guaranteed outcome claims.</div>
+      <div class="note">Reservation costs nothing. Payment is requested only after the case is accepted. Wallet activation is still pending.</div>
+      <div class="proof"><strong>This is not an idea validator.</strong> It is for founders who already have evidence — visits, signups, trials, calls, rejections, or revenue — but cannot tell whether the real problem is demand, positioning, pricing, activation, conversion, or distribution.</div>
     </section>
 
     <section class="grid">
       <article class="card">
         <h2>What you get</h2>
         <ul>
-          <li>One root-cause diagnosis tied to your facts</li>
-          <li>Current external evidence that supports or contradicts it</li>
+          <li>One root-cause diagnosis tied to your actual facts</li>
+          <li>Current outside-world evidence that supports or contradicts it</li>
           <li>1–3 experiments for the next 7 days</li>
           <li>Pass/fail criteria and a clear kill rule</li>
-          <li>One follow-up pass in the same issue</li>
+          <li>One follow-up pass in the same GitHub issue</li>
         </ul>
       </article>
 
       <article class="card">
-        <h2>Who it is for</h2>
-        <p>Solo founders and small teams already building or selling — especially when the problem sounds like:</p>
+        <h2>Good symptoms to bring</h2>
         <ul>
-          <li>“People say it is good, but nobody pays.”</li>
+          <li>“People use the free version, then disappear.”</li>
           <li>“Traffic exists, conversion does not.”</li>
-          <li>“I cannot tell if this is product, positioning, pricing, or acquisition.”</li>
+          <li>“People say it is useful, but nobody pays.”</li>
+          <li>“I cannot tell if I have a product problem or a distribution problem.”</li>
         </ul>
       </article>
 
       <article class="card full">
-        <h2>How the order works</h2>
-        <div class="step"><div class="num">1</div><div>Send <strong>59 USDC on Base</strong> to the payment wallet after activation.</div></div>
-        <div class="step"><div class="num">2</div><div>Open the Evidence-Backed Diagnosis GitHub issue and provide project facts plus the transaction hash.</div></div>
-        <div class="step"><div class="num">3</div><div>The issue becomes the workroom: research, diagnosis, experiment plan, and one follow-up all stay traceable in one thread.</div></div>
-        <div class="wallet">WALLET_ADDRESS_PENDING</div>
+        <h2>How the beta works</h2>
+        <div class="step"><div class="num">1</div><div><strong>Reserve a slot for free.</strong> Open one GitHub issue with your project URL, real numbers, and the decision you need to make.</div></div>
+        <div class="step"><div class="num">2</div><div><strong>Fit is checked before payment.</strong> If the case is too early, too vague, or outside scope, no payment is requested.</div></div>
+        <div class="step"><div class="num">3</div><div><strong>If accepted, pay 59 USDC on Base.</strong> Add the transaction hash to the same issue. Founding-beta target is delivery within 24 hours after payment and complete context.</div></div>
+        <div class="step"><div class="num">4</div><div><strong>The issue becomes the workroom.</strong> Research, diagnosis, experiment plan, and one follow-up stay traceable in one thread.</div></div>
+        <div class="wallet">Payment wallet: WALLET_ADDRESS_PENDING</div>
       </article>
 
       <article class="card">
-        <h2>Why not just ask ChatGPT?</h2>
-        <p>The free OPC Clinic already helps you interrogate your own story. The paid layer buys the missing part: checking whether the outside world supports that story.</p>
+        <h2>Why not a $9 AI validation report?</h2>
+        <p>Automated idea validators are useful before building. This beta starts after reality has already disagreed with your plan. The work is to reconcile your actual funnel evidence with what the market is doing now.</p>
       </article>
 
       <article class="card">
         <h2>Evidence standard</h2>
-        <p>Material external claims should be traceable. Weak evidence is labeled weak. Contradictory evidence stays contradictory. The goal is a decision, not reassurance.</p>
+        <p>Material external claims should be traceable. Weak evidence is labeled weak. Contradictory evidence stays contradictory. The output is intentionally short: enough evidence to make one decision, not 40 pages of generic research.</p>
       </article>
     </section>
 
-    <div class="footer">OPC Clinic · Free core remains open source under MIT. Paid beta is a research-and-diagnosis service, not legal, tax, investment, or regulated professional advice.</div>
+    <div class="footer">OPC Clinic · Free core remains open source under MIT. Paid beta is a research-and-diagnosis service, not legal, tax, investment, medical, or other regulated professional advice.</div>
   </main>
 </body>
 </html>
