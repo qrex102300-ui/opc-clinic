@@ -47,25 +47,29 @@ Two sales exceed the $100 target.
 
 The first positioning pass exposed an important distinction: generic AI idea-validation is already crowded and cheap, so OPC Clinic should not compete there.
 
-Representative current prices:
+Representative current prices checked on 2026-09-09:
 
 - [FounderSpace](https://www.founderspace.work/pricing) — $8 for one automated validation report.
-- [RoastIdea](https://www.roastidea.com/pricing) — $9.99 for live web/Reddit validation; $19.99 with deeper planning reports.
-- [GoValidate](https://www.govalidate.dev/pricing) — $49 for one structured validation report.
+- [RoastIdea](https://www.roastidea.com/pricing) — free first question, $9.99 for a live-web/Reddit validation, $19.99 for the builder package.
+- [ValidateMyIdea](https://validatemyidea.app/pricing) — $19 for one report, with a $9 founding lifetime offer currently advertised.
+- [XpertVex](https://www.xpertvex.com/) — $5 per AI validation report.
+- [GoValidate](https://www.govalidate.dev/pricing) — $49 for a one-off validation report; $29/month for its founder workspace.
 - [NoCrickets](https://nocrickets.com/) — $39 for a post-launch research diagnosis and one-week recovery plan.
 - [ValidationLaunch](https://validationlaunch.com/) — $97 self-guided framework; $3,500 guided validation sprint.
 
-Decision: keep the $59 beta price, but position it as **post-launch founder debugging**, not idea validation. The customer must bring real-world evidence such as visits, signups, trials, calls, rejections, usage, or revenue. Reservation is free and payment is requested only after the case is accepted.
+Decision: **do not lower the $59 beta price simply to match automated reports.** Price competition is already a race to the bottom, including $5–$19 products. OPC Clinic must earn the premium by staying post-launch, using the founder's real funnel evidence, explicitly checking contradictory evidence, and including one follow-up pass. The free triage reduces purchase risk before payment.
 
 ### Demand signals
 
 Recent founder discussions continue to show the exact symptom this offer targets:
 
+- [Not having paying customers](https://www.reddit.com/r/SaaS/comments/1w43lvd/not_having_paying_customers/) — Sep 1, 2026. The thread centers on the recurring builder failure mode of creating software before proving need and sales.
+- [123 active users, $0 MRR — how do I actually get people to pay?](https://www.reddit.com/r/SaaS/comments/1w2nfv3/123_active_users_0_mrr_how_do_i_actually_get/) — Aug 30, 2026.
+- [100+ uses/day but nobody will pay](https://www.reddit.com/r/SaaS/comments/1viuhbg/100_usersday_but_nobody_will_pay/) — Aug 8, 2026.
 - [Built a SaaS for a year. People use it. No one pays.](https://www.reddit.com/r/SaaS/comments/1qrmfik/built_a_saas_for_a_year_people_use_it_no_one_pays/) — Jan 30, 2026.
 - [Built and launched multiple products. Still no real customers.](https://www.reddit.com/r/startups/comments/1rfno5n/built_and_launched_multiple_products_still_no/) — Feb 26, 2026.
-- [I built a SaaS but getting users feels impossible.](https://www.reddit.com/r/SaaS/comments/1t72wav/i_built_a_saas_but_getting_users_feels_impossible/) — May 8, 2026.
 
-These are demand signals, not proof of willingness to pay. Only collected revenue will count as validation.
+These are **problem signals, not willingness-to-pay evidence**. A founder posting about zero revenue does not prove they will buy this service. Only reservations and collected revenue count as funnel validation.
 
 ## Public scorecard
 
