@@ -13,6 +13,18 @@
 
 ---
 
+## 🔬 Founding Beta · Post-launch Founder Debugging
+
+**已经做出来了，但没人付费？ / Built it. People try it. Nobody pays?**
+
+免费 OPC Clinic 继续保持 MIT 开源。我们正在测试 3 个付费的 Evidence-Backed Founder Diagnosis 名额：你带真实数据（访问、注册、试用、访谈、拒绝、收入），诊断会把这些事实与当前竞争者、客户抱怨、价格和替代方案交叉验证，再给出一个 7 天可判定成败的实验。
+
+**$59 USDC · 先免费预约，只有 case 被接受后才付款。**
+
+[Reserve a beta slot →](./paid-diagnosis.html) · [Public $0 → $100 self-funding sprint →](./SELF_FUNDING_SPRINT.md)
+
+---
+
 ## 这是什么(以及不是什么)
 
 - ✅ 是一段**精心设计的提示词(prompt / skill)**,把"现场追问、一眼看穿糊弄"的诊断能力固化下来
@@ -67,7 +79,7 @@
    连自己卡在哪都讲不明白的小老板?你是做这行的,你知道该问什么。
    把同一个空白对话框扔给你的目标客户,他聊得出你那个结论吗?
    如果聊不出,你拿来打分的根本不是"产品 vs 大模型",
-   是"你这个专家 vs 你的产品"——这场比试从头就不公平。
+   是"你这个专家 vs. 你的产品"——这场比试从头就不公平。
 
    ...(它顶着作者的每一次反驳,追问了十几轮,最后下了这个诊断)
 
