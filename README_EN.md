@@ -12,6 +12,20 @@
 
 ---
 
+## Founding Beta · Post-launch Founder Debugging
+
+**Built it. People try it. Nobody pays?**
+
+The open-source OPC Clinic stays free under MIT. The founding beta adds a different layer for founders who already have reality to inspect: bring actual visits, signups, trials, calls, rejections, usage, or revenue, and the diagnosis is cross-checked against current competitors, customer complaints, pricing, and substitutes before turning into a 7-day test.
+
+**$0 bottleneck triage → $59 USDC accepted diagnosis · 3 founding-beta slots.**
+
+No sales call. No subscription. No 40-page generic report. Start with the free triage; payment is requested only after the case is accepted. The paid diagnosis targets delivery within 24 hours after payment and complete context.
+
+[Get a free bottleneck triage →](./paid-diagnosis.html) · [See the exact paid sample →](./SAMPLE_PAID_DIAGNOSIS.md) · [Follow the public $0 → $100 self-funding sprint →](./SELF_FUNDING_SPRINT.md)
+
+---
+
 ## What This Is (and Isn't)
 
 - ✅ A **carefully crafted prompt / skill** that codifies the ability to "interrogate on the spot and see through bullshit at a glance"
@@ -106,8 +120,11 @@ That stance is the entire value of this prompt.
 
 ```
 opc-clinic/
-├── README.md                          # You're reading this (Chinese)
+├── README.md                          # Chinese + beta entry point
 ├── README_EN.md                       # English version
+├── PAID_DIAGNOSIS.md                  # Paid beta scope
+├── SAMPLE_PAID_DIAGNOSIS.md           # Transparent sample deliverable
+├── SELF_FUNDING_SPRINT.md              # Public revenue experiment scorecard
 ├── prompt/
 │   └── diagnostician.md               # Core: the diagnostician prompt (copy this to use)
 ├── examples/
