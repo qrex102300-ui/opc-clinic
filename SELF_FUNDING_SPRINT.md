@@ -57,8 +57,13 @@ Representative current prices checked on 2026-09-09:
 - [AgencyOS Audit](https://innovaai.io/pricing) — free lead-capture scan, $29.99 for a 15-section full report, $69.99/month for monitoring.
 - [NoCrickets](https://nocrickets.com/) — $39 for a post-launch research diagnosis and one-week recovery plan.
 - [ValidationLaunch](https://validationlaunch.com/) — $97 self-guided framework; $3,500 guided validation sprint.
+- [Roamp](https://roamp.it/) — first behavioral website audit free, then $99 for a single audit; its five-audit bundle works out to about $59.80 per page.
+- [Borsani Consulting](https://borsaniconsulting.com/) — $250/hour for focused diagnostics and one-off audits.
+- [ZeroCTO](https://zerocto.ai/) — $99 discovery call and $1,500 one-week AI readiness audit.
+- [Arctic Grey](https://arcticgrey.com/pages/audit) — $99 entry audit with an explicit refund promise if the buyer does not think the audit was worth the price.
+- [AIGyde startup audit](https://aigyde.com/services/startup-audit) — post-launch diagnostic + market/competitive teardown + 90-day roadmap; fee is quoted after fit review, and the diagnostic call carries a full-refund promise if it does not convince the buyer.
 
-Decision: **do not lower the $59 beta price simply to match automated reports.** Price competition is already a race to the bottom, including $5–$29.99 products. OPC Clinic must earn the premium by staying post-launch, using the founder's real funnel evidence, explicitly checking contradictory evidence, and including one follow-up pass. The free triage reduces purchase risk before payment.
+Decision: **do not lower the $59 beta price simply to match automated reports.** Price competition is already a race to the bottom, including $5–$29.99 products. At the same time, the current market shows that diagnostic products commonly reduce purchase risk with a free first step, a sample, or a refund promise. OPC Clinic therefore keeps $59, keeps the free triage, and adds an objective founding-beta decision guarantee: the paid deliverable must include at least one falsifiable bottleneck hypothesis tied to supplied facts and at least one measurable 7-day pass/fail test, or the buyer can request a refund within 24 hours of delivery.
 
 ### Demand signals
 
@@ -76,6 +81,17 @@ These are **problem signals, not willingness-to-pay evidence**. A founder postin
 ### Distribution reality check
 
 The landing page and GitHub intake are live, but the public PromptFrenzy directory did **not** show an OPC Clinic listing when checked on 2026-09-09. The directory badge alone therefore does not count as distribution or traffic. Until an external listing, referral, or inbound reservation is observable, the sprint should treat acquisition as unproven rather than repeatedly polishing copy.
+
+## Run log
+
+### 2026-09-09 10:16 CST
+
+- GitHub Issues: **0 open issues; 0 free triage submissions; 0 paid orders; 0 transaction hashes to verify.**
+- Repository state: Issues and GitHub Pages are enabled; paid landing page and intake template remain live.
+- Demand check: current founder discussions continue to support the post-launch “people use/demo it but do not pay” problem. The Sep 6 case is especially useful because the founder discovered activation — not distribution — was the actual bottleneck.
+- Competitive check: $59 is not obviously too high for a human/AI-assisted diagnostic; current audit offers range from low-cost automated reports to $99 entry audits, $250/hour advisory, and $1,500+ diagnostic engagements. The more immediate trust gap is risk reversal, not price.
+- Reversible change shipped: added a public, objective founding-beta decision guarantee and explained why the $59 price is deliberately a proof-building beta price. No paid spend added.
+- Acquisition remains the highest-risk unknown. No external listing or inbound reservation is yet observable, so further copy changes should be secondary to obtaining real distribution.
 
 ## Public scorecard
 
