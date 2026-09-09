@@ -10,6 +10,8 @@ body:
 
         This is for founders who have already launched or tested something and have real evidence to inspect. The free triage gives you a short first pass: **most plausible bottleneck category → what evidence is missing → fit/no-fit for the deeper diagnosis**.
 
+        **Only 3 inputs are required:** what the product is, what has actually happened, and the decision you need to make next. If a public URL is available, OPC Clinic can infer obvious product/customer context before asking anything else.
+
         It is not a full market-research report and no payment is required for the triage. If the case is accepted and you want the deeper evidence-backed pass, payment instructions are posted in the issue before work starts.
 
         This issue is public. **Sanitized numbers are fine** — you do not need to reveal customer identities, exact confidential revenue, or private company data. Ranges and ratios are enough when they still preserve the shape of the funnel. Please do not include passwords, API keys, private customer data, or other secrets.
@@ -26,20 +28,11 @@ body:
   - type: input
     id: url
     attributes:
-      label: Public URL
-      description: Website, product page, or public repository if available. Leave blank if you prefer not to share one publicly.
+      label: Public URL (optional)
+      description: Website, product page, or public repository. Leave blank if you prefer not to share one publicly.
       placeholder: "https://..."
     validations:
       required: false
-
-  - type: textarea
-    id: customer
-    attributes:
-      label: Customer and offer
-      description: Who is the customer and what are you asking them to buy?
-      placeholder: "e.g. US bookkeeping agencies; $29/month assistant that categorizes client expenses"
-    validations:
-      required: true
 
   - type: textarea
     id: evidence
@@ -55,20 +48,29 @@ body:
       required: true
 
   - type: textarea
-    id: stuck
-    attributes:
-      label: Your current hypothesis (optional)
-      description: Where do you think you are stuck? Leave blank if you genuinely do not know.
-    validations:
-      required: false
-
-  - type: textarea
     id: decision
     attributes:
       label: What decision must you make in the next 7 days?
       placeholder: "e.g. keep building onboarding vs stop and change positioning"
     validations:
       required: true
+
+  - type: textarea
+    id: customer
+    attributes:
+      label: Customer and offer (optional)
+      description: If it is not obvious from the public URL, who do you think should buy and what are you asking them to buy? Leave blank if you are unsure — uncertainty here may itself be diagnostic.
+      placeholder: "e.g. US bookkeeping agencies; $29/month assistant that categorizes client expenses"
+    validations:
+      required: false
+
+  - type: textarea
+    id: stuck
+    attributes:
+      label: Your current hypothesis (optional)
+      description: Where do you think you are stuck? Leave blank if you genuinely do not know.
+    validations:
+      required: false
 
   - type: checkboxes
     id: agreement
@@ -77,7 +79,5 @@ body:
       options:
         - label: I have removed secrets and private customer data from this issue.
           required: true
-        - label: I understand the free triage is a short first pass, not a full market-research report and not a guarantee of acceptance.
-          required: true
-        - label: I understand the diagnosis is evidence-based advice, not a guarantee of revenue or business outcome.
+        - label: I understand this is evidence-based business diagnosis, not a guarantee of revenue or other business outcomes.
           required: true
