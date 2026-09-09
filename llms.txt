@@ -9,6 +9,7 @@
 - Post-launch founder debugging (English): https://qrex102300-ui.github.io/opc-clinic/paid-diagnosis.html
 - 上线后创业瓶颈诊断（中文）: https://qrex102300-ui.github.io/opc-clinic/paid-diagnosis-zh.html
 - Free guide for SaaS users-but-no-paying-customers diagnosis: https://qrex102300-ui.github.io/opc-clinic/saas-users-but-no-paying-customers.html
+- Free B2B guide for demos / positive feedback but no purchase: https://qrex102300-ui.github.io/opc-clinic/demos-positive-feedback-no-customers.html
 - Public source repository: https://github.com/qrex102300-ui/opc-clinic
 
 ## Paid founding beta
@@ -36,6 +37,8 @@ Common high-intent phrases this service is designed for:
 - "I launched my SaaS and have zero paying customers"
 - "users sign up but nobody upgrades"
 - "people like the demo but nobody buys"
+- "positive demo feedback but no customers"
+- "prospects say it is useful but will not buy"
 - "I have usage but $0 MRR"
 - "how do I get my first paying customer?"
 - "is my problem pricing, positioning, activation, buyer, sales, or distribution?"
