@@ -23,6 +23,22 @@ jobs:
           mkdir -p ops
           page="$(mktemp)"
           code="$(curl -sS -L -o "$page" -w '%{http_code}' 'https://saasscout.org/submit')"
+          scripts="$(mktemp)"
+          grep -Eo 'src="[^"]+\.js[^"]*"' "$page" | sed -E 's/^src="//;s/"$//' | sort -u > "$scripts" || true
+          signals="$(mktemp)"
+          while IFS= read -r src; do
+            [ -n "$src" ] || continue
+            case "$src" in
+              http://*|https://*) url="$src" ;;
+              /*) url="https://saasscout.org$src" ;;
+              *) url="https://saasscout.org/$src" ;;
+            esac
+            js="$(mktemp)"
+            if curl -sS -L --max-time 15 -o "$js" "$url"; then
+              grep -Eo '.{0,100}(submit|submission|/api/|email|website|url).{0,180}' "$js" | head -n 80 >> "$signals" || true
+            fi
+            rm -f "$js"
+          done < "$scripts"
           {
             echo '# SaaS Scout submission-route audit'
             echo
@@ -32,16 +48,19 @@ jobs:
             echo
             echo "HTTP status: $code"
             echo
-            echo '## Public form / endpoint signals'
+            echo '## Server-rendered structural signals'
             echo
-            # Keep only structural snippets; do not mirror the whole third-party page.
             grep -Eio '<form[^>]*>|action="[^"]+"|method="[^"]+"|name="[^"]+"|type="email"|/api/[A-Za-z0-9_/?=&.-]+' "$page" | head -n 120 || true
             echo
+            echo '## Client-script endpoint signals'
+            echo
+            sed -E 's/[[:space:]]+/ /g' "$signals" | grep -Ei 'submit|submission|/api/|email' | head -n 120 || true
+            echo
             echo '## Decision'
-            if grep -Eqi 'type=["'"']?email|name=["'"'][^"'"']*email' "$page"; then
-              echo 'Email field detected in public HTML. No submission was made.'
+            if grep -Eqi 'type=["'"']?email|name=["'"'][^"'"']*email' "$page" || grep -Eqi 'email' "$signals"; then
+              echo 'An email-related signal exists in the public submission code. No submission was made because the sprint must not use a private contact identity without authorization.'
             else
-              echo 'No email field was detected in the server-rendered HTML. This is only a probe; no submission was made until the actual POST contract is unambiguous.'
+              echo 'No email field was detected, but no unambiguous public POST contract was proven yet. No submission was made.'
             fi
           } > ops/saasscout-submission-route.md
 
@@ -55,5 +74,5 @@ jobs:
           if git diff --cached --quiet; then
             exit 0
           fi
-          git commit -m 'Audit SaaS Scout submission route'
+          git commit -m 'Deepen SaaS Scout submission-route audit'
           git push
