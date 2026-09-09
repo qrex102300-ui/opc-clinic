@@ -1,0 +1,87 @@
+name: Register OPC Clinic with Skills Registry
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/register-gotskills.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  register:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Trigger first public install and registry discovery
+        shell: bash
+        run: |
+          set +e
+          mkdir -p /tmp/opc-skills-test
+          cd /tmp/opc-skills-test
+          npm init -y >/dev/null 2>&1
+
+          npx --yes skills add qrex102300-ui/opc-clinic --skill skill --force > /tmp/gotskills-install.log 2>&1
+          install_code=$?
+
+          npx --yes skills search "opc clinic" --json > /tmp/gotskills-search.json 2>/tmp/gotskills-search.err
+          search_code=$?
+
+          {
+            echo "install_code=$install_code"
+            echo "search_code=$search_code"
+          } > /tmp/gotskills-status.env
+          exit 0
+
+      - name: Write acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          source /tmp/gotskills-status.env
+          mkdir -p ops
+          {
+            echo '# Skills Registry / gotskills acquisition audit'
+            echo
+            echo "Last attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'Registry documentation states that a public GitHub skill is automatically added on its first install; no separate account or submission is required.'
+            echo 'Repository: https://github.com/qrex102300-ui/opc-clinic'
+            echo 'Skill path: skill/SKILL.md'
+            echo
+            echo "Install command exit code: $install_code"
+            echo "Registry search exit code: $search_code"
+            echo
+            echo '## Install output'
+            echo
+            echo '```text'
+            sed -n '1,160p' /tmp/gotskills-install.log
+            echo '```'
+            echo
+            echo '## Registry search output'
+            echo
+            echo '```json'
+            if [ -s /tmp/gotskills-search.json ]; then
+              head -c 12000 /tmp/gotskills-search.json
+            else
+              cat /tmp/gotskills-search.err || true
+            fi
+            echo
+            echo '```'
+          } > ops/gotskills-registration.md
+
+      - name: Commit audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/gotskills-registration.md
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git pull --rebase origin main
+          git push
