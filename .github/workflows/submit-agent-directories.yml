@@ -1,0 +1,60 @@
+name: Submit OPC Clinic to Agent Directories
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-agent-directories.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Submit to Agent Directory API
+        shell: bash
+        run: |
+          set -euo pipefail
+          payload='{
+            "name": "OPC Clinic",
+            "handle": "opc-clinic",
+            "tagline": "Evidence-first AI founder diagnostician for products that launched but are not converting.",
+            "description": "Open-source, model-agnostic founder diagnosis skill that traces post-launch symptoms to a likely bottleneck, anchors conclusions to supplied facts, and turns the diagnosis into a measurable 7-day test.",
+            "website_url": "https://qrex102300-ui.github.io/opc-clinic/",
+            "capabilities": ["startup root-cause diagnosis", "post-launch bottleneck triage", "7-day experiment design", "multi-turn evidence interrogation"],
+            "skills": ["business-diagnosis", "startup-triage", "experiment-design", "market-research"],
+            "stack": ["static web", "model-agnostic LLM prompt", "GitHub Issues"]
+          }'
+          response_file="$(mktemp)"
+          http_code="$(curl -sS -L -o "$response_file" -w '%{http_code}' \
+            -X POST 'https://agent-directory-api.vercel.app/api/agents' \
+            -H 'Content-Type: application/json' \
+            --data "$payload")"
+          cat "$response_file"
+          echo
+          echo "HTTP $http_code"
+          test "$http_code" = "200" -o "$http_code" = "201" -o "$http_code" = "409"
+
+      - name: Submit to agents-launch directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          payload='{
+            "name": "OPC Clinic",
+            "tagline": "Evidence-first founder diagnosis for launched products that are not converting.",
+            "description": "Open-source AI diagnostician for solo founders. It uses multi-turn evidence interrogation to identify the most plausible post-launch bottleneck and define a measurable 7-day test instead of returning generic advice.",
+            "website_url": "https://qrex102300-ui.github.io/opc-clinic/",
+            "category": "productivity",
+            "pricing": "freemium"
+          }'
+          response_file="$(mktemp)"
+          http_code="$(curl -sS -L -o "$response_file" -w '%{http_code}' \
+            -X POST 'https://agents-launch.lovable.app/api/public/v1/agents' \
+            -H 'Content-Type: application/json' \
+            --data "$payload")"
+          cat "$response_file"
+          echo
+          echo "HTTP $http_code"
+          test "$http_code" = "200" -o "$http_code" = "201" -o "$http_code" = "409"
