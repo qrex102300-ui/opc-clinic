@@ -1,0 +1,105 @@
+name: Submit OPC Clinic to Awesome Skills
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-awesomeskills.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Playwright
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Submit through designated public form
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > submit-awesomeskills.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          import fs from 'fs';
+
+          const skillUrl = 'https://github.com/qrex102300-ui/opc-clinic/tree/main/skill';
+          const browser = await chromium.launch({ headless: true });
+          const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
+          const result = {
+            attempted: true,
+            skillUrl,
+            finalUrl: '',
+            successSignal: false,
+            bodyText: '',
+            error: null
+          };
+
+          try {
+            await page.goto('https://www.awesomeskills.dev/en/submit', {
+              waitUntil: 'domcontentloaded',
+              timeout: 60000
+            });
+
+            const input = page.locator('input[type="url"], input[placeholder*="github" i], input').first();
+            await input.fill(skillUrl);
+
+            const button = page.getByRole('button', { name: /Submit Skill|Submit/i }).first();
+            await button.click();
+            await page.waitForTimeout(7000);
+
+            result.finalUrl = page.url();
+            result.bodyText = (await page.locator('body').innerText()).slice(0, 8000);
+            result.successSignal = /opc[ -]clinic|success|submitted|published|live|added/i.test(result.bodyText) && !/error|failed|invalid/i.test(result.bodyText);
+          } catch (err) {
+            result.error = String(err?.message || err);
+          } finally {
+            fs.writeFileSync('/tmp/awesomeskills-result.json', JSON.stringify(result, null, 2));
+            await browser.close();
+          }
+          EOF
+          node submit-awesomeskills.mjs || true
+          rm -f submit-awesomeskills.mjs
+
+      - name: Write sanitized acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          {
+            echo '# Awesome Skills acquisition submission audit'
+            echo
+            echo "Last attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'Surface: https://www.awesomeskills.dev/en/submit — designated public skill-submission form.'
+            echo 'Submission requires only a public GitHub skill URL; no account, email, payment, private credential, or identity claim was supplied.'
+            echo 'Skill source: https://github.com/qrex102300-ui/opc-clinic/tree/main/skill'
+            echo
+            echo '```json'
+            jq . /tmp/awesomeskills-result.json
+            echo '```'
+          } > ops/awesomeskills-submission.md
+
+      - name: Commit acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/awesomeskills-submission.md
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'Record Awesome Skills directory submission'
+          git pull --rebase origin main
+          git push
