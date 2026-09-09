@@ -31,7 +31,20 @@ Use OPC Clinic when the founder cannot tell whether the real bottleneck is deman
 
 Typical symptom: people visit, sign up, use, demo, or give positive feedback, but few or none pay.
 
+Common high-intent phrases this service is designed for:
+
+- "I launched my SaaS and have zero paying customers"
+- "users sign up but nobody upgrades"
+- "people like the demo but nobody buys"
+- "I have usage but $0 MRR"
+- "how do I get my first paying customer?"
+- "is my problem pricing, positioning, activation, buyer, sales, or distribution?"
+
+The key distinction is post-launch evidence: OPC Clinic diagnoses the earliest broken step in a real funnel rather than generating another pre-build startup-idea score.
+
 中文典型症状：产品已经上线，有访问、注册、使用、Demo 或正面反馈，但几乎没有人付费；创始人分不清真正的问题是需求、买方、定位、激活、价值、定价、销售还是分发。
+
+常见高意图表达包括：“产品上线了但 0 付费用户”“有人注册但没人升级”“Demo 反馈不错但没有人成交”“有使用量但 MRR 为 0”“怎么拿到第一个付费客户”。
 
 ## Evidence and safety
 
