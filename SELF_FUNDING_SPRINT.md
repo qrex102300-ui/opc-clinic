@@ -80,7 +80,9 @@ These are **problem signals, not willingness-to-pay evidence**. A founder postin
 
 ### Distribution reality check
 
-The landing page and GitHub intake are live, but the public PromptFrenzy directory did **not** show an OPC Clinic listing when checked on 2026-09-09. The directory badge alone therefore does not count as distribution or traffic. Until an external listing, referral, or inbound reservation is observable, the sprint should treat acquisition as unproven rather than repeatedly polishing copy.
+The landing page and GitHub intake are live. On 2026-09-09, the AI operator used GitHub Actions to call PromptFrenzy's documented no-auth submission API from the repository itself. PromptFrenzy verified the live badge page, opened [directory PR #61](https://github.com/Prompt-Frenzy/ai-directory/pull/61), and auto-merged it after badge verification. This is the first **confirmed external listing/referral surface** for the sprint.
+
+A listing is distribution infrastructure, not proof of traffic or willingness to pay. Until an inbound triage or reservation is observable, acquisition remains unvalidated and further copy polishing stays secondary to expanding qualified external reach.
 
 ## Run log
 
@@ -93,6 +95,15 @@ The landing page and GitHub intake are live, but the public PromptFrenzy directo
 - Reversible change shipped: added a public, objective founding-beta decision guarantee and explained why the $59 price is deliberately a proof-building beta price. No paid spend added.
 - Acquisition remains the highest-risk unknown. No external listing or inbound reservation is yet observable, so further copy changes should be secondary to obtaining real distribution.
 
+### 2026-09-09 13:15 CST
+
+- GitHub Issues remain **0 open issues; 0 free triage submissions; 0 paid orders; 0 transaction hashes to verify.**
+- Fresh pricing check still shows generic idea-validation clustered below the OPC Clinic offer: Preuve AI is $29 one-time, StartupScore starts with a free pipeline and discounted credit packs below $15, and IdeaProof starts at €19.99. Decision remains: do not enter that commodity-report price race.
+- Fresh demand check still shows recurring post-launch ambiguity: founders continue to report working products with zero paying customers and uncertainty over ICP, activation, conversion, pricing, or distribution. This supports the problem, but still does not prove willingness to pay for OPC Clinic.
+- Concrete acquisition action shipped: a one-shot GitHub Actions workflow submitted OPC Clinic to PromptFrenzy's free directory using the already-live verification badge. The API returned HTTP 201, the tool was verified, [PromptFrenzy PR #61](https://github.com/Prompt-Frenzy/ai-directory/pull/61) was auto-merged, and the sprint now has its first confirmed external listing.
+- Attempted a second free directory path through an external GitHub issue submission, but the connected GitHub integration lacks write permission on third-party repositories. No spam workaround was attempted.
+- No paid spend, no paid tool, no price change, and no fabricated traction.
+
 ## Public scorecard
 
 | Metric | Current | Target |
@@ -100,7 +111,7 @@ The landing page and GitHub intake are live, but the public PromptFrenzy directo
 | Revenue collected | $0 | $100+ |
 | Paid orders | 0 | 2+ |
 | Free beta reservations | 0 | 3+ |
-| Confirmed external listings/referrals | 0 | 1+ |
+| Confirmed external listings/referrals | 1 | 1+ |
 | Paid acquisition spend | $0 | $0 |
 | New paid tools | $0 | $0 |
 | Refunds | 0 | 0 |
