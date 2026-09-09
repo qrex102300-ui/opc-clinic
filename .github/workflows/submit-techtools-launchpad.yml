@@ -1,0 +1,114 @@
+name: Submit OPC Clinic to TechTools Launchpad
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-techtools-launchpad.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Submit through public bot-friendly API
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          base='https://techtools.cz/launchpad-api'
+          website='https://qrex102300-ui.github.io/opc-clinic/'
+
+          docs_body="$(mktemp)"
+          docs_code="$(curl -sS -L --max-time 20 -o "$docs_body" -w '%{http_code}' "$base/docs")"
+
+          list_body="$(mktemp)"
+          list_code="$(curl -sS -L --max-time 20 -o "$list_body" -w '%{http_code}' "$base/tools?per_page=100&sort=recent")"
+
+          result_body="$(mktemp)"
+          status=''
+          if [ "$list_code" = "200" ] && jq -e --arg website "$website" '.. | objects | select(((.url // "") | rtrimstr("/")) == ($website | rtrimstr("/")))' "$list_body" >/dev/null 2>&1; then
+            status='already-listed'
+            jq -c --arg website "$website" '[.. | objects | select(((.url // "") | rtrimstr("/")) == ($website | rtrimstr("/")))] | unique_by(.id // .url)' "$list_body" > "$result_body"
+          else
+            # The public Launchpad page documents these fields and identifies the API as AI/bot friendly.
+            # submitted_by / name / website identity fields are intentionally omitted.
+            payload='{
+              "name":"OPC Clinic",
+              "url":"https://qrex102300-ui.github.io/opc-clinic/",
+              "tagline":"Evidence-first founder diagnosis for launched products that are not converting.",
+              "description":"OPC Clinic is an open-source AI founder diagnostician that identifies the most plausible post-launch bottleneck from supplied evidence and turns the diagnosis into a measurable 7-day experiment instead of generic startup advice.",
+              "category":"productivity"
+            }'
+            status="$(curl -sS -L --max-time 30 -o "$result_body" -w '%{http_code}' \
+              -X POST "$base/tools" \
+              -H 'Content-Type: application/json' \
+              --data "$payload")"
+          fi
+
+          verify_body="$(mktemp)"
+          verify_code="$(curl -sS -L --max-time 20 -o "$verify_body" -w '%{http_code}' "$base/tools?per_page=100&sort=recent")"
+          visible='false'
+          if [ "$verify_code" = "200" ] && jq -e --arg website "$website" '.. | objects | select(((.url // "") | rtrimstr("/")) == ($website | rtrimstr("/")))' "$verify_body" >/dev/null 2>&1; then
+            visible='true'
+          fi
+
+          {
+            echo '# TechTools Launchpad acquisition submission audit'
+            echo
+            echo "Attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'Surface: https://techtools.cz/tools/launchpad/'
+            echo 'The public page explicitly states: no registration, no CAPTCHA, instant listing, and an AI/bot-friendly API for automated submissions.'
+            echo 'No account, email, payment, private credential, or personal identity was supplied. Optional submitter identity fields were omitted.'
+            echo
+            echo "API docs HTTP status: $docs_code"
+            echo "Preflight list HTTP status: $list_code"
+            echo "Submission/result status: $status"
+            echo "Post-submit verification HTTP status: $verify_code"
+            echo "Listing visible in API after attempt: $visible"
+            echo
+            echo '## Submission response'
+            echo
+            echo '```json'
+            if jq -e . "$result_body" >/dev/null 2>&1; then jq -c . "$result_body"; else head -c 4000 "$result_body"; fi
+            echo
+            echo '```'
+            echo
+            echo '## Verified record'
+            echo
+            echo '```json'
+            if [ "$visible" = 'true' ]; then
+              jq -c --arg website "$website" '[.. | objects | select(((.url // "") | rtrimstr("/")) == ($website | rtrimstr("/")))] | unique_by(.id // .url)' "$verify_body"
+            else
+              echo '[]'
+            fi
+            echo '```'
+          } > ops/techtools-launchpad-submission.md
+
+          case "$status" in
+            already-listed|200|201|202) ;;
+            *) echo "TechTools Launchpad submission was not accepted (status $status)" >&2 ;;
+          esac
+          if [ "$visible" != 'true' ]; then
+            echo 'TechTools Launchpad listing was not verifiably visible after the attempt.' >&2
+            exit 1
+          fi
+
+      - name: Commit audit record
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/techtools-launchpad-submission.md
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'Record TechTools Launchpad acquisition listing'
+          git push
