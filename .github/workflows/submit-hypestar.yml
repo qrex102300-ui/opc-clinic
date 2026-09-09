@@ -1,0 +1,130 @@
+name: Submit OPC Clinic to Hype Star
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-hypestar.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Submit through public no-auth listing API
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          base='https://hypestar.org/api/v1'
+          website='https://qrex102300-ui.github.io/opc-clinic/'
+
+          preflight_body="$(mktemp)"
+          preflight_code="$(curl -sS -L --max-time 25 -G -o "$preflight_body" -w '%{http_code}' \
+            "$base/search" --data-urlencode 'q=OPC Clinic' --data-urlencode 'limit=50')"
+
+          public_before='false'
+          if [ "$preflight_code" = '200' ] && jq -e --arg website "$website" '.. | objects | select((((.url // "") | rtrimstr("/")) == ($website | rtrimstr("/"))))' "$preflight_body" >/dev/null 2>&1; then
+            public_before='true'
+          fi
+
+          result_body="$(mktemp)"
+          if [ "$public_before" = 'true' ]; then
+            result_code='already-public'
+            jq -c --arg website "$website" '[.. | objects | select((((.url // "") | rtrimstr("/")) == ($website | rtrimstr("/"))))] | unique_by(.slug // .url)' "$preflight_body" > "$result_body"
+          else
+            payload='{"url":"https://qrex102300-ui.github.io/opc-clinic/","kind":"service","categorySlug":"services-marketplaces","supporterChoice":"skipped"}'
+            result_code="$(curl -sS -L --max-time 35 -o "$result_body" -w '%{http_code}' \
+              -X POST "$base/listings" \
+              -H 'Content-Type: application/json' \
+              --data "$payload")"
+          fi
+
+          verify_body="$(mktemp)"
+          verify_code="$(curl -sS -L --max-time 25 -G -o "$verify_body" -w '%{http_code}' \
+            "$base/search" --data-urlencode 'q=OPC Clinic' --data-urlencode 'limit=50')"
+          public_after='false'
+          if [ "$verify_code" = '200' ] && jq -e --arg website "$website" '.. | objects | select((((.url // "") | rtrimstr("/")) == ($website | rtrimstr("/"))))' "$verify_body" >/dev/null 2>&1; then
+            public_after='true'
+          fi
+
+          submission_summary='{}'
+          if jq -e . "$result_body" >/dev/null 2>&1; then
+            # Keep only non-secret operational fields. Review job IDs, tokens, status URLs, or capabilities are deliberately excluded.
+            submission_summary="$(jq -c '{
+              message: (.data.message // .message // null),
+              listing: ((.data.listing // .listing // null) | if . == null then null else {
+                slug: .slug,
+                name: .name,
+                domain: .domain,
+                kind: .kind,
+                categorySlug: .categorySlug,
+                status: .status,
+                publicationStatus: .publicationStatus,
+                listingActive: .listingActive,
+                profilePath: .profilePath,
+                nextStep: .nextStep
+              } end),
+              reviewStatus: (.data.review.status // .review.status // null),
+              registrationRequired: (.data.registrationRequired // .registrationRequired // null),
+              accountCreated: (.data.accountCreated // .accountCreated // null),
+              paymentRequired: (.data.paymentRequired // .paymentRequired // null)
+            }' "$result_body")"
+          fi
+
+          {
+            echo '# Hype Star acquisition submission audit'
+            echo
+            echo "Attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'Surface: https://hypestar.org/submit'
+            echo 'Public API contract: https://hypestar.org/openapi.json'
+            echo 'Hype Star explicitly documents credential-free project submission for permanent basic inclusion after human review; no account, email, API key, card, payment, or renewal is required.'
+            echo 'Submitted as kind `service` in category `services-marketplaces`; supporterChoice was `skipped`, so no badge, reciprocal link, paid enhancement, or product-page change was requested.'
+            echo 'No account, email, payment, private credential, or personal identity was supplied.'
+            echo
+            echo "Preflight search HTTP status: $preflight_code"
+            echo "Public before attempt: $public_before"
+            echo "Submission/result status: $result_code"
+            echo "Post-attempt search HTTP status: $verify_code"
+            echo "Public after attempt: $public_after"
+            echo
+            echo '## Sanitized submission result'
+            echo
+            echo '```json'
+            printf '%s\n' "$submission_summary"
+            echo '```'
+            echo
+            echo '## Public verification record'
+            echo
+            echo '```json'
+            if [ "$public_after" = 'true' ]; then
+              jq -c --arg website "$website" '[.. | objects | select((((.url // "") | rtrimstr("/")) == ($website | rtrimstr("/"))))] | unique_by(.slug // .url)' "$verify_body"
+            else
+              echo '[]'
+            fi
+            echo '```'
+          } > ops/hypestar-submission.md
+
+          case "$result_code" in
+            already-public|200|202) ;;
+            *) echo "Hype Star submission did not return an accepted/already-known state (status $result_code)" >&2; exit 1 ;;
+          esac
+
+      - name: Commit audit record
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/hypestar-submission.md
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'Record Hype Star acquisition submission'
+          git push
