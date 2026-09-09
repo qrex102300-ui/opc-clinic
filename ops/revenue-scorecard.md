@@ -1,62 +1,51 @@
 # OPC Clinic Revenue Sprint — Auditable Scorecard
 
-Last checked: **2026-09-10 04:59 CST**  
+Last checked: **2026-09-10 07:15 CST**  
 Experiment window: **2026-09-09 → 2026-09-15**
 
-This file is the canonical operational count for the 7-day revenue sprint. Counts only move on observable evidence; directory presence is not treated as a lead, and a lead is not treated as revenue.
+This is the canonical operational count for the 7-day revenue sprint. Counts move only on observable evidence. A directory submission is not a lead; a lead is not revenue; only confirmed collected payment counts as revenue.
 
 | Metric | Current | Evidence rule |
 |---|---:|---|
-| Confirmed external listings / referral surfaces | **5** | Public listing or directory API confirms the product exists |
-| Pending external directory / registry reviews | **3** | Submission accepted but not yet confirmed as a default public listing |
+| Confirmed external listings / referral surfaces | **5** | Public listing or directory/API evidence confirms OPC Clinic is live |
+| Pending external directory / registry reviews | **5** | Submission accepted but not yet confirmed as a default public listing |
 | Inbound free-triage submissions | **0** | A real external user opens a `[Free Triage]` case |
-| Qualified leads | **0** | Launched/tested product + real evidence + a near-term decision; case fits deeper diagnosis |
-| Payment-ready leads | **0** | Qualified case accepted and ready for the $59 offer, with only payment/custody step remaining |
-| Paid orders | **0** | Order contains sufficient context plus a valid payment transaction |
+| Qualified leads | **0** | Launched/tested product + real evidence + near-term decision; case fits deeper diagnosis |
+| Payment-ready leads | **0** | Qualified case is ready for the $59 offer and only payment/custody remains |
+| Paid orders | **0** | Sufficient customer context plus a valid payment transaction |
 | Gross revenue | **$0** | Confirmed collected payment only |
 | Refunds | **$0** | Confirmed refunded amount |
 | Payment fees | **$0** | Confirmed fees attributable to collected sprint revenue |
 | Net revenue | **$0** | Gross revenue − refunds − payment fees |
-| Paid acquisition spend | **$0** | Actual paid distribution/ads/tools used for this sprint |
+| Paid acquisition spend | **$0** | Actual paid distribution, ads, or tools used for this sprint |
 
-## External distribution evidence
+## Confirmed external discovery surfaces
 
-1. **PromptFrenzy** — verified badge submission, directory PR #61 auto-merged on 2026-09-09.
-2. **Agent Directory API** — public no-auth directory rejects `opc-clinic` as an existing handle, confirming directory presence.
-3. **agents-launch** — public no-auth directory returns the existing OPC Clinic record (`slug: opc-clinic`, created 2026-09-09T15:28:06Z).
-4. **SaaS Scout** — documented public no-login product API accepted OPC Clinic with HTTP 201 and returned `status: approved`, `slug: opc-clinic`, an 85/100 relevance score, and `isRelevant: true` on 2026-09-10 CST. No account, email, payment, private credential, or personal identity was supplied. See [`ops/saasscout-submission.md`](./saasscout-submission.md).
-5. **TechTools Launchpad** — its public page explicitly states no registration, no CAPTCHA, instant listing, and an AI/bot-friendly API. The API accepted OPC Clinic with HTTP 201, returned tool ID `817` plus a public share URL, and a follow-up GET verified the record was live. Optional submitter identity fields were omitted. See [`ops/techtools-launchpad-submission.md`](./techtools-launchpad-submission.md).
-6. **OpenAgentSkill** — its public no-auth submission API accepted `skill/SKILL.md` with HTTP 202 and submission status `submitted`. Automated review is still pending, so it is tracked separately and is **not** counted as a confirmed listing yet.
-7. **AIPO.ST** — its documented public agent-submission API accepted OPC Clinic with HTTP 201 on 2026-09-10 CST and returned `status: pending` plus the proposed product page `https://aipo.st/products/opc`. It is tracked as pending until the listing is verifiably public. See [`ops/aipost-submission.md`](./aipost-submission.md).
-8. **Hype Star** — its public OpenAPI contract explicitly supports credential-free project submission for permanent basic inclusion after review. OPC Clinic was submitted once as a `service` in `services-marketplaces` with `supporterChoice: skipped`; HTTP 202 returned `submitted_for_review` / `pending`, and a post-submit public search correctly showed no public listing yet. No account, email, API key, card, payment, badge, reciprocal link, private credential, or identity was used. See [`ops/hypestar-submission.md`](./hypestar-submission.md).
+1. **PromptFrenzy** — verified badge submission; directory PR #61 auto-merged on 2026-09-09.
+2. **Agent Directory API** — public no-auth directory already recognizes the `opc-clinic` handle.
+3. **agents-launch** — public no-auth directory returns an existing OPC Clinic record.
+4. **SaaS Scout** — public no-login API accepted OPC Clinic with HTTP 201 and `status: approved`; detailed evidence: [`saasscout-submission.md`](./saasscout-submission.md).
+5. **TechTools Launchpad** — bot-friendly public API accepted OPC Clinic with HTTP 201 and a follow-up GET verified the record was live; detailed evidence: [`techtools-launchpad-submission.md`](./techtools-launchpad-submission.md).
 
-The earlier zero-cost agent-directory submission receipts are recorded in [`ops/agent-directory-submissions.md`](./agent-directory-submissions.md). Public audit files exclude private submission/status tokens.
+## Pending reviews / accepted submissions
 
-## Additional zero-cost acquisition checks this run
+1. **OpenAgentSkill** — public no-auth submission accepted with HTTP 202; automated review still pending.
+2. **AIPO.ST** — public agent-submission API accepted OPC Clinic with HTTP 201 and returned `status: pending`; detailed evidence: [`aipost-submission.md`](./aipost-submission.md).
+3. **Hype Star** — public credential-free listing API accepted the submission with HTTP 202 and `submitted_for_review`; detailed evidence: [`hypestar-submission.md`](./hypestar-submission.md).
+4. **LaunchKit Tools** — designated public form accepted OPC Clinic and displayed “Thanks! We'll review your submission and add it if it's a good fit.” No email, personal identity, private credential, payment, or CAPTCHA bypass was used; detailed evidence: [`free-directory-round2.md`](./free-directory-round2.md).
+5. **CurataHub** — designated public form accepted OPC Clinic and displayed “Thanks — submission received.” No email, personal identity, private credential, payment, or CAPTCHA bypass was used; detailed evidence: [`free-directory-round2.md`](./free-directory-round2.md).
 
-- **Hype Star** — successful legitimate acquisition action. Its current public OpenAPI contract documents `POST /api/v1/listings`, requires only the public URL, listing kind, and category slug, and explicitly states that no account, email, API key, card, payment, supporter badge, or renewal is required. A preflight search found no existing OPC Clinic listing; one submission then returned HTTP 202 with `publicationStatus: submitted_for_review` and `reviewStatus: pending`. It is counted as pending, not confirmed, and not as a lead. The optional supporter choice was explicitly skipped, so this created no product/funnel change or backlink obligation. See [`ops/hypestar-submission.md`](./hypestar-submission.md).
-- **TechTools Launchpad** — successful legitimate acquisition action. Its documented public API is explicitly designed for bots and AI agents. A preflight listing check avoided duplicates; the submission then returned HTTP 201 with `success: true` and `Tool submitted successfully! It is now live.`, and a post-submit listing check independently found the OPC Clinic URL. It is counted as a confirmed external listing, not as a lead. No account, email, payment, private credential, or submitter identity was used.
-- **SaaS Scout** — successful legitimate acquisition action. The site publicly states that no login is required to submit. A public API-contract probe showed that `POST /api/products` requires only name, tagline, description, website, and category; an actual submission was then accepted with HTTP 201 and `status: approved`. It is counted as a confirmed external listing, not as a lead. See [`ops/saasscout-submission-route.md`](./saasscout-submission-route.md) and [`ops/saasscout-submission.md`](./saasscout-submission.md).
-- **AIPO.ST** — successful legitimate acquisition action from an earlier run: one no-auth/no-email/no-card submission was accepted, but the returned state remains pending and is not counted as confirmed traffic or a lead.
-- **AIToolsIndex** — its live public submission page currently marks contact email optional. Because a fresh public crawl resolved the page after the earlier GitHub-runner DNS failure, one justified retry was made without identity or email. The runner still returned `DNS_PROBE_FINISHED_NXDOMAIN` before reaching the form, so no submission occurred and nothing is counted. Do not retry again without new runner/network evidence. See [`ops/aitoolsindex-submission.md`](./aitoolsindex-submission.md).
-- **WebList / appli.st** — researched because it explicitly exposes `POST /api/submit` to AI agents, uses a CC0 directory, and makes contact optional. A single no-auth/no-email API submission attempt returned Cloudflare HTTP 522; therefore no acceptance is claimed and nothing is counted. See [`ops/weblist-submission.md`](./weblist-submission.md).
-- **Linkrena** — one designated no-account/no-card public-form attempt was made earlier. A later public API verification returned HTTP 200 but did **not** show OPC Clinic, so it is not counted as confirmed or pending. See [`ops/linkrena-submission.md`](./linkrena-submission.md).
-- **Awesome Skills** — its public submit page accepts a GitHub URL in principle, but after the OPC Clinic skill URL was entered the submit button remained disabled until browser timeout. No submission was made and nothing is counted. See [`ops/awesomeskills-submission.md`](./awesomeskills-submission.md).
-- **Skills Registry / gotskills** — one first-install discovery attempt was made because the registry documents first-install discovery for public GitHub skills. A subsequent verification-only search did not return OPC Clinic, so it is not counted. No repeated installs will be used to inflate discovery/install signals. See [`ops/gotskills-registration.md`](./gotskills-registration.md).
-- **MCP.Directory** — the apparent skill-submission route redirects to an MCP server submission form. It remains **NOT SUBMITTED / NOT COUNTED**; no identity, email, payment, or private credential was supplied. See [`ops/mcp-directory-submission.md`](./mcp-directory-submission.md).
-- **SubmitLLMs** — researched as another legitimate free discovery surface focused on AI-ready websites. Its public directory currently indexes thousands of sites, but no no-identity submission contract was proven in this run, so no submission was made and nothing is counted.
-- **SoloLaunch** — current public copy says app submission is free and needs no account, but a live DOM probe of the designated form found a confirmation checkbox stating that the submitter has the right to submit the app. The automation did **not** make that rights attestation on the owner's behalf, so SoloLaunch remains **NOT SUBMITTED / NOT COUNTED**. See [`ops/sololaunch-dom-probe.md`](./sololaunch-dom-probe.md).
-- **NeuronFeed** — a strong, agent-friendly acquisition surface was verified: its public documentation explicitly supports a JSON `POST /api/submit`, free editorial review, and no account. However, the documented schema requires a reachable `contactEmail`. No private identity/contact data was supplied, so NeuronFeed remains **NOT SUBMITTED / NOT COUNTED**.
-- **IndexOf.AI** — free basic listings exist, but its current submit page requires sign-in before tool submission. No account or identity action was taken, so it remains **NOT SUBMITTED / NOT COUNTED**.
-- **BotFriendly.xyz** — high-fit for machine-readable agent services and it documents a public bot submission endpoint, but the live listing form requires a verification email. No private identity/contact data was supplied, so it remains **NOT SUBMITTED / NOT COUNTED**.
-- **AgentsSpot** — free directory review currently requires reciprocal-backlink verification. Because there is no observed funnel defect justifying a product/page change, no backlink was added and no submission is counted.
-- **AgentsIndex** — this is the best newly verified no-identity route in this run: its free submit page asks for only tool name and website, states that no account is needed for the submit step, and does not require a card. A one-shot designated-form attempt has been initiated with the optional email-updates box left unchecked and without supplying identity or payment. Until the submission audit produces an acceptance signal or the listing becomes public, it remains **NOT COUNTED**.
-- **Current founder-demand evidence** — recent public SaaS and indie-founder discussions continue to show launched products with zero paid users and distribution/customer acquisition as repeated bottlenecks. These surfaces are used only to guide channel selection; no unsolicited promotion is posted into ordinary help threads. See [`ops/acquisition-demand-evidence.md`](./acquisition-demand-evidence.md).
+## Unsuccessful / not counted acquisition routes in the latest round
+
+- **AIToolsIndex** — GitHub runner still hit `DNS_PROBE_FINISHED_NXDOMAIN`; no submission occurred. Do not retry again without new runner/network evidence.
+- **Find AI Tools** — runner received HTTP 403 before the public form loaded; no bypass was attempted.
+- **Alieradox** — anti-bot browser check prevented the product fields from loading; no bypass was attempted.
+- Third-party GitHub issue/PR submission remains constrained by the connected GitHub account's manual-review restriction; directory-specific public forms/APIs remain the preferred route.
 
 ## Intake check
 
-GitHub Issues check at 2026-09-10 04:59 CST: **0 issues**, therefore there are no free-triage submissions, paid orders, transaction hashes, qualified leads, or payment-ready leads to process in this run.
+GitHub Issues check at **2026-09-10 07:15 CST**: **0 issues**. Therefore there are no new free-triage submissions, qualified leads, payment-ready leads, paid orders, or transaction hashes to process in this run.
 
 ## Operating rule
 
-Acquisition remains the bottleneck. Do not spend sprint cycles polishing the landing page, copy, or SEO without new observed user behavior identifying a specific funnel defect. Prioritize legitimate zero-cost distribution and high-fit public demand surfaces; never post unsolicited promotional comments into unrelated communities or issues.
+Acquisition remains the bottleneck. Do not spend sprint cycles polishing the landing page, copy, pricing, or SEO without new observed user behavior identifying a specific funnel defect. Prioritize legitimate zero-cost distribution and high-fit public demand surfaces. Never post unsolicited promotional comments into unrelated communities or issues, never spend money, and never use private credentials or owner identity to force a listing.
