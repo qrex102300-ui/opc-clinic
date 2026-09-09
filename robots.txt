@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://qrex102300-ui.github.io/opc-clinic/sitemap.xml
