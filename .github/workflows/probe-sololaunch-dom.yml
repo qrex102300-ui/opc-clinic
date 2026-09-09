@@ -1,0 +1,74 @@
+name: Probe SoloLaunch public form DOM
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/probe-sololaunch-dom.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Playwright
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.55.0 >/dev/null 2>&1
+          npx playwright install chromium >/dev/null 2>&1
+      - name: Inspect designated public form without submitting
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+          mkdir -p ops
+          cat >/tmp/probe-solo-dom.js <<'NODE'
+          const { chromium } = require('/tmp/node_modules/playwright');
+          const fs = require('fs');
+          (async()=>{
+            const b = await chromium.launch({headless:true});
+            const p = await b.newPage();
+            const r = await p.goto('https://sololaunch.ai/submit',{waitUntil:'networkidle',timeout:45000});
+            const out=[];
+            out.push('# SoloLaunch public form DOM probe','',`Checked: ${new Date().toISOString()}`,`HTTP status: ${r ? r.status() : 'none'}`,'','Discovery only; no fields were filled and no submission was sent.','', '## Controls','```text');
+            const q=p.locator('input,textarea,select,button');
+            for(let i=0;i<await q.count();i++){
+              const e=q.nth(i);
+              const tag=await e.evaluate(x=>x.tagName.toLowerCase());
+              const type=(await e.getAttribute('type'))||'';
+              const name=(await e.getAttribute('name'))||'';
+              const id=(await e.getAttribute('id'))||'';
+              const ph=(await e.getAttribute('placeholder'))||'';
+              const req=await e.evaluate(x=>!!x.required);
+              const text=((await e.innerText().catch(()=>''))||'').replace(/\s+/g,' ').slice(0,180);
+              const parent=await e.evaluate(x=>(x.closest('label')?.innerText||x.parentElement?.innerText||'').replace(/\s+/g,' ').slice(0,220));
+              out.push(`${i}: tag=${tag} type=${type} name=${name} id=${id} required=${req} placeholder=${JSON.stringify(ph)} text=${JSON.stringify(text)} context=${JSON.stringify(parent)}`);
+              if(tag==='select'){
+                const opts=(await e.locator('option').allTextContents()).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean);
+                out.push(`   options=${JSON.stringify(opts.slice(0,30))}`);
+              }
+            }
+            out.push('```');
+            fs.writeFileSync('ops/sololaunch-dom-probe.md',out.join('\n')+'\n');
+            await b.close();
+          })();
+          NODE
+          node /tmp/probe-solo-dom.js
+      - name: Commit audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/sololaunch-dom-probe.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Record SoloLaunch public form schema'
+          git pull --rebase origin main
+          git push
