@@ -1,0 +1,212 @@
+name: Submit OPC Clinic to SoloLaunch
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-sololaunch.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install browser automation
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.55.0 >/dev/null 2>&1
+          npx playwright install chromium >/dev/null 2>&1
+
+      - name: Submit only through the designated public form
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          cat >/tmp/submit-sololaunch.js <<'NODE'
+          const { chromium } = require('/tmp/node_modules/playwright');
+          const fs = require('fs');
+
+          (async () => {
+            const audit = [];
+            const out = (s='') => audit.push(String(s));
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage({ viewport: { width: 1280, height: 1000 } });
+            const targetUrl = 'https://qrex102300-ui.github.io/opc-clinic/';
+            const appName = 'OPC Clinic';
+            const tagline = 'Evidence-first founder diagnosis for launched products that are not converting.';
+            const description = 'Open-source AI founder diagnostician for launched products with users, demos, or feedback but weak or zero paid conversion. It identifies the most plausible bottleneck from supplied evidence and turns it into a measurable 7-day experiment instead of generic startup advice.';
+
+            out('# SoloLaunch acquisition submission audit');
+            out('');
+            out(`Attempted: ${new Date().toISOString()}`);
+            out('Surface: https://sololaunch.ai/submit');
+            out('Policy: one designated public-form attempt only; no account, email, payment, private credential, personal identity, unsolicited comment, or terms acceptance supplied by automation.');
+            out('');
+
+            // Conservative preflight: avoid a duplicate if the obvious public slug is already live.
+            let preflightListed = false;
+            try {
+              const r = await page.goto('https://sololaunch.ai/apps/opc-clinic', { waitUntil: 'domcontentloaded', timeout: 30000 });
+              const text = (await page.locator('body').innerText().catch(() => '')) || '';
+              preflightListed = !!r && r.status() < 400 && /OPC Clinic/i.test(text);
+              out(`Preflight obvious-slug HTTP status: ${r ? r.status() : 'none'}`);
+              out(`Preflight already listed: ${preflightListed}`);
+            } catch (e) {
+              out(`Preflight error: ${e.name}`);
+            }
+
+            if (preflightListed) {
+              out('Result: already-listed; no submission sent.');
+              fs.writeFileSync('ops/sololaunch-submission.md', audit.join('\n') + '\n');
+              await browser.close();
+              return;
+            }
+
+            const resp = await page.goto('https://sololaunch.ai/submit', { waitUntil: 'networkidle', timeout: 45000 });
+            out(`Submit page HTTP status: ${resp ? resp.status() : 'none'}`);
+
+            const controls = page.locator('input, textarea, select');
+            const count = await controls.count();
+            out(`Public form controls discovered: ${count}`);
+
+            let identityBlocked = false;
+            let legalBlocked = false;
+            const unfilled = [];
+
+            for (let i = 0; i < count; i++) {
+              const el = controls.nth(i);
+              const tag = await el.evaluate(n => n.tagName.toLowerCase());
+              const type = ((await el.getAttribute('type')) || '').toLowerCase();
+              const name = ((await el.getAttribute('name')) || '').toLowerCase();
+              const placeholder = ((await el.getAttribute('placeholder')) || '').toLowerCase();
+              const required = await el.evaluate(n => !!n.required);
+              const id = await el.getAttribute('id');
+              let label = '';
+              if (id) label = await page.locator(`label[for="${id.replace(/"/g,'\\"')}"]`).innerText().catch(()=>'');
+              if (!label) label = await el.evaluate(n => (n.closest('label')?.innerText || n.parentElement?.innerText || '').slice(0,220));
+              const hint = `${name} ${placeholder} ${label}`.toLowerCase();
+
+              if (type === 'hidden' || type === 'submit' || type === 'button') continue;
+              if (type === 'email' || /\b(email|e-mail)\b/.test(hint) || /\b(your|founder|maker|builder)\s+(name|handle)\b/.test(hint)) {
+                if (required) identityBlocked = true;
+                continue;
+              }
+              if (type === 'checkbox') {
+                if (required && /(terms|privacy|agree|consent|policy|condition)/i.test(hint)) legalBlocked = true;
+                continue;
+              }
+              if (type === 'file') {
+                if (required) unfilled.push(`required file control: ${label || name || placeholder || i}`);
+                continue;
+              }
+
+              let filled = false;
+              if (/(website|url|link|app url|project url)/i.test(hint)) {
+                if (tag === 'select') {
+                  // no-op
+                } else { await el.fill(targetUrl); filled = true; }
+              } else if (/(app name|project name|tool name|product name|name of)/i.test(hint) || (/\bname\b/i.test(hint) && !/(your|founder|maker|builder)/i.test(hint))) {
+                if (tag !== 'select') { await el.fill(appName); filled = true; }
+              } else if (/(tagline|one.?liner|short description|headline)/i.test(hint)) {
+                if (tag !== 'select') { await el.fill(tagline); filled = true; }
+              } else if (/description|about/i.test(hint)) {
+                if (tag !== 'select') { await el.fill(description); filled = true; }
+              } else if (/(ai tool|built with|created with|made with|platform used)/i.test(hint)) {
+                if (tag === 'select') {
+                  const opts = await el.locator('option').allTextContents();
+                  let ix = opts.findIndex(x => /chatgpt|openai/i.test(x));
+                  if (ix < 0) ix = opts.findIndex(x => /^other$/i.test(x.trim()));
+                  if (ix >= 0) { await el.selectOption({ index: ix }); filled = true; }
+                } else { await el.fill('ChatGPT'); filled = true; }
+              } else if (/category/i.test(hint) && tag === 'select') {
+                const opts = await el.locator('option').allTextContents();
+                let ix = opts.findIndex(x => /productivity|business|startup|developer/i.test(x));
+                if (ix < 0) ix = opts.findIndex(x => /^other$/i.test(x.trim()));
+                if (ix >= 0) { await el.selectOption({ index: ix }); filled = true; }
+              }
+
+              if (required && !filled) {
+                const val = await el.inputValue().catch(()=> '');
+                if (!val) unfilled.push(`required control: ${label || name || placeholder || `${tag}#${i}`}`);
+              }
+            }
+
+            // Some builders use clickable option cards instead of native selects for "built with".
+            for (const term of ['ChatGPT', 'OpenAI', 'Other']) {
+              const opt = page.getByText(term, { exact: true }).first();
+              if (await opt.count()) {
+                const visible = await opt.isVisible().catch(()=>false);
+                if (visible) { await opt.click().catch(()=>{}); break; }
+              }
+            }
+
+            out(`Required identity/email blocked: ${identityBlocked}`);
+            out(`Required legal-consent checkbox blocked: ${legalBlocked}`);
+            out(`Other required fields still unfilled: ${unfilled.length}`);
+            if (unfilled.length) {
+              out('Unfilled field labels (non-sensitive):');
+              for (const x of unfilled.slice(0,20)) out(`- ${x}`);
+            }
+
+            if (identityBlocked || legalBlocked || unfilled.length) {
+              out('Result: NOT SUBMITTED. The public form could not be completed without an identity/legal action or an unmapped required field.');
+              fs.writeFileSync('ops/sololaunch-submission.md', audit.join('\n') + '\n');
+              await browser.close();
+              return;
+            }
+
+            const submit = page.getByRole('button', { name: /submit|launch|publish|add app/i }).first();
+            if (!(await submit.count()) || !(await submit.isEnabled().catch(()=>false))) {
+              out('Result: NOT SUBMITTED. No enabled designated submit button was available after filling non-identity fields.');
+              fs.writeFileSync('ops/sololaunch-submission.md', audit.join('\n') + '\n');
+              await browser.close();
+              return;
+            }
+
+            await submit.click();
+            await page.waitForTimeout(2500);
+            await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(()=>{});
+            const body = ((await page.locator('body').innerText().catch(()=>'')) || '').replace(/\s+/g,' ').slice(0,1800);
+            const current = page.url();
+            const success = /(submitted|thank|review|success|live|launch)/i.test(body) && !/(error|failed|try again)/i.test(body);
+            out(`Post-submit URL: ${current}`);
+            out(`Success-like public response observed: ${success}`);
+            out('Post-submit page excerpt:');
+            out('```text');
+            out(body);
+            out('```');
+            out(success ? 'Result: submission sent through the designated public form; treat as pending until public listing is independently verified.' : 'Result: submission response was ambiguous; do not count as accepted or retry automatically.');
+            fs.writeFileSync('ops/sololaunch-submission.md', audit.join('\n') + '\n');
+            await browser.close();
+          })().catch(err => {
+            fs.writeFileSync('ops/sololaunch-submission.md', `# SoloLaunch acquisition submission audit\n\nResult: probe failed safely before any confirmed submission.\nError class: ${err.name}\n`);
+            process.exitCode = 0;
+          });
+          NODE
+          cd /tmp
+          node /tmp/submit-sololaunch.js
+          cp /tmp/ops/sololaunch-submission.md "$GITHUB_WORKSPACE/ops/sololaunch-submission.md" 2>/dev/null || true
+          if [ ! -f "$GITHUB_WORKSPACE/ops/sololaunch-submission.md" ]; then
+            cp ops/sololaunch-submission.md "$GITHUB_WORKSPACE/ops/sololaunch-submission.md" 2>/dev/null || true
+          fi
+
+      - name: Commit acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/sololaunch-submission.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Record SoloLaunch acquisition attempt'
+          git pull --rebase origin main
+          git push
