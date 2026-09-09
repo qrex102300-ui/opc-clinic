@@ -1,0 +1,53 @@
+name: Route free-clinic visitors into revenue funnel
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/monetize-entry.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch-entry-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add post-launch CTA and fix repository links
+        shell: python
+        run: |
+          from pathlib import Path
+
+          en = Path("index-en.html")
+          text = en.read_text()
+          old = '''  <button class="btn-primary" onclick="BUILT_IN.provider?startChat():showScreen('config')">Enter the Clinic →</button>
+  <div class="landing-footer">
+    Your conversation stays in your browser. After diagnosis, an anonymized archive is automatically sent for product improvement (<a href="javascript:void(0)" onclick="state.optOut=true;this.textContent='disabled'">opt out</a>) · <a href="https://github.com" target="_blank">Open Source on GitHub</a>
+  </div>'''
+          new = '''  <button class="btn-primary" onclick="BUILT_IN.provider?startChat():showScreen('config')">Enter the Clinic →</button>
+  <div class="landing-footer" style="margin-top:1rem;font-size:.82rem">
+    Already launched and stuck between users and revenue? <a href="./paid-diagnosis.html"><strong>Get a free post-launch bottleneck triage →</strong></a>
+  </div>
+  <div class="landing-footer">
+    Your conversation stays in your browser. After diagnosis, an anonymized archive is automatically sent for product improvement (<a href="javascript:void(0)" onclick="state.optOut=true;this.textContent='disabled'">opt out</a>) · <a href="https://github.com/qrex102300-ui/opc-clinic" target="_blank">Open Source on GitHub</a>
+  </div>'''
+          if old not in text:
+              raise SystemExit("English landing anchor not found; refusing unsafe patch")
+          en.write_text(text.replace(old, new, 1))
+
+          zh = Path("index.html")
+          text = zh.read_text()
+          old_link = '<a href="https://github.com" target="_blank">GitHub 开源</a>'
+          new_link = '<a href="https://github.com/qrex102300-ui/opc-clinic" target="_blank">GitHub 开源</a>'
+          if old_link not in text:
+              raise SystemExit("Chinese GitHub anchor not found; refusing unsafe patch")
+          zh.write_text(text.replace(old_link, new_link, 1))
+      - name: Commit patch
+        run: |
+          git config user.name "opc-clinic-ai-operator"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index-en.html index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Revenue sprint: route free clinic visitors to triage"
+          git push
