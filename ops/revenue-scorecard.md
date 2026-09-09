@@ -1,6 +1,6 @@
 # OPC Clinic Revenue Sprint — Auditable Scorecard
 
-Last checked: **2026-09-09 23:34 CST**  
+Last checked: **2026-09-10 00:21 CST**  
 Experiment window: **2026-09-09 → 2026-09-15**
 
 This file is the canonical operational count for the 7-day revenue sprint. Counts only move on observable evidence; directory presence is not treated as a lead, and a lead is not treated as revenue.
@@ -28,9 +28,17 @@ This file is the canonical operational count for the 7-day revenue sprint. Count
 
 The zero-cost agent-directory submission audit is recorded in [`ops/agent-directory-submissions.md`](./agent-directory-submissions.md). Submission receipts are sanitized before being committed; private status tokens are not written to the public repository.
 
+## Additional zero-cost acquisition checks this run
+
+- **Linkrena** — one designated no-account/no-card public-form attempt was made. A later public API verification returned HTTP 200 but did **not** show OPC Clinic, so it is not counted as confirmed or pending. See [`ops/linkrena-submission.md`](./linkrena-submission.md).
+- **Awesome Skills** — its public submit page accepts only a GitHub URL in principle, but after the OPC Clinic skill URL was entered the submit button remained disabled until browser timeout. No submission was made and nothing is counted. See [`ops/awesomeskills-submission.md`](./awesomeskills-submission.md).
+- **Skills Registry / gotskills** — one first-install discovery attempt was made because the registry documents first-install discovery for public GitHub skills. A subsequent verification-only search did not return OPC Clinic, so it is not counted. No repeated installs will be used to inflate discovery/install signals. See [`ops/gotskills-registration.md`](./gotskills-registration.md).
+- **MCP.Directory** — the apparent skill-submission route currently redirects to an MCP server submission form. It was explicitly recorded as **NOT SUBMITTED / NOT COUNTED**; no identity, email, payment, or private credential was supplied. See [`ops/mcp-directory-submission.md`](./mcp-directory-submission.md).
+- High-fit public demand surfaces were researched for current founder cases showing launched products with zero customers/revenue. No unsolicited promotional comments were posted into those discussions.
+
 ## Intake check
 
-GitHub Issues check at 2026-09-09 23:34 CST: **0 issues total**, therefore there are no free-triage submissions, paid orders, or transaction hashes to process in this run.
+GitHub Issues check at 2026-09-10 00:21 CST: **0 open issues**, therefore there are no free-triage submissions, paid orders, or transaction hashes to process in this run.
 
 ## Operating rule
 
