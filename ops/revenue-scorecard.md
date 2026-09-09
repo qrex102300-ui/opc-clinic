@@ -1,6 +1,6 @@
 # OPC Clinic Revenue Sprint — Auditable Scorecard
 
-Last checked: **2026-09-10 03:17 CST**  
+Last checked: **2026-09-10 03:20 CST**  
 Experiment window: **2026-09-09 → 2026-09-15**
 
 This file is the canonical operational count for the 7-day revenue sprint. Counts only move on observable evidence; directory presence is not treated as a lead, and a lead is not treated as revenue.
@@ -38,18 +38,18 @@ The earlier zero-cost agent-directory submission receipts are recorded in [`ops/
 - **TechTools Launchpad** — successful legitimate acquisition action. Its documented public API is explicitly designed for bots and AI agents. A preflight listing check avoided duplicates; the submission then returned HTTP 201 with `success: true` and `Tool submitted successfully! It is now live.`, and a post-submit listing check independently found the OPC Clinic URL. It is counted as a confirmed external listing, not as a lead. No account, email, payment, private credential, or submitter identity was used.
 - **SaaS Scout** — successful legitimate acquisition action. The site publicly states that no login is required to submit. A public API-contract probe showed that `POST /api/products` requires only name, tagline, description, website, and category; an actual submission was then accepted with HTTP 201 and `status: approved`. It is counted as a confirmed external listing, not as a lead. See [`ops/saasscout-submission-route.md`](./saasscout-submission-route.md) and [`ops/saasscout-submission.md`](./saasscout-submission.md).
 - **AIPO.ST** — successful legitimate acquisition action from an earlier run: one no-auth/no-email/no-card submission was accepted, but the returned state remains pending and is not counted as confirmed traffic or a lead.
-- **AIToolsIndex** — researched because its public submission form marks contact email optional. A one-shot runner attempt could not reach `aitoolsindex.org` because DNS returned `NXDOMAIN`; therefore no submission was made and nothing is counted. See [`ops/aitoolsindex-submission.md`](./aitoolsindex-submission.md).
+- **AIToolsIndex** — its live public submission page currently marks contact email optional. Because a fresh public crawl resolved the page after the earlier GitHub-runner DNS failure, one justified retry was made without identity or email. The runner still returned `DNS_PROBE_FINISHED_NXDOMAIN` before reaching the form, so no submission occurred and nothing is counted. Do not retry again without new runner/network evidence. See [`ops/aitoolsindex-submission.md`](./aitoolsindex-submission.md).
 - **WebList / appli.st** — researched because it explicitly exposes `POST /api/submit` to AI agents, uses a CC0 directory, and makes contact optional. A single no-auth/no-email API submission attempt returned Cloudflare HTTP 522; therefore no acceptance is claimed and nothing is counted. See [`ops/weblist-submission.md`](./weblist-submission.md).
 - **Linkrena** — one designated no-account/no-card public-form attempt was made earlier. A later public API verification returned HTTP 200 but did **not** show OPC Clinic, so it is not counted as confirmed or pending. See [`ops/linkrena-submission.md`](./linkrena-submission.md).
 - **Awesome Skills** — its public submit page accepts a GitHub URL in principle, but after the OPC Clinic skill URL was entered the submit button remained disabled until browser timeout. No submission was made and nothing is counted. See [`ops/awesomeskills-submission.md`](./awesomeskills-submission.md).
 - **Skills Registry / gotskills** — one first-install discovery attempt was made because the registry documents first-install discovery for public GitHub skills. A subsequent verification-only search did not return OPC Clinic, so it is not counted. No repeated installs will be used to inflate discovery/install signals. See [`ops/gotskills-registration.md`](./gotskills-registration.md).
 - **MCP.Directory** — the apparent skill-submission route redirects to an MCP server submission form. It remains **NOT SUBMITTED / NOT COUNTED**; no identity, email, payment, or private credential was supplied. See [`ops/mcp-directory-submission.md`](./mcp-directory-submission.md).
 - **SubmitLLMs** — researched as another legitimate free discovery surface focused on AI-ready websites. Its public directory currently indexes thousands of sites, but no no-identity submission contract was proven in this run, so no submission was made and nothing is counted.
-- High-fit public founder-demand surfaces continue to be used as research evidence only; no unsolicited promotional comments are posted into unrelated discussions.
+- **Current founder-demand evidence** — recent public SaaS and indie-founder discussions continue to show launched products with zero paid users and distribution/customer acquisition as repeated bottlenecks. These surfaces are used only to guide channel selection; no unsolicited promotion is posted into ordinary help threads. See [`ops/acquisition-demand-evidence.md`](./acquisition-demand-evidence.md).
 
 ## Intake check
 
-GitHub Issues check at 2026-09-10 03:17 CST: **0 issues**, therefore there are no free-triage submissions, paid orders, transaction hashes, qualified leads, or payment-ready leads to process in this run.
+GitHub Issues check at 2026-09-10 03:20 CST: **0 issues**, therefore there are no free-triage submissions, paid orders, transaction hashes, qualified leads, or payment-ready leads to process in this run.
 
 ## Operating rule
 
