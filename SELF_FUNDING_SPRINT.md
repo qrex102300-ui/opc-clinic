@@ -64,6 +64,7 @@ Decision: **do not lower the $59 beta price simply to match automated reports.**
 
 Recent founder discussions continue to show the exact symptom this offer targets:
 
+- [A working AI ATS, demos and positive feedback, but zero paying customers](https://www.reddit.com/r/SaaS/comments/1waq7hv/i_built_an_ai_ats_that_works_zero_paying/) — Sep 8, 2026. The founder had already tried LinkedIn outreach, HR conversations, and demos, yet still could not tell whether the failure was company segment, buyer choice, sales motion, or another cause. This expands the target symptom beyond freemium conversion into B2B “positive feedback but no purchase” ambiguity.
 - [100+ signups, zero revenue, then a $99/month first customer](https://www.reddit.com/r/micro_saas/comments/1w8pc3a/got_our_first_paying_customer_yesterday_after/) — Sep 6, 2026. The founder reported that distribution was not the bottleneck; activation at an organization-creation step was. This is strong evidence for diagnosing the actual funnel break instead of assuming “more marketing.”
 - [Not having paying customers](https://www.reddit.com/r/SaaS/comments/1w43lvd/not_having_paying_customers/) — Sep 1, 2026. The thread centers on the recurring builder failure mode of creating software before proving need and sales.
 - [123 active users, $0 MRR — how do I actually get people to pay?](https://www.reddit.com/r/SaaS/comments/1w2nfv3/123_active_users_0_mrr_how_do_i_actually_get/) — Aug 30, 2026.
