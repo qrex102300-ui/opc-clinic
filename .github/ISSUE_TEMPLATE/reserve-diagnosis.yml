@@ -12,7 +12,7 @@ body:
 
         It is not a full market-research report and no payment is required for the triage. If the case is accepted and you want the deeper evidence-backed pass, payment instructions are posted in the issue before work starts.
 
-        Please do not include passwords, API keys, private customer data, or other secrets.
+        This issue is public. **Sanitized numbers are fine** — you do not need to reveal customer identities, exact confidential revenue, or private company data. Ranges and ratios are enough when they still preserve the shape of the funnel. Please do not include passwords, API keys, private customer data, or other secrets.
 
   - type: input
     id: project
@@ -27,7 +27,7 @@ body:
     id: url
     attributes:
       label: Public URL
-      description: Website, product page, or public repository if available.
+      description: Website, product page, or public repository if available. Leave blank if you prefer not to share one publicly.
       placeholder: "https://..."
     validations:
       required: false
@@ -45,10 +45,10 @@ body:
     id: evidence
     attributes:
       label: What has actually happened so far?
-      description: Give facts, not hopes — users, revenue, traffic, calls, conversion, experiments, rejections, etc.
+      description: Give facts, not hopes — users, revenue, traffic, calls, conversion, experiments, rejections, etc. Sanitized ranges or ratios are acceptable.
       placeholder: |
-        - 320 visits last 30 days
-        - 18 signups
+        - ~300 visits last 30 days
+        - 15–20 signups
         - 0 paid users
         - 7 founder calls; 4 said X, 3 said Y
     validations:
