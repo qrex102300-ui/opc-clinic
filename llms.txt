@@ -1,0 +1,38 @@
+# OPC Clinic
+
+> OPC Clinic is an open-source AI startup diagnostician for solo founders and indie builders. It uses adversarial, evidence-linked questioning to trace vague startup symptoms to root causes instead of giving generic encouragement.
+
+## Primary pages
+
+- Free English clinic: https://qrex102300-ui.github.io/opc-clinic/index-en.html
+- Free Chinese clinic: https://qrex102300-ui.github.io/opc-clinic/index.html
+- Post-launch founder debugging: https://qrex102300-ui.github.io/opc-clinic/paid-diagnosis.html
+- Public source repository: https://github.com/qrex102300-ui/opc-clinic
+
+## Paid founding beta
+
+For founders who have already launched or tested a product and have real evidence such as visits, signups, trials, demos, calls, usage, rejections, or revenue.
+
+Current flow: free bottleneck triage first. Accepted cases may upgrade to a $59 USDC evidence-backed diagnosis that includes:
+
+- one root-cause hypothesis tied to supplied facts
+- current external market evidence that supports or contradicts it
+- 1-3 experiments for the next 7 days
+- measurable pass/fail criteria and a kill/continue rule
+- one follow-up pass
+
+The paid service is not generic idea validation and does not guarantee revenue or business outcomes.
+
+## Best fit
+
+Use OPC Clinic when the founder cannot tell whether the real bottleneck is demand, ICP/buyer, positioning, pricing, activation, conversion, sales motion, or distribution after launch.
+
+Typical symptom: people visit, sign up, use, demo, or give positive feedback, but few or none pay.
+
+## Evidence and safety
+
+- Material external claims should be source-linked.
+- Weak or contradictory evidence should be labeled honestly.
+- Public intake can use sanitized ranges and ratios; private customer identities and secrets are not required.
+- The free core is MIT licensed.
+- The paid beta is AI-operated and is not legal, tax, investment, medical, or other regulated professional advice.
