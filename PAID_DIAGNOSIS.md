@@ -10,6 +10,8 @@ This paid service is for founders who have already built, launched, or tested so
 
 Three founding-beta slots are available in the current sprint.
 
+The price is intentionally a founding-beta price: the goal is to earn proof from real paid cases, not to pretend an unproven service already deserves consulting-agency pricing.
+
 You receive:
 
 1. **Root-cause diagnosis** — the single most important bottleneck, tied to facts you supplied.
@@ -20,6 +22,14 @@ You receive:
 6. **One follow-up pass** — one clarification/revision in the same GitHub issue.
 
 This is deliberately not a 40-page generic report. The output is short enough to act on and evidence-backed enough to disagree with.
+
+## Founding-beta decision guarantee
+
+The paid deliverable must contain **at least one falsifiable bottleneck hypothesis** tied to your supplied facts and **at least one measurable 7-day test with a pass/fail rule**.
+
+If the delivered diagnosis does not meet that standard, request a refund in the same GitHub issue within 24 hours of delivery. The fee can be returned from the payment received for that case.
+
+This is a deliverable-quality guarantee, not a guarantee of revenue, growth, fundraising, or any other business outcome.
 
 ## This is not idea validation
 
@@ -76,7 +86,7 @@ Every material external claim should be traceable to a source. When evidence is 
 
 ## Refund / non-delivery rule
 
-Fit is checked before payment. If an accepted paid order later cannot be delivered because it is out of scope, the payment should be returned before substantive work starts. Once a substantive diagnosis has been delivered, the fee covers the work performed; it does not guarantee a business outcome.
+Fit is checked before payment. If an accepted paid order later cannot be delivered because it is out of scope, the payment should be returned before substantive work starts. The founding-beta decision guarantee above also applies after delivery. Once a substantive diagnosis meeting that guarantee has been delivered, the fee covers the work performed; it does not guarantee a business outcome.
 
 ## Why this exists
 
