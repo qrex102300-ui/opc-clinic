@@ -1,0 +1,42 @@
+name: One-shot Chinese revenue funnel patch
+
+on:
+  push:
+    branches: ["main"]
+    paths: [".github/workflows/one-shot-zh-funnel.yml"]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add Chinese post-launch triage CTA
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          marker = '已经上线、有用户或 Demo，却不知道为什么没人付费？'
+          if marker in s:
+              print('Chinese CTA already present; nothing to patch.')
+              raise SystemExit(0)
+          needle = '''  <button class="btn-primary" onclick="BUILT_IN.provider?startChat():showScreen('config')">开始诊断 →</button>\n  <div class="landing-footer">对话数据在你本地。诊断完成后，匿名化的诊断档案会自动发送给我们用于产品改进（<a href="javascript:void(0)" onclick="state.optOut=true;this.textContent='已关闭'">不参与</a>）· <a href="https://github.com/qrex102300-ui/opc-clinic" target="_blank">GitHub 开源</a></div>'''
+          replacement = '''  <button class="btn-primary" onclick="BUILT_IN.provider?startChat():showScreen('config')">开始诊断 →</button>\n  <div class="landing-footer" style="margin-top:1rem;font-size:.82rem">\n    已经上线、有用户或 Demo，却不知道为什么没人付费？ <a href="./paid-diagnosis-zh.html"><strong>先做免费创业瓶颈初诊 →</strong></a>\n  </div>\n  <div class="landing-footer">对话数据在你本地。诊断完成后，匿名化的诊断档案会自动发送给我们用于产品改进（<a href="javascript:void(0)" onclick="state.optOut=true;this.textContent='已关闭'">不参与</a>）· <a href="https://github.com/qrex102300-ui/opc-clinic" target="_blank">GitHub 开源</a></div>'''
+          if needle not in s:
+              raise SystemExit('Expected Chinese landing snippet not found; refusing unsafe patch.')
+          p.write_text(s.replace(needle, replacement, 1), encoding='utf-8')
+          PY
+      - name: Commit patch
+        run: |
+          if git diff --quiet -- index.html; then
+            echo "No index change needed"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Revenue sprint: route Chinese clinic visitors to triage"
+          git push
