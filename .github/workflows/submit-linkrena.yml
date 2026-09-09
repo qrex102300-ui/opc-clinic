@@ -1,4 +1,4 @@
-name: Submit OPC Clinic to Linkrena
+name: Verify OPC Clinic on Linkrena
 
 on:
   push:
@@ -10,128 +10,42 @@ permissions:
   contents: write
 
 jobs:
-  submit:
+  verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 5
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Pre-check Linkrena directory
-        id: precheck
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p ops
-          pre="$(mktemp)"
-          code="$(curl -sS -L -o "$pre" -w '%{http_code}' 'https://linkrena.com/api/v1/tools?q=OPC%20Clinic')"
-          echo "http_code=$code" >> "$GITHUB_OUTPUT"
-          cp "$pre" /tmp/linkrena-pre.json
-          if grep -Fq 'qrex102300-ui.github.io/opc-clinic' "$pre"; then
-            echo 'already_listed=true' >> "$GITHUB_OUTPUT"
-          else
-            echo 'already_listed=false' >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Install Playwright
-        if: steps.precheck.outputs.already_listed != 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm init -y >/dev/null 2>&1
-          npm install --silent playwright@1.55.0
-          npx playwright install --with-deps chromium
-
-      - name: Submit website through Linkrena public form
-        if: steps.precheck.outputs.already_listed != 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          cat > submit-linkrena.mjs <<'EOF'
-          import { chromium } from 'playwright';
-          import fs from 'fs';
-
-          const browser = await chromium.launch({ headless: true });
-          const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
-          let outcome = { attempted: true, successSignal: false, finalUrl: '', bodyText: '', error: null };
-          try {
-            await page.goto('https://linkrena.com/submit', { waitUntil: 'domcontentloaded', timeout: 60000 });
-            const urlInput = page.locator('input[type="url"], input[name*="url" i], input[placeholder*="tool" i], input[placeholder*="website" i], input').first();
-            await urlInput.fill('https://qrex102300-ui.github.io/opc-clinic/');
-
-            const submitButton = page.getByRole('button', { name: /submit|list|add/i }).first();
-            if (await submitButton.count()) {
-              await submitButton.click();
-            } else {
-              await urlInput.press('Enter');
-            }
-
-            await page.waitForTimeout(7000);
-            outcome.finalUrl = page.url();
-            outcome.bodyText = (await page.locator('body').innerText()).slice(0, 6000);
-            outcome.successSignal = /submitted|queued|review|published|added|success|thank/i.test(outcome.bodyText);
-          } catch (err) {
-            outcome.error = String(err?.message || err);
-          } finally {
-            fs.writeFileSync('/tmp/linkrena-form-result.json', JSON.stringify(outcome, null, 2));
-            await browser.close();
-          }
-          EOF
-          node submit-linkrena.mjs
-          rm -f submit-linkrena.mjs
-
-      - name: Verify directory presence
+      - name: Verify Linkrena directory presence
         id: verify
         shell: bash
         run: |
           set -euo pipefail
-          listed=false
-          body="$(mktemp)"
-          for i in $(seq 1 12); do
-            curl -sS -L 'https://linkrena.com/api/v1/tools?q=OPC%20Clinic' -o "$body" || true
-            if grep -Fq 'qrex102300-ui.github.io/opc-clinic' "$body"; then
-              listed=true
-              break
-            fi
-            sleep 10
-          done
-          echo "listed=$listed" >> "$GITHUB_OUTPUT"
-          cp "$body" /tmp/linkrena-post.json
-
-      - name: Write sanitized acquisition audit
-        shell: bash
-        run: |
-          set -euo pipefail
           mkdir -p ops
+          body="$(mktemp)"
+          code="$(curl -sS -L -o "$body" -w '%{http_code}' 'https://linkrena.com/api/v1/tools?q=OPC%20Clinic')"
+          listed=false
+          if grep -Fq 'qrex102300-ui.github.io/opc-clinic' "$body"; then
+            listed=true
+          fi
           {
-            echo '# Linkrena acquisition submission audit'
+            echo '# Linkrena acquisition verification'
             echo
-            echo "Last attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo "Last checked: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
             echo
-            echo 'Surface: https://linkrena.com/ — free standard listing, no account/card required.'
-            echo 'Submitted website: https://qrex102300-ui.github.io/opc-clinic/'
+            echo 'A single no-account/no-card submission attempt was made through Linkrena’s designated public form earlier in this sprint. This workflow is verification-only and will not resubmit, avoiding duplicate/spam submissions.'
             echo
-            echo "Pre-check HTTP status: ${{ steps.precheck.outputs.http_code }}"
-            echo "Already listed before submission: ${{ steps.precheck.outputs.already_listed }}"
-            echo "Confirmed listed after attempt: ${{ steps.verify.outputs.listed }}"
-            echo
-            if [ -f /tmp/linkrena-form-result.json ]; then
-              echo '## Public form result (sanitized)'
-              echo
-              echo '```json'
-              jq '{attempted, successSignal, finalUrl, error, bodyText}' /tmp/linkrena-form-result.json
-              echo '```'
-            fi
-            echo
-            echo '## Verification response excerpt'
+            echo "Verification HTTP status: $code"
+            echo "Confirmed listed: $listed"
             echo
             echo '```json'
-            head -c 4000 /tmp/linkrena-post.json || true
+            head -c 6000 "$body" || true
             echo
             echo '```'
           } > ops/linkrena-submission.md
 
-      - name: Commit acquisition audit
+      - name: Commit verification audit
         shell: bash
         run: |
           set -euo pipefail
@@ -141,5 +55,6 @@ jobs:
           if git diff --cached --quiet; then
             exit 0
           fi
-          git commit -m 'Record Linkrena acquisition submission'
+          git commit -m 'Record Linkrena listing verification'
+          git pull --rebase origin main
           git push
