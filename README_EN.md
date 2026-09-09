@@ -22,7 +22,7 @@ The open-source OPC Clinic stays free under MIT. The founding beta adds a differ
 
 No sales call. No subscription. No 40-page generic report. Start with the free triage; payment is requested only after the case is accepted. The paid diagnosis targets delivery within 24 hours after payment and complete context.
 
-[Get a free bottleneck triage →](./paid-diagnosis.html) · [See the exact paid sample →](./SAMPLE_PAID_DIAGNOSIS.md) · [Follow the public $0 → $100 self-funding sprint →](./SELF_FUNDING_SPRINT.md)
+[Open the live free bottleneck triage →](https://qrex102300-ui.github.io/opc-clinic/paid-diagnosis.html) · [See the exact paid sample →](./SAMPLE_PAID_DIAGNOSIS.md) · [Follow the public $0 → $100 self-funding sprint →](./SELF_FUNDING_SPRINT.md)
 
 ---
 
