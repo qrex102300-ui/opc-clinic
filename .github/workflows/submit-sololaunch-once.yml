@@ -1,0 +1,114 @@
+name: SoloLaunch one-shot public submission
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-sololaunch-once.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Playwright
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.55.0 >/dev/null 2>&1
+          npx playwright install chromium >/dev/null 2>&1
+      - name: Attempt one legitimate public-form submission
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+          mkdir -p ops
+          cat >/tmp/solo.js <<'NODE'
+          const { chromium } = require('/tmp/node_modules/playwright');
+          const fs = require('fs');
+          const OUT = 'ops/sololaunch-submission.md';
+          const log = [];
+          const p = (x='') => log.push(String(x));
+          const save = () => fs.writeFileSync(OUT, log.join('\n')+'\n');
+          (async()=>{
+            const b=await chromium.launch({headless:true});
+            const page=await b.newPage({viewport:{width:1280,height:1000}});
+            const url='https://qrex102300-ui.github.io/opc-clinic/';
+            p('# SoloLaunch acquisition submission audit'); p();
+            p(`Attempted: ${new Date().toISOString()}`);
+            p('Surface: https://sololaunch.ai/submit');
+            p('Policy: one attempt through the site’s designated free/no-account form; no personal identity, email, payment, private credential, unsolicited community post, or automated legal consent.'); p();
+
+            let r=await page.goto('https://sololaunch.ai/apps/opc-clinic',{waitUntil:'domcontentloaded',timeout:30000}).catch(()=>null);
+            let t=(await page.locator('body').innerText().catch(()=>''))||'';
+            if(r && r.status()<400 && /OPC Clinic/i.test(t)){
+              p(`Preflight public listing: true (HTTP ${r.status()})`); p('Result: already listed; no duplicate submission sent.'); save(); await b.close(); return;
+            }
+            p(`Preflight public listing: false (${r?`HTTP ${r.status()}`:'request failed'})`);
+
+            r=await page.goto('https://sololaunch.ai/submit',{waitUntil:'networkidle',timeout:45000}).catch(()=>null);
+            p(`Submit-page HTTP status: ${r?r.status():'request failed'}`);
+            const els=page.locator('input,textarea,select');
+            const n=await els.count(); p(`Form controls discovered: ${n}`);
+            let blockedIdentity=false, blockedTerms=false; const missing=[];
+
+            for(let i=0;i<n;i++){
+              const e=els.nth(i); const tag=await e.evaluate(x=>x.tagName.toLowerCase());
+              const type=((await e.getAttribute('type'))||'').toLowerCase();
+              if(['hidden','submit','button'].includes(type)) continue;
+              const name=((await e.getAttribute('name'))||''); const ph=((await e.getAttribute('placeholder'))||''); const id=await e.getAttribute('id');
+              let label=''; if(id) label=await page.locator(`label[for="${id.replace(/"/g,'\\"')}"]`).innerText().catch(()=>'');
+              if(!label) label=await e.evaluate(x=>(x.closest('label')?.innerText||x.parentElement?.innerText||'').slice(0,180));
+              const h=`${name} ${ph} ${label}`.toLowerCase(); const req=await e.evaluate(x=>!!x.required);
+              if(type==='email'||/\bemail\b|e-mail/.test(h)||/\b(your|founder|maker|builder)\s+(name|handle)\b/.test(h)){ if(req) blockedIdentity=true; continue; }
+              if(type==='checkbox'){ if(req&&/(terms|privacy|agree|consent|condition|policy)/i.test(h)) blockedTerms=true; continue; }
+              if(type==='file'){ if(req) missing.push(label||name||'required file'); continue; }
+              let done=false;
+              if(/website|project url|app url|tool url|\burl\b|link/i.test(h)&&tag!=='select'){await e.fill(url);done=true;}
+              else if(/app name|project name|tool name|product name|name of/i.test(h)||(\bname\b/i.test(h)&&!/(your|founder|maker|builder)/i.test(h))){if(tag!=='select'){await e.fill('OPC Clinic');done=true;}}
+              else if(/tagline|headline|one.?liner|short description/i.test(h)){if(tag!=='select'){await e.fill('Evidence-first founder diagnosis for launched products that are not converting.');done=true;}}
+              else if(/description|about/i.test(h)){if(tag!=='select'){await e.fill('Open-source AI founder diagnostician for launched products with users, demos, or feedback but weak or zero paid conversion. It identifies the most plausible bottleneck from supplied evidence and turns it into a measurable 7-day experiment instead of generic startup advice.');done=true;}}
+              else if(/ai tool|built with|made with|created with|platform used/i.test(h)){
+                if(tag==='select'){
+                  const o=await e.locator('option').allTextContents(); let k=o.findIndex(x=>/chatgpt|openai/i.test(x)); if(k<0)k=o.findIndex(x=>/^other$/i.test(x.trim())); if(k>=0){await e.selectOption({index:k});done=true;}
+                }else{await e.fill('ChatGPT');done=true;}
+              }else if(/category/i.test(h)&&tag==='select'){
+                const o=await e.locator('option').allTextContents(); let k=o.findIndex(x=>/productivity|business|startup|developer/i.test(x)); if(k<0)k=o.findIndex(x=>/^other$/i.test(x.trim())); if(k>=0){await e.selectOption({index:k});done=true;}
+              }
+              if(req&&!done){const v=await e.inputValue().catch(()=>''); if(!v) missing.push(label||name||ph||`${tag}#${i}`);}
+            }
+
+            // Handle visible non-native "built with" option cards without accepting legal terms.
+            for(const s of ['ChatGPT','OpenAI','Other']){const x=page.getByText(s,{exact:true}).first(); if(await x.count()&&await x.isVisible().catch(()=>false)){await x.click().catch(()=>{});break;}}
+            p(`Required identity/email blocker: ${blockedIdentity}`); p(`Required legal-consent blocker: ${blockedTerms}`); p(`Other required fields unfilled: ${missing.length}`);
+            if(missing.length){p('Unfilled labels:'); missing.slice(0,20).forEach(x=>p(`- ${x.replace(/\s+/g,' ').slice(0,140)}`));}
+            if(blockedIdentity||blockedTerms||missing.length){p('Result: NOT SUBMITTED; completion would require identity/legal action or a required field the safe mapper could not populate.');save();await b.close();return;}
+
+            const btn=page.getByRole('button',{name:/submit|launch|publish|add app/i}).first();
+            if(!(await btn.count())||!(await btn.isEnabled().catch(()=>false))){p('Result: NOT SUBMITTED; no enabled designated submit button after safe field completion.');save();await b.close();return;}
+            await btn.click(); await page.waitForTimeout(2500); await page.waitForLoadState('networkidle',{timeout:15000}).catch(()=>{});
+            t=((await page.locator('body').innerText().catch(()=>''))||'').replace(/\s+/g,' ');
+            const success=/(submitted|thank|under review|reviewing|successfully submitted|submission received)/i.test(t)&&!/(error|failed|try again)/i.test(t);
+            p(`Post-submit URL: ${page.url()}`); p(`Acceptance-like response: ${success}`);
+            p('Post-submit excerpt:'); p('```text'); p(t.slice(0,1600)); p('```');
+            p(success?'Result: accepted by the designated public form; count as pending until independently public.':'Result: ambiguous response; do not count as accepted and do not automatically retry.'); save(); await b.close();
+          })().catch(async e=>{p(`Result: browser attempt failed safely; error class ${e.name}. No acceptance is claimed.`);save();process.exitCode=0;});
+          NODE
+          node /tmp/solo.js
+      - name: Commit audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/sololaunch-submission.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Record SoloLaunch acquisition attempt'
+          git pull --rebase origin main
+          git push
