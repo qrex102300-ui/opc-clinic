@@ -1,0 +1,149 @@
+name: Submit OPC Clinic to AIToolsIndex
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-aitoolsindex.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Playwright
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Submit through designated public form
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > submit-aitoolsindex.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          import fs from 'fs';
+
+          const payload = {
+            name: 'OPC Clinic',
+            url: 'https://qrex102300-ui.github.io/opc-clinic/',
+            description: 'Open-source AI founder diagnostician for launched products that are stuck: traces symptoms to a likely bottleneck and turns the diagnosis into a measurable 7-day test.'
+          };
+
+          const browser = await chromium.launch({ headless: true });
+          const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
+          const result = {
+            attempted: true,
+            surface: 'https://aitoolsindex.org/submit',
+            submittedEmail: false,
+            finalUrl: '',
+            successSignal: false,
+            bodyText: '',
+            error: null
+          };
+
+          async function fillFirst(candidates, value) {
+            for (const locator of candidates) {
+              try {
+                if (await locator.count()) {
+                  const first = locator.first();
+                  if (await first.isVisible()) {
+                    await first.fill(value);
+                    return true;
+                  }
+                }
+              } catch {}
+            }
+            return false;
+          }
+
+          try {
+            await page.goto(result.surface, { waitUntil: 'domcontentloaded', timeout: 60000 });
+
+            const nameOk = await fillFirst([
+              page.getByLabel(/tool name/i),
+              page.locator('input[name*="name" i]'),
+              page.locator('input[placeholder*="name" i]')
+            ], payload.name);
+
+            const urlOk = await fillFirst([
+              page.getByLabel(/website|url/i),
+              page.locator('input[type="url"]'),
+              page.locator('input[name*="url" i]'),
+              page.locator('input[placeholder*="url" i]')
+            ], payload.url);
+
+            const descriptionOk = await fillFirst([
+              page.getByLabel(/description/i),
+              page.locator('textarea[name*="description" i]'),
+              page.locator('textarea')
+            ], payload.description);
+
+            if (!nameOk || !urlOk) {
+              throw new Error(`Required public form fields not found (name=${nameOk}, url=${urlOk}, description=${descriptionOk})`);
+            }
+
+            // Email is intentionally left blank because the public form marks it optional.
+            const submit = page.getByRole('button', { name: /submit|add tool|send/i }).first();
+            await submit.click({ timeout: 30000 });
+            await page.waitForTimeout(7000);
+
+            result.finalUrl = page.url();
+            result.bodyText = (await page.locator('body').innerText()).slice(0, 8000);
+            result.successSignal = /thank|submitted|success|review|received|pending|added/i.test(result.bodyText)
+              && !/required.*email|error|failed|invalid/i.test(result.bodyText);
+          } catch (err) {
+            result.error = String(err?.message || err);
+            try {
+              result.finalUrl = page.url();
+              result.bodyText = (await page.locator('body').innerText()).slice(0, 8000);
+            } catch {}
+          } finally {
+            fs.writeFileSync('/tmp/aitoolsindex-result.json', JSON.stringify(result, null, 2));
+            await browser.close();
+          }
+          EOF
+          node submit-aitoolsindex.mjs || true
+          rm -f submit-aitoolsindex.mjs
+
+      - name: Write sanitized acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          {
+            echo '# AIToolsIndex acquisition submission audit'
+            echo
+            echo "Last attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'Surface: https://aitoolsindex.org/submit — designated public AI-tool submission form.'
+            echo 'No account, payment, private credential, or contact email was supplied.'
+            echo 'Website submitted: https://qrex102300-ui.github.io/opc-clinic/'
+            echo
+            echo '```json'
+            jq . /tmp/aitoolsindex-result.json
+            echo '```'
+          } > ops/aitoolsindex-submission.md
+
+      - name: Commit acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/aitoolsindex-submission.md
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'Record AIToolsIndex directory submission'
+          git pull --rebase origin main
+          git push
