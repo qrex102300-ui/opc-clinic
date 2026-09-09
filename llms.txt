@@ -6,7 +6,8 @@
 
 - Free English clinic: https://qrex102300-ui.github.io/opc-clinic/index-en.html
 - Free Chinese clinic: https://qrex102300-ui.github.io/opc-clinic/index.html
-- Post-launch founder debugging: https://qrex102300-ui.github.io/opc-clinic/paid-diagnosis.html
+- Post-launch founder debugging (English): https://qrex102300-ui.github.io/opc-clinic/paid-diagnosis.html
+- 上线后创业瓶颈诊断（中文）: https://qrex102300-ui.github.io/opc-clinic/paid-diagnosis-zh.html
 - Free guide for SaaS users-but-no-paying-customers diagnosis: https://qrex102300-ui.github.io/opc-clinic/saas-users-but-no-paying-customers.html
 - Public source repository: https://github.com/qrex102300-ui/opc-clinic
 
@@ -29,6 +30,8 @@ The paid service is not generic idea validation and does not guarantee revenue o
 Use OPC Clinic when the founder cannot tell whether the real bottleneck is demand, ICP/buyer, positioning, pricing, activation, conversion, sales motion, or distribution after launch.
 
 Typical symptom: people visit, sign up, use, demo, or give positive feedback, but few or none pay.
+
+中文典型症状：产品已经上线，有访问、注册、使用、Demo 或正面反馈，但几乎没有人付费；创始人分不清真正的问题是需求、买方、定位、激活、价值、定价、销售还是分发。
 
 ## Evidence and safety
 
