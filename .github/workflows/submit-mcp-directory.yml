@@ -1,0 +1,104 @@
+name: Submit OPC Clinic Skill to MCP.Directory
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-mcp-directory.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Playwright
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Submit public skill URL
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > submit-mcp-directory.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          import fs from 'fs';
+
+          const sourceUrl = 'https://github.com/qrex102300-ui/opc-clinic/blob/main/skill/SKILL.md';
+          const browser = await chromium.launch({ headless: true });
+          const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
+          const result = { attempted: true, sourceUrl, finalUrl: '', successSignal: false, bodyText: '', error: null };
+          try {
+            await page.goto('https://mcp.directory/submit-skill', { waitUntil: 'domcontentloaded', timeout: 60000 });
+            const source = page.getByLabel(/Skill Source URL/i).first();
+            if (await source.count()) {
+              await source.fill(sourceUrl);
+            } else {
+              await page.locator('input').first().fill(sourceUrl);
+            }
+
+            const name = page.getByLabel(/Skill Name/i).first();
+            if (await name.count()) await name.fill('OPC Clinic');
+
+            const description = page.getByLabel(/Description/i).first();
+            if (await description.count()) {
+              await description.fill('Evidence-first founder diagnosis for launched products that are not converting. Traces symptoms to a likely bottleneck and defines a measurable 7-day test.');
+            }
+
+            const submit = page.getByRole('button', { name: /Submit for Review|Submit/i }).first();
+            await submit.click();
+            await page.waitForTimeout(6000);
+            result.finalUrl = page.url();
+            result.bodyText = (await page.locator('body').innerText()).slice(0, 6000);
+            result.successSignal = /submitted|review|thank|success|received|pending/i.test(result.bodyText);
+          } catch (err) {
+            result.error = String(err?.message || err);
+          } finally {
+            fs.writeFileSync('/tmp/mcp-directory-result.json', JSON.stringify(result, null, 2));
+            await browser.close();
+          }
+          if (!result.successSignal && result.error) process.exitCode = 1;
+          EOF
+          node submit-mcp-directory.mjs || true
+          rm -f submit-mcp-directory.mjs
+
+      - name: Write sanitized acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          {
+            echo '# MCP.Directory skill submission audit'
+            echo
+            echo "Last attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'Surface: https://mcp.directory/submit-skill — designated public agent-skill submission form.'
+            echo 'Email field is optional; no email, account, payment, or private credential was supplied.'
+            echo 'Skill source: https://github.com/qrex102300-ui/opc-clinic/blob/main/skill/SKILL.md'
+            echo
+            echo '```json'
+            jq . /tmp/mcp-directory-result.json
+            echo '```'
+          } > ops/mcp-directory-submission.md
+
+      - name: Commit acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/mcp-directory-submission.md
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'Record MCP.Directory skill submission'
+          git push
