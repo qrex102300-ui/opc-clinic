@@ -1,0 +1,71 @@
+name: Probe SoloLaunch public submission route
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/probe-sololaunch.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect public submit page and client bundles
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops /tmp/solojs
+          page=/tmp/sololaunch.html
+          code="$(curl -sS -L --max-time 30 -o "$page" -w '%{http_code}' 'https://sololaunch.ai/submit')"
+          {
+            echo '# SoloLaunch public submission-route probe'
+            echo
+            echo "Checked: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo "Page HTTP status: $code"
+            echo
+            echo 'SoloLaunch publicly advertises a free app submission with no account required. This probe is discovery-only; it does not submit anything.'
+            echo
+            echo '## Form/action markers from HTML'
+            echo '```text'
+            grep -Eoi '<form[^>]*>|action="[^"]+"|href="[^"]*submit[^"]*"|/api/[A-Za-z0-9_./?=&%-]+' "$page" | head -n 100 || true
+            echo '```'
+            echo
+            echo '## Public client-bundle route markers'
+            echo '```text'
+          } > ops/sololaunch-probe.md
+
+          mapfile -t scripts < <(grep -Eo 'src="[^"]+\.js[^\"]*"' "$page" | sed -E 's/^src="//;s/"$//' | sort -u)
+          n=0
+          for src in "${scripts[@]}"; do
+            n=$((n+1))
+            [ "$n" -le 40 ] || break
+            case "$src" in
+              http*) url="$src" ;;
+              /*) url="https://sololaunch.ai$src" ;;
+              *) url="https://sololaunch.ai/$src" ;;
+            esac
+            f="/tmp/solojs/$n.js"
+            curl -sS -L --max-time 20 "$url" -o "$f" || continue
+            grep -Eo 'https?://[^"'"'"' <>()]+|/api/[A-Za-z0-9_./?=&%-]+' "$f" \
+              | grep -Ei 'submit|app|api|supabase|project|launch' \
+              | sed "s#^#$src :: #" \
+              | head -n 60 || true
+          done >> ops/sololaunch-probe.md
+          echo '```' >> ops/sololaunch-probe.md
+
+      - name: Commit probe audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/sololaunch-probe.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Probe SoloLaunch public submission route'
+          git pull --rebase origin main
+          git push
