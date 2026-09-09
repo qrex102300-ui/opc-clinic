@@ -47,7 +47,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat > /tmp/submit-linkrena.mjs <<'EOF'
+          cat > submit-linkrena.mjs <<'EOF'
           import { chromium } from 'playwright';
           import fs from 'fs';
 
@@ -56,7 +56,7 @@ jobs:
           let outcome = { attempted: true, successSignal: false, finalUrl: '', bodyText: '', error: null };
           try {
             await page.goto('https://linkrena.com/submit', { waitUntil: 'domcontentloaded', timeout: 60000 });
-            const urlInput = page.locator('input[type="url"], input[name*="url" i], input[placeholder*="tool" i], input[placeholder*="website" i], input').filter({ visible: true }).first();
+            const urlInput = page.locator('input[type="url"], input[name*="url" i], input[placeholder*="tool" i], input[placeholder*="website" i], input').first();
             await urlInput.fill('https://qrex102300-ui.github.io/opc-clinic/');
 
             const submitButton = page.getByRole('button', { name: /submit|list|add/i }).first();
@@ -77,7 +77,8 @@ jobs:
             await browser.close();
           }
           EOF
-          node /tmp/submit-linkrena.mjs
+          node submit-linkrena.mjs
+          rm -f submit-linkrena.mjs
 
       - name: Verify directory presence
         id: verify
