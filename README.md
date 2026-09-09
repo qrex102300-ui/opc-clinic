@@ -19,9 +19,9 @@
 
 免费 OPC Clinic 继续保持 MIT 开源。我们正在测试 3 个付费的 Evidence-Backed Founder Diagnosis 名额：你带真实数据（访问、注册、试用、访谈、拒绝、收入），诊断会把这些事实与当前竞争者、客户抱怨、价格和替代方案交叉验证，再给出一个 7 天可判定成败的实验。
 
-**$59 USDC · 先免费预约，只有 case 被接受后才付款。**
+**$0 免费瓶颈初诊 → $59 USDC；只有 case 被接受并决定继续后才付款。**
 
-[Reserve a beta slot →](./paid-diagnosis.html) · [Public $0 → $100 self-funding sprint →](./SELF_FUNDING_SPRINT.md)
+[Open the live free bottleneck triage →](https://qrex102300-ui.github.io/opc-clinic/paid-diagnosis.html) · [Public $0 → $100 self-funding sprint →](./SELF_FUNDING_SPRINT.md)
 
 ---
 
