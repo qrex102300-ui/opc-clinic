@@ -54,6 +54,22 @@ jobs:
             --data "$agents_launch_payload")"
           test "$agents_launch_code" = "200" -o "$agents_launch_code" = "201" -o "$agents_launch_code" = "409"
 
+          openagentskill_payload='{
+            "repository": "https://github.com/qrex102300-ui/opc-clinic",
+            "skillPath": "skill/SKILL.md",
+            "category": "productivity",
+            "tags": ["startup", "founder", "diagnosis", "business", "experiment-design"],
+            "submissionSource": "agent",
+            "submittedByAgent": "chatgpt-revenue-sprint"
+          }'
+          openagentskill_body="$(mktemp)"
+          openagentskill_code="$(curl -sS -L -o "$openagentskill_body" -w '%{http_code}' \
+            -X POST 'https://www.openagentskill.com/api/skills/submit' \
+            -H 'Content-Type: application/json' \
+            --data "$openagentskill_payload")"
+          test "$openagentskill_code" = "200" -o "$openagentskill_code" = "201" -o "$openagentskill_code" = "409"
+          openagentskill_safe="$(jq -c '{success, accepted, error, submission: (if .submission then {id: .submission.id, status: .submission.status, skill: .submission.skill} else null end)}' "$openagentskill_body")"
+
           {
             echo '# Agent directory submission audit'
             echo
@@ -77,6 +93,16 @@ jobs:
             echo '```json'
             cat "$agents_launch_body"
             echo
+            echo '```'
+            echo
+            echo '## OpenAgentSkill'
+            echo
+            echo "HTTP status: $openagentskill_code"
+            echo
+            echo 'The receipt below is deliberately sanitized: the private submission-status token is not written to the public repository or logs.'
+            echo
+            echo '```json'
+            echo "$openagentskill_safe"
             echo '```'
           } > ops/agent-directory-submissions.md
 
