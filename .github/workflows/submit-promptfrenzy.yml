@@ -1,0 +1,47 @@
+name: Submit OPC Clinic to PromptFrenzy
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-promptfrenzy.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Submit verified listing
+        shell: bash
+        run: |
+          set -euo pipefail
+          payload='{
+            "name": "OPC Clinic",
+            "url": "https://qrex102300-ui.github.io/opc-clinic/directory.html",
+            "description": "Open-source AI startup diagnostician for solo founders, with a free post-launch bottleneck triage and an optional evidence-backed diagnosis.",
+            "category": "agents",
+            "pricing": "freemium",
+            "badge_url": "https://qrex102300-ui.github.io/opc-clinic/directory.html",
+            "tags": ["startup", "solopreneur", "diagnosis", "founder", "business"],
+            "pricing_detail": "Free MIT-licensed core and free bottleneck triage; accepted founding-beta cases can buy a $59 USDC evidence-backed diagnosis.",
+            "key_features": [
+              "Multi-turn startup root-cause diagnosis tied to founder-provided facts",
+              "Free post-launch bottleneck triage for launched products",
+              "Optional evidence-backed diagnosis with current market research and a 7-day test plan",
+              "Model-agnostic prompt works with major LLMs"
+            ],
+            "works_with": ["chatgpt", "claude", "gemini", "deepseek"],
+            "platforms": ["web"],
+            "submitted_by": "qrex102300-ui"
+          }'
+          response_file="$(mktemp)"
+          http_code="$(curl -sS -L -o "$response_file" -w '%{http_code}' \
+            -X POST 'https://www.promptfrenzy.com/api/directory/submit' \
+            -H 'Content-Type: application/json' \
+            --data "$payload")"
+          cat "$response_file"
+          echo
+          echo "HTTP $http_code"
+          test "$http_code" = "201"
