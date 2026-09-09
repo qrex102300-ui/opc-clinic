@@ -1,3 +1,4 @@
+# Retry note 2026-09-10: public web crawl resolves aitoolsindex.org again after the earlier runner DNS NXDOMAIN.
 name: Submit OPC Clinic to AIToolsIndex
 
 on:
