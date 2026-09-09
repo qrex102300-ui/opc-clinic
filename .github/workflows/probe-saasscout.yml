@@ -16,51 +16,62 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Inspect public no-login submission surface
+      - name: Verify public submission API contract
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p ops
-          page="$(mktemp)"
-          code="$(curl -sS -L -o "$page" -w '%{http_code}' 'https://saasscout.org/submit')"
-          scripts="$(mktemp)"
-          grep -Eo 'src="[^"]+\.js[^"]*"' "$page" | sed -E 's/^src="//;s/"$//' | sort -u > "$scripts" || true
-          signals="$(mktemp)"
-          while IFS= read -r src; do
-            [ -n "$src" ] || continue
-            case "$src" in
-              http://*|https://*) url="$src" ;;
-              /*) url="https://saasscout.org$src" ;;
-              *) url="https://saasscout.org/$src" ;;
-            esac
-            js="$(mktemp)"
-            if curl -sS -L --max-time 15 -o "$js" "$url"; then
-              grep -Eo '.{0,100}(submit|submission|/api/|email|website|url).{0,180}' "$js" | head -n 80 >> "$signals" || true
-            fi
-            rm -f "$js"
-          done < "$scripts"
+          categories_body="$(mktemp)"
+          categories_code="$(curl -sS -L -o "$categories_body" -w '%{http_code}' 'https://saasscout.org/api/categories')"
+
+          scrape_body="$(mktemp)"
+          scrape_code="$(curl -sS -L -o "$scrape_body" -w '%{http_code}' \
+            -X POST 'https://saasscout.org/api/scrape-metadata' \
+            -H 'Content-Type: application/json' \
+            --data '{"url":"https://qrex102300-ui.github.io/opc-clinic/","website":"https://qrex102300-ui.github.io/opc-clinic/"}')"
+
+          validation_body="$(mktemp)"
+          validation_code="$(curl -sS -L -o "$validation_body" -w '%{http_code}' \
+            -X POST 'https://saasscout.org/api/products' \
+            -H 'Content-Type: application/json' \
+            --data '{}')"
+
           {
             echo '# SaaS Scout submission-route audit'
             echo
             echo "Checked: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
             echo
-            echo 'Purpose: verify whether the public no-login submission flow can be used without supplying an email, account, payment, or private identity.'
+            echo 'Purpose: verify the documented no-login submission flow without using an email, account, payment, or private identity. No real product submission is made in this probe.'
             echo
-            echo "HTTP status: $code"
+            echo '## Categories endpoint'
             echo
-            echo '## Server-rendered structural signals'
+            echo "HTTP status: $categories_code"
+            echo '```json'
+            if jq -e . "$categories_body" >/dev/null 2>&1; then jq -c . "$categories_body"; else head -c 2000 "$categories_body"; fi
             echo
-            grep -Eio '<form[^>]*>|action="[^"]+"|method="[^"]+"|name="[^"]+"|type="email"|/api/[A-Za-z0-9_/?=&.-]+' "$page" | head -n 120 || true
+            echo '```'
             echo
-            echo '## Client-script endpoint signals'
+            echo '## Metadata endpoint for OPC Clinic public URL'
             echo
-            sed -E 's/[[:space:]]+/ /g' "$signals" | grep -Ei 'submit|submission|/api/|email' | head -n 120 || true
+            echo "HTTP status: $scrape_code"
+            echo '```json'
+            if jq -e . "$scrape_body" >/dev/null 2>&1; then jq -c . "$scrape_body"; else head -c 3000 "$scrape_body"; fi
+            echo
+            echo '```'
+            echo
+            echo '## Empty-payload validation probe'
+            echo
+            echo "HTTP status: $validation_code"
+            echo '```json'
+            if jq -e . "$validation_body" >/dev/null 2>&1; then jq -c . "$validation_body"; else head -c 3000 "$validation_body"; fi
+            echo
+            echo '```'
             echo
             echo '## Decision'
-            if grep -Eqi 'type=["'"']?email|name=["'"'][^"'"']*email' "$page" || grep -Eqi 'email' "$signals"; then
-              echo 'An email-related signal exists in the public submission code. No submission was made because the sprint must not use a private contact identity without authorization.'
+            if grep -Eqi 'email' "$validation_body"; then
+              echo 'The product API validation references an email field. No real submission was made.'
             else
-              echo 'No email field was detected, but no unambiguous public POST contract was proven yet. No submission was made.'
+              echo 'The empty-payload validator does not expose an email requirement. A real submission still requires a complete validated payload; this probe does not create one.'
             fi
           } > ops/saasscout-submission-route.md
 
@@ -74,5 +85,5 @@ jobs:
           if git diff --cached --quiet; then
             exit 0
           fi
-          git commit -m 'Deepen SaaS Scout submission-route audit'
+          git commit -m 'Verify SaaS Scout public API contract'
           git push
