@@ -7,17 +7,22 @@ on:
       - ".github/workflows/submit-agent-directories.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   submit:
     runs-on: ubuntu-latest
     steps:
-      - name: Submit to Agent Directory API
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Submit to zero-cost agent directories
         shell: bash
         run: |
           set -euo pipefail
-          payload='{
+          mkdir -p ops
+
+          agent_directory_payload='{
             "name": "OPC Clinic",
             "handle": "opc-clinic",
             "tagline": "Evidence-first AI founder diagnostician for products that launched but are not converting.",
@@ -27,21 +32,14 @@ jobs:
             "skills": ["business-diagnosis", "startup-triage", "experiment-design", "market-research"],
             "stack": ["static web", "model-agnostic LLM prompt", "GitHub Issues"]
           }'
-          response_file="$(mktemp)"
-          http_code="$(curl -sS -L -o "$response_file" -w '%{http_code}' \
+          agent_directory_body="$(mktemp)"
+          agent_directory_code="$(curl -sS -L -o "$agent_directory_body" -w '%{http_code}' \
             -X POST 'https://agent-directory-api.vercel.app/api/agents' \
             -H 'Content-Type: application/json' \
-            --data "$payload")"
-          cat "$response_file"
-          echo
-          echo "HTTP $http_code"
-          test "$http_code" = "200" -o "$http_code" = "201" -o "$http_code" = "409"
+            --data "$agent_directory_payload")"
+          test "$agent_directory_code" = "200" -o "$agent_directory_code" = "201" -o "$agent_directory_code" = "409"
 
-      - name: Submit to agents-launch directory
-        shell: bash
-        run: |
-          set -euo pipefail
-          payload='{
+          agents_launch_payload='{
             "name": "OPC Clinic",
             "tagline": "Evidence-first founder diagnosis for launched products that are not converting.",
             "description": "Open-source AI diagnostician for solo founders. It uses multi-turn evidence interrogation to identify the most plausible post-launch bottleneck and define a measurable 7-day test instead of returning generic advice.",
@@ -49,12 +47,48 @@ jobs:
             "category": "productivity",
             "pricing": "freemium"
           }'
-          response_file="$(mktemp)"
-          http_code="$(curl -sS -L -o "$response_file" -w '%{http_code}' \
+          agents_launch_body="$(mktemp)"
+          agents_launch_code="$(curl -sS -L -o "$agents_launch_body" -w '%{http_code}' \
             -X POST 'https://agents-launch.lovable.app/api/public/v1/agents' \
             -H 'Content-Type: application/json' \
-            --data "$payload")"
-          cat "$response_file"
-          echo
-          echo "HTTP $http_code"
-          test "$http_code" = "200" -o "$http_code" = "201" -o "$http_code" = "409"
+            --data "$agents_launch_payload")"
+          test "$agents_launch_code" = "200" -o "$agents_launch_code" = "201" -o "$agents_launch_code" = "409"
+
+          {
+            echo '# Agent directory submission audit'
+            echo
+            echo "Last attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'These submissions use public, no-auth endpoints and no paid placement.'
+            echo
+            echo '## Agent Directory API'
+            echo
+            echo "HTTP status: $agent_directory_code"
+            echo
+            echo '```json'
+            cat "$agent_directory_body"
+            echo
+            echo '```'
+            echo
+            echo '## agents-launch'
+            echo
+            echo "HTTP status: $agents_launch_code"
+            echo
+            echo '```json'
+            cat "$agents_launch_body"
+            echo
+            echo '```'
+          } > ops/agent-directory-submissions.md
+
+      - name: Commit audit record
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/agent-directory-submissions.md
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'Record agent directory submission results'
+          git push
