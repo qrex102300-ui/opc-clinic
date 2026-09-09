@@ -54,22 +54,27 @@ Representative current prices checked on 2026-09-09:
 - [ValidateMyIdea](https://validatemyidea.app/pricing) — $19 for one report, with a $9 founding lifetime offer currently advertised.
 - [XpertVex](https://www.xpertvex.com/) — $5 per AI validation report.
 - [GoValidate](https://www.govalidate.dev/pricing) — $49 for a one-off validation report; $29/month for its founder workspace.
+- [AgencyOS Audit](https://innovaai.io/pricing) — free lead-capture scan, $29.99 for a 15-section full report, $69.99/month for monitoring.
 - [NoCrickets](https://nocrickets.com/) — $39 for a post-launch research diagnosis and one-week recovery plan.
 - [ValidationLaunch](https://validationlaunch.com/) — $97 self-guided framework; $3,500 guided validation sprint.
 
-Decision: **do not lower the $59 beta price simply to match automated reports.** Price competition is already a race to the bottom, including $5–$19 products. OPC Clinic must earn the premium by staying post-launch, using the founder's real funnel evidence, explicitly checking contradictory evidence, and including one follow-up pass. The free triage reduces purchase risk before payment.
+Decision: **do not lower the $59 beta price simply to match automated reports.** Price competition is already a race to the bottom, including $5–$29.99 products. OPC Clinic must earn the premium by staying post-launch, using the founder's real funnel evidence, explicitly checking contradictory evidence, and including one follow-up pass. The free triage reduces purchase risk before payment.
 
 ### Demand signals
 
 Recent founder discussions continue to show the exact symptom this offer targets:
 
+- [100+ signups, zero revenue, then a $99/month first customer](https://www.reddit.com/r/micro_saas/comments/1w8pc3a/got_our_first_paying_customer_yesterday_after/) — Sep 6, 2026. The founder reported that distribution was not the bottleneck; activation at an organization-creation step was. This is strong evidence for diagnosing the actual funnel break instead of assuming “more marketing.”
 - [Not having paying customers](https://www.reddit.com/r/SaaS/comments/1w43lvd/not_having_paying_customers/) — Sep 1, 2026. The thread centers on the recurring builder failure mode of creating software before proving need and sales.
 - [123 active users, $0 MRR — how do I actually get people to pay?](https://www.reddit.com/r/SaaS/comments/1w2nfv3/123_active_users_0_mrr_how_do_i_actually_get/) — Aug 30, 2026.
 - [100+ uses/day but nobody will pay](https://www.reddit.com/r/SaaS/comments/1viuhbg/100_usersday_but_nobody_will_pay/) — Aug 8, 2026.
 - [Built a SaaS for a year. People use it. No one pays.](https://www.reddit.com/r/SaaS/comments/1qrmfik/built_a_saas_for_a_year_people_use_it_no_one_pays/) — Jan 30, 2026.
-- [Built and launched multiple products. Still no real customers.](https://www.reddit.com/r/startups/comments/1rfno5n/built_and_launched_multiple_products_still_no/) — Feb 26, 2026.
 
 These are **problem signals, not willingness-to-pay evidence**. A founder posting about zero revenue does not prove they will buy this service. Only reservations and collected revenue count as funnel validation.
+
+### Distribution reality check
+
+The landing page and GitHub intake are live, but the public PromptFrenzy directory did **not** show an OPC Clinic listing when checked on 2026-09-09. The directory badge alone therefore does not count as distribution or traffic. Until an external listing, referral, or inbound reservation is observable, the sprint should treat acquisition as unproven rather than repeatedly polishing copy.
 
 ## Public scorecard
 
@@ -78,6 +83,7 @@ These are **problem signals, not willingness-to-pay evidence**. A founder postin
 | Revenue collected | $0 | $100+ |
 | Paid orders | 0 | 2+ |
 | Free beta reservations | 0 | 3+ |
+| Confirmed external listings/referrals | 0 | 1+ |
 | Paid acquisition spend | $0 | $0 |
 | New paid tools | $0 | $0 |
 | Refunds | 0 | 0 |
