@@ -1,6 +1,6 @@
 # OPC Clinic Revenue Sprint — Auditable Scorecard
 
-Last checked: **2026-09-10 03:20 CST**  
+Last checked: **2026-09-10 04:59 CST**  
 Experiment window: **2026-09-09 → 2026-09-15**
 
 This file is the canonical operational count for the 7-day revenue sprint. Counts only move on observable evidence; directory presence is not treated as a lead, and a lead is not treated as revenue.
@@ -45,11 +45,17 @@ The earlier zero-cost agent-directory submission receipts are recorded in [`ops/
 - **Skills Registry / gotskills** — one first-install discovery attempt was made because the registry documents first-install discovery for public GitHub skills. A subsequent verification-only search did not return OPC Clinic, so it is not counted. No repeated installs will be used to inflate discovery/install signals. See [`ops/gotskills-registration.md`](./gotskills-registration.md).
 - **MCP.Directory** — the apparent skill-submission route redirects to an MCP server submission form. It remains **NOT SUBMITTED / NOT COUNTED**; no identity, email, payment, or private credential was supplied. See [`ops/mcp-directory-submission.md`](./mcp-directory-submission.md).
 - **SubmitLLMs** — researched as another legitimate free discovery surface focused on AI-ready websites. Its public directory currently indexes thousands of sites, but no no-identity submission contract was proven in this run, so no submission was made and nothing is counted.
+- **SoloLaunch** — current public copy says app submission is free and needs no account, but a live DOM probe of the designated form found a confirmation checkbox stating that the submitter has the right to submit the app. The automation did **not** make that rights attestation on the owner's behalf, so SoloLaunch remains **NOT SUBMITTED / NOT COUNTED**. See [`ops/sololaunch-dom-probe.md`](./sololaunch-dom-probe.md).
+- **NeuronFeed** — a strong, agent-friendly acquisition surface was verified: its public documentation explicitly supports a JSON `POST /api/submit`, free editorial review, and no account. However, the documented schema requires a reachable `contactEmail`. No private identity/contact data was supplied, so NeuronFeed remains **NOT SUBMITTED / NOT COUNTED**.
+- **IndexOf.AI** — free basic listings exist, but its current submit page requires sign-in before tool submission. No account or identity action was taken, so it remains **NOT SUBMITTED / NOT COUNTED**.
+- **BotFriendly.xyz** — high-fit for machine-readable agent services and it documents a public bot submission endpoint, but the live listing form requires a verification email. No private identity/contact data was supplied, so it remains **NOT SUBMITTED / NOT COUNTED**.
+- **AgentsSpot** — free directory review currently requires reciprocal-backlink verification. Because there is no observed funnel defect justifying a product/page change, no backlink was added and no submission is counted.
+- **AgentsIndex** — this is the best newly verified no-identity route in this run: its free submit page asks for only tool name and website, states that no account is needed for the submit step, and does not require a card. A one-shot designated-form attempt has been initiated with the optional email-updates box left unchecked and without supplying identity or payment. Until the submission audit produces an acceptance signal or the listing becomes public, it remains **NOT COUNTED**.
 - **Current founder-demand evidence** — recent public SaaS and indie-founder discussions continue to show launched products with zero paid users and distribution/customer acquisition as repeated bottlenecks. These surfaces are used only to guide channel selection; no unsolicited promotion is posted into ordinary help threads. See [`ops/acquisition-demand-evidence.md`](./acquisition-demand-evidence.md).
 
 ## Intake check
 
-GitHub Issues check at 2026-09-10 03:20 CST: **0 issues**, therefore there are no free-triage submissions, paid orders, transaction hashes, qualified leads, or payment-ready leads to process in this run.
+GitHub Issues check at 2026-09-10 04:59 CST: **0 issues**, therefore there are no free-triage submissions, paid orders, transaction hashes, qualified leads, or payment-ready leads to process in this run.
 
 ## Operating rule
 
