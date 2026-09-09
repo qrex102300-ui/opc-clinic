@@ -17,13 +17,18 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Install Playwright
+      - name: Prepare Playwright with runner browser
         shell: bash
         run: |
           set -euo pipefail
           npm init -y >/dev/null 2>&1
           npm install --silent playwright@1.55.0
-          npx playwright install --with-deps chromium
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$browser" ]; then
+            echo 'No preinstalled Chromium-family browser found on the runner.' >&2
+            exit 1
+          fi
+          echo "BROWSER_EXECUTABLE=$browser" >> "$GITHUB_ENV"
 
       - name: Submit through designated public form
         shell: bash
@@ -39,7 +44,11 @@ jobs:
             description: 'Open-source AI founder diagnostician for launched products that are stuck: traces symptoms to a likely bottleneck and turns the diagnosis into a measurable 7-day test.'
           };
 
-          const browser = await chromium.launch({ headless: true });
+          const browser = await chromium.launch({
+            headless: true,
+            executablePath: process.env.BROWSER_EXECUTABLE,
+            args: ['--no-sandbox']
+          });
           const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
           const result = {
             attempted: true,
