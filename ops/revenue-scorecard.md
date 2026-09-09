@@ -1,13 +1,13 @@
 # OPC Clinic Revenue Sprint — Auditable Scorecard
 
-Last checked: **2026-09-10 01:50 CST**  
+Last checked: **2026-09-10 02:47 CST**  
 Experiment window: **2026-09-09 → 2026-09-15**
 
 This file is the canonical operational count for the 7-day revenue sprint. Counts only move on observable evidence; directory presence is not treated as a lead, and a lead is not treated as revenue.
 
 | Metric | Current | Evidence rule |
 |---|---:|---|
-| Confirmed external listings / referral surfaces | **3** | Public listing or directory API confirms the product exists |
+| Confirmed external listings / referral surfaces | **4** | Public listing or directory API confirms the product exists |
 | Pending external directory / registry reviews | **2** | Submission accepted but not yet confirmed as a default public listing |
 | Inbound free-triage submissions | **0** | A real external user opens a `[Free Triage]` case |
 | Qualified leads | **0** | Launched/tested product + real evidence + a near-term decision; case fits deeper diagnosis |
@@ -24,13 +24,15 @@ This file is the canonical operational count for the 7-day revenue sprint. Count
 1. **PromptFrenzy** — verified badge submission, directory PR #61 auto-merged on 2026-09-09.
 2. **Agent Directory API** — public no-auth directory rejects `opc-clinic` as an existing handle, confirming directory presence.
 3. **agents-launch** — public no-auth directory returns the existing OPC Clinic record (`slug: opc-clinic`, created 2026-09-09T15:28:06Z).
-4. **OpenAgentSkill** — its public no-auth submission API accepted `skill/SKILL.md` with HTTP 202 and submission status `submitted`. Automated review is still pending, so it is tracked separately and is **not** counted as a confirmed listing yet.
-5. **AIPO.ST** — its documented public agent-submission API accepted OPC Clinic with HTTP 201 on 2026-09-10 CST and returned `status: pending` plus the proposed product page `https://aipo.st/products/opc`. It is tracked as pending until the listing is verifiably public. See [`ops/aipost-submission.md`](./aipost-submission.md).
+4. **SaaS Scout** — documented public no-login product API accepted OPC Clinic with HTTP 201 and returned `status: approved`, `slug: opc-clinic`, an 85/100 relevance score, and `isRelevant: true` on 2026-09-10 CST. No account, email, payment, private credential, or personal identity was supplied. See [`ops/saasscout-submission.md`](./saasscout-submission.md).
+5. **OpenAgentSkill** — its public no-auth submission API accepted `skill/SKILL.md` with HTTP 202 and submission status `submitted`. Automated review is still pending, so it is tracked separately and is **not** counted as a confirmed listing yet.
+6. **AIPO.ST** — its documented public agent-submission API accepted OPC Clinic with HTTP 201 on 2026-09-10 CST and returned `status: pending` plus the proposed product page `https://aipo.st/products/opc`. It is tracked as pending until the listing is verifiably public. See [`ops/aipost-submission.md`](./aipost-submission.md).
 
 The earlier zero-cost agent-directory submission receipts are recorded in [`ops/agent-directory-submissions.md`](./agent-directory-submissions.md). Public audit files exclude private submission/status tokens.
 
 ## Additional zero-cost acquisition checks this run
 
+- **SaaS Scout** — successful legitimate acquisition action. The site publicly states that no login is required to submit. A public API-contract probe showed that `POST /api/products` requires only name, tagline, description, website, and category; an actual submission was then accepted with HTTP 201 and `status: approved`. It is counted as a confirmed external listing, not as a lead. See [`ops/saasscout-submission-route.md`](./saasscout-submission-route.md) and [`ops/saasscout-submission.md`](./saasscout-submission.md).
 - **AIPO.ST** — successful legitimate acquisition action: one no-auth/no-email/no-card submission was accepted for review. Nothing is counted as confirmed traffic or a lead merely because the directory accepted it.
 - **AIToolsIndex** — researched because its public submission form marks contact email optional. A one-shot runner attempt could not reach `aitoolsindex.org` because DNS returned `NXDOMAIN`; therefore no submission was made and nothing is counted. See [`ops/aitoolsindex-submission.md`](./aitoolsindex-submission.md).
 - **WebList / appli.st** — researched because it explicitly exposes `POST /api/submit` to AI agents, uses a CC0 directory, and makes contact optional. A single no-auth/no-email API submission attempt returned Cloudflare HTTP 522; therefore no acceptance is claimed and nothing is counted. See [`ops/weblist-submission.md`](./weblist-submission.md).
@@ -42,7 +44,7 @@ The earlier zero-cost agent-directory submission receipts are recorded in [`ops/
 
 ## Intake check
 
-GitHub Issues check at 2026-09-10 01:50 CST: **0 issues**, therefore there are no free-triage submissions, paid orders, transaction hashes, qualified leads, or payment-ready leads to process in this run.
+GitHub Issues check at 2026-09-10 02:47 CST: **0 issues**, therefore there are no free-triage submissions, paid orders, transaction hashes, qualified leads, or payment-ready leads to process in this run.
 
 ## Operating rule
 
