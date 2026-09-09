@@ -1,0 +1,233 @@
+name: Submit OPC Clinic to Free Directories Round 2
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-free-directories-round2.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Prepare Playwright with runner browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright@1.55.0
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$browser" ]; then
+            echo 'No preinstalled Chromium-family browser found on the runner.' >&2
+            exit 1
+          fi
+          echo "BROWSER_EXECUTABLE=$browser" >> "$GITHUB_ENV"
+
+      - name: Submit to designated public free-listing forms
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > submit-free-directories.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          import fs from 'fs';
+
+          const product = {
+            name: 'OPC Clinic',
+            url: 'https://qrex102300-ui.github.io/opc-clinic/',
+            github: 'https://github.com/qrex102300-ui/opc-clinic',
+            tagline: 'Evidence-backed founder diagnosis for launched products stuck before revenue.',
+            description: 'OPC Clinic is an open-source AI founder diagnostician for launched products that are stuck before reliable revenue. It traces symptoms to a likely bottleneck, checks the diagnosis against current market evidence, and turns it into a measurable 7-day experiment with a clear continue/kill rule. The core tool is free and MIT licensed; an optional $59 evidence-backed diagnosis is available for founders who want the research and experiment plan done for them.'
+          };
+
+          const surfaces = [
+            { id: 'aitoolsindex', url: 'https://aitoolsindex.org/submit', category: true, pricing: false },
+            { id: 'launchkittools', url: 'https://launchkittools.com/submit', category: true, pricing: true },
+            { id: 'curatahub', url: 'https://curatahub.com/submit', category: true, pricing: false },
+            { id: 'findaitools', url: 'https://findaitools.app/submit', category: false, pricing: false },
+            { id: 'alieradox', url: 'https://alieradox.com/submit', category: true, pricing: true }
+          ];
+
+          const browser = await chromium.launch({
+            headless: true,
+            executablePath: process.env.BROWSER_EXECUTABLE,
+            args: ['--no-sandbox']
+          });
+
+          async function fillFirst(page, candidates, value) {
+            for (const locator of candidates) {
+              try {
+                if (await locator.count()) {
+                  const first = locator.first();
+                  if (await first.isVisible() && await first.isEditable()) {
+                    await first.fill(value);
+                    return true;
+                  }
+                }
+              } catch {}
+            }
+            return false;
+          }
+
+          async function chooseSelect(page, keywords, skip = []) {
+            const selects = page.locator('select');
+            const n = await selects.count();
+            for (let i = 0; i < n; i++) {
+              const sel = selects.nth(i);
+              try {
+                if (!(await sel.isVisible())) continue;
+                const meta = `${await sel.getAttribute('name') || ''} ${await sel.getAttribute('id') || ''} ${await sel.getAttribute('aria-label') || ''}`.toLowerCase();
+                if (skip.some(k => meta.includes(k))) continue;
+                const options = await sel.locator('option').allTextContents();
+                for (const kw of keywords) {
+                  const idx = options.findIndex(t => t.toLowerCase().includes(kw.toLowerCase()));
+                  if (idx >= 0) {
+                    await sel.selectOption({ index: idx });
+                    return { ok: true, selected: options[idx] };
+                  }
+                }
+              } catch {}
+            }
+            return { ok: false, selected: null };
+          }
+
+          async function resultFor(surface) {
+            const page = await browser.newPage({ viewport: { width: 1365, height: 1000 } });
+            const result = {
+              id: surface.id,
+              surface: surface.url,
+              attempted: true,
+              submittedEmail: false,
+              submittedIdentity: false,
+              categorySelected: null,
+              pricingSelected: null,
+              finalUrl: '',
+              successSignal: false,
+              blockedByCaptcha: false,
+              bodyText: '',
+              error: null
+            };
+            try {
+              await page.goto(surface.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+              await page.waitForTimeout(1500);
+
+              const initialBody = (await page.locator('body').innerText()).slice(0, 12000);
+              if (/captcha|turnstile|verify you are human|cloudflare challenge/i.test(initialBody)) {
+                result.blockedByCaptcha = true;
+                throw new Error('Public submission is gated by a human-verification challenge; automation stopped without bypassing it.');
+              }
+
+              const nameOk = await fillFirst(page, [
+                page.getByLabel(/tool name|site name|name of.*tool/i),
+                page.locator('input[name*="tool" i][name*="name" i]'),
+                page.locator('input[name="name"]'),
+                page.locator('input[placeholder*="chatgpt" i]'),
+                page.locator('input[placeholder*="tool name" i]')
+              ], product.name);
+
+              const urlOk = await fillFirst(page, [
+                page.getByLabel(/official website|website url|tool url|site url|website|url/i),
+                page.locator('input[type="url"]'),
+                page.locator('input[name*="url" i]')
+              ], product.url);
+
+              const descOk = await fillFirst(page, [
+                page.getByLabel(/short description|description/i),
+                page.locator('textarea[name*="description" i]'),
+                page.locator('textarea')
+              ], product.description);
+
+              // Preserve honeypot/identity/contact fields as blank. No email or person name is supplied.
+              const honeypots = page.locator('input');
+              const count = await honeypots.count();
+              for (let i = 0; i < count; i++) {
+                const el = honeypots.nth(i);
+                const meta = `${await el.getAttribute('name') || ''} ${await el.getAttribute('placeholder') || ''} ${await el.getAttribute('aria-label') || ''}`.toLowerCase();
+                if (meta.includes('company') && meta.includes('leave blank')) {
+                  try { await el.fill(''); } catch {}
+                }
+              }
+
+              if (surface.category) {
+                const cat = await chooseSelect(page, ['business', 'productivity', 'marketing', 'research', 'startup', 'other'], ['pricing']);
+                result.categorySelected = cat.selected;
+              }
+              if (surface.pricing) {
+                const price = await chooseSelect(page, ['freemium', 'free', 'paid', 'other'], ['category']);
+                result.pricingSelected = price.selected;
+              }
+
+              if (!nameOk || !urlOk || !descOk) {
+                throw new Error(`Required product fields not found (name=${nameOk}, url=${urlOk}, description=${descOk})`);
+              }
+
+              const submit = page.getByRole('button', { name: /submit tool|submit.*review|submit/i }).first();
+              if (!(await submit.count())) throw new Error('Submit button not found.');
+              await submit.click({ timeout: 30000 });
+              await page.waitForTimeout(7000);
+
+              result.finalUrl = page.url();
+              result.bodyText = (await page.locator('body').innerText()).slice(0, 12000);
+              result.blockedByCaptcha = /captcha|turnstile|verify you are human|cloudflare challenge/i.test(result.bodyText);
+              result.successSignal = /thank|submitted|success|review|received|pending|we.?ll review|added/i.test(result.bodyText)
+                && !/required.*email|email.*required|error|failed|invalid/i.test(result.bodyText)
+                && !result.blockedByCaptcha;
+            } catch (err) {
+              result.error = String(err?.message || err);
+              try {
+                result.finalUrl = page.url();
+                result.bodyText = (await page.locator('body').innerText()).slice(0, 12000);
+              } catch {}
+            } finally {
+              await page.close();
+            }
+            return result;
+          }
+
+          const results = [];
+          for (const surface of surfaces) {
+            results.push(await resultFor(surface));
+          }
+          fs.writeFileSync('/tmp/free-directory-results.json', JSON.stringify(results, null, 2));
+          await browser.close();
+          EOF
+          node submit-free-directories.mjs || true
+          rm -f submit-free-directories.mjs
+
+      - name: Write sanitized acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          {
+            echo '# Free directory acquisition round 2'
+            echo
+            echo "Last attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'Goal: expand legitimate zero-cost external discovery without unsolicited comments, paid spend, private credentials, or owner identity.'
+            echo 'The workflow used only designated public submission forms and intentionally left email/person identity fields blank. It does not bypass CAPTCHA or other human-verification gates.'
+            echo
+            echo '```json'
+            jq . /tmp/free-directory-results.json
+            echo '```'
+          } > ops/free-directory-round2.md
+
+      - name: Commit acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/free-directory-round2.md
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'Record free directory acquisition round 2'
+          git pull --rebase origin main
+          git push
