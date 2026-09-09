@@ -1,0 +1,83 @@
+name: 免费创业瓶颈初诊
+about: 已经上线或测试过产品，但有人用/有人聊却没人付费？先做一次免费初诊，不需要付款。
+title: "[免费初诊] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 免费创业瓶颈初诊
+
+        适合已经上线或真实测试过、手里有一些事实数据的创始人。免费初诊只做一件事：**最可能的瓶颈类别 → 还缺什么证据 → 是否适合进入更深的付费诊断**。
+
+        初诊不收费，也不是完整市场研究。若案例适合、你希望继续，才会在同一个 Issue 里给出付费诊断说明。
+
+        这个 Issue 是公开的。可以使用区间、比例和匿名数据；不要提交密码、API Key、客户姓名、合同、私密营收或其他敏感信息。
+
+  - type: input
+    id: project
+    attributes:
+      label: 项目 / 产品
+      description: 你在做或卖什么？
+      placeholder: "例如：给小型代理公司的 AI 记账助手"
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: 公开链接（可选）
+      description: 官网、产品页或公开代码仓库；不方便公开可留空。
+      placeholder: "https://..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: customer
+    attributes:
+      label: 客户与报价
+      description: 谁是客户？你希望他们买什么、多少钱？
+      placeholder: "例如：美国小型记账公司；29 美元/月，自动分类客户费用"
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 目前真实发生了什么？
+      description: 只写事实：访问、注册、活跃、Demo、通话、报价、拒绝、收入、转化等。区间和比例也可以。
+      placeholder: |
+        - 最近 30 天约 300 次访问
+        - 15–20 个注册
+        - 0 个付费用户
+        - 和 7 位潜在客户聊过；4 人提到 X，3 人提到 Y
+    validations:
+      required: true
+
+  - type: textarea
+    id: stuck
+    attributes:
+      label: 你目前怀疑卡在哪里？（可选）
+      description: 如果完全不知道，留空即可。
+    validations:
+      required: false
+
+  - type: textarea
+    id: decision
+    attributes:
+      label: 未来 7 天必须做出的决定是什么？
+      placeholder: "例如：继续改 onboarding，还是停止开发并重做定位"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: agreement
+    attributes:
+      label: 确认
+      options:
+        - label: 我已经移除密码、API Key、客户隐私和其他敏感信息。
+          required: true
+        - label: 我理解免费初诊只是短评，不是完整市场研究，也不保证进入付费诊断。
+          required: true
+        - label: 我理解诊断只提供基于证据的商业判断，不保证收入、增长或融资结果。
+          required: true
