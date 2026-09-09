@@ -1,6 +1,6 @@
 # OPC Clinic Revenue Sprint — Auditable Scorecard
 
-Last checked: **2026-09-10 02:50 CST**  
+Last checked: **2026-09-10 03:17 CST**  
 Experiment window: **2026-09-09 → 2026-09-15**
 
 This file is the canonical operational count for the 7-day revenue sprint. Counts only move on observable evidence; directory presence is not treated as a lead, and a lead is not treated as revenue.
@@ -8,7 +8,7 @@ This file is the canonical operational count for the 7-day revenue sprint. Count
 | Metric | Current | Evidence rule |
 |---|---:|---|
 | Confirmed external listings / referral surfaces | **5** | Public listing or directory API confirms the product exists |
-| Pending external directory / registry reviews | **2** | Submission accepted but not yet confirmed as a default public listing |
+| Pending external directory / registry reviews | **3** | Submission accepted but not yet confirmed as a default public listing |
 | Inbound free-triage submissions | **0** | A real external user opens a `[Free Triage]` case |
 | Qualified leads | **0** | Launched/tested product + real evidence + a near-term decision; case fits deeper diagnosis |
 | Payment-ready leads | **0** | Qualified case accepted and ready for the $59 offer, with only payment/custody step remaining |
@@ -28,11 +28,13 @@ This file is the canonical operational count for the 7-day revenue sprint. Count
 5. **TechTools Launchpad** — its public page explicitly states no registration, no CAPTCHA, instant listing, and an AI/bot-friendly API. The API accepted OPC Clinic with HTTP 201, returned tool ID `817` plus a public share URL, and a follow-up GET verified the record was live. Optional submitter identity fields were omitted. See [`ops/techtools-launchpad-submission.md`](./techtools-launchpad-submission.md).
 6. **OpenAgentSkill** — its public no-auth submission API accepted `skill/SKILL.md` with HTTP 202 and submission status `submitted`. Automated review is still pending, so it is tracked separately and is **not** counted as a confirmed listing yet.
 7. **AIPO.ST** — its documented public agent-submission API accepted OPC Clinic with HTTP 201 on 2026-09-10 CST and returned `status: pending` plus the proposed product page `https://aipo.st/products/opc`. It is tracked as pending until the listing is verifiably public. See [`ops/aipost-submission.md`](./aipost-submission.md).
+8. **Hype Star** — its public OpenAPI contract explicitly supports credential-free project submission for permanent basic inclusion after review. OPC Clinic was submitted once as a `service` in `services-marketplaces` with `supporterChoice: skipped`; HTTP 202 returned `submitted_for_review` / `pending`, and a post-submit public search correctly showed no public listing yet. No account, email, API key, card, payment, badge, reciprocal link, private credential, or identity was used. See [`ops/hypestar-submission.md`](./hypestar-submission.md).
 
 The earlier zero-cost agent-directory submission receipts are recorded in [`ops/agent-directory-submissions.md`](./agent-directory-submissions.md). Public audit files exclude private submission/status tokens.
 
 ## Additional zero-cost acquisition checks this run
 
+- **Hype Star** — successful legitimate acquisition action. Its current public OpenAPI contract documents `POST /api/v1/listings`, requires only the public URL, listing kind, and category slug, and explicitly states that no account, email, API key, card, payment, supporter badge, or renewal is required. A preflight search found no existing OPC Clinic listing; one submission then returned HTTP 202 with `publicationStatus: submitted_for_review` and `reviewStatus: pending`. It is counted as pending, not confirmed, and not as a lead. The optional supporter choice was explicitly skipped, so this created no product/funnel change or backlink obligation. See [`ops/hypestar-submission.md`](./hypestar-submission.md).
 - **TechTools Launchpad** — successful legitimate acquisition action. Its documented public API is explicitly designed for bots and AI agents. A preflight listing check avoided duplicates; the submission then returned HTTP 201 with `success: true` and `Tool submitted successfully! It is now live.`, and a post-submit listing check independently found the OPC Clinic URL. It is counted as a confirmed external listing, not as a lead. No account, email, payment, private credential, or submitter identity was used.
 - **SaaS Scout** — successful legitimate acquisition action. The site publicly states that no login is required to submit. A public API-contract probe showed that `POST /api/products` requires only name, tagline, description, website, and category; an actual submission was then accepted with HTTP 201 and `status: approved`. It is counted as a confirmed external listing, not as a lead. See [`ops/saasscout-submission-route.md`](./saasscout-submission-route.md) and [`ops/saasscout-submission.md`](./saasscout-submission.md).
 - **AIPO.ST** — successful legitimate acquisition action from an earlier run: one no-auth/no-email/no-card submission was accepted, but the returned state remains pending and is not counted as confirmed traffic or a lead.
@@ -47,7 +49,7 @@ The earlier zero-cost agent-directory submission receipts are recorded in [`ops/
 
 ## Intake check
 
-GitHub Issues check at 2026-09-10 02:50 CST: **0 issues**, therefore there are no free-triage submissions, paid orders, transaction hashes, qualified leads, or payment-ready leads to process in this run.
+GitHub Issues check at 2026-09-10 03:17 CST: **0 issues**, therefore there are no free-triage submissions, paid orders, transaction hashes, qualified leads, or payment-ready leads to process in this run.
 
 ## Operating rule
 
