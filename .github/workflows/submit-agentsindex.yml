@@ -1,0 +1,134 @@
+name: Submit OPC Clinic to AgentsIndex
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-agentsindex.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Playwright
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.55.0 >/dev/null 2>&1
+          npx playwright install chromium >/dev/null 2>&1
+
+      - name: Submit through designated free public form
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+          mkdir -p ops
+          cat >/tmp/agentsindex.js <<'NODE'
+          const { chromium } = require('/tmp/node_modules/playwright');
+          const fs = require('fs');
+
+          (async () => {
+            const lines = [];
+            const log = (s='') => lines.push(String(s));
+            const save = () => fs.writeFileSync('ops/agentsindex-submission.md', lines.join('\n') + '\n');
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+
+            log('# AgentsIndex acquisition submission audit');
+            log('');
+            log(`Attempted: ${new Date().toISOString()}`);
+            log('Surface: https://agentsindex.ai/submit');
+            log('AgentsIndex publicly states that the basic listing is free, the submit step needs no account, and the form asks only for tool name and website; the optional email-updates box is left unchecked.');
+            log('No account, email, payment, private credential, personal identity, reciprocal link, or paid tier was used.');
+            log('');
+
+            const response = await page.goto('https://agentsindex.ai/submit', { waitUntil: 'networkidle', timeout: 45000 });
+            log(`Submit page HTTP status: ${response ? response.status() : 'none'}`);
+
+            const textInputs = page.locator('input[type="text"], input:not([type])');
+            const urlInputs = page.locator('input[type="url"]');
+            const allInputs = page.locator('input');
+            const allCount = await allInputs.count();
+            log(`Input controls discovered: ${allCount}`);
+
+            let nameField = page.getByLabel(/name/i).first();
+            if (!(await nameField.count())) nameField = page.locator('input').filter({ has: page.locator('nothing') }).first();
+            let websiteField = page.getByLabel(/website|url/i).first();
+
+            if (!(await nameField.count())) {
+              const candidates = page.locator('input').filter({ hasNot: page.locator('[type="checkbox"]') });
+              nameField = candidates.nth(0);
+            }
+            if (!(await websiteField.count())) {
+              websiteField = urlInputs.count().then(async c => c ? urlInputs.first() : page.locator('input').nth(1));
+            }
+            if (websiteField && typeof websiteField.then === 'function') websiteField = await websiteField;
+
+            await nameField.fill('OPC Clinic');
+            await websiteField.fill('https://qrex102300-ui.github.io/opc-clinic/');
+
+            const newsletter = page.locator('input[type="checkbox"]').first();
+            if (await newsletter.count()) {
+              const checked = await newsletter.isChecked().catch(() => false);
+              if (checked) await newsletter.uncheck();
+            }
+
+            const submit = page.getByRole('button', { name: /submit for free/i }).first();
+            if (!(await submit.count()) || !(await submit.isEnabled().catch(() => false))) {
+              log('Result: NOT SUBMITTED — designated free submit button was not available after filling only the public tool fields.');
+              save();
+              await browser.close();
+              return;
+            }
+
+            await Promise.all([
+              page.waitForLoadState('networkidle', { timeout: 20000 }).catch(() => {}),
+              submit.click()
+            ]);
+            await page.waitForTimeout(1800);
+
+            const body = ((await page.locator('body').innerText().catch(() => '')) || '').replace(/\s+/g, ' ').slice(0, 1800);
+            const currentUrl = page.url();
+            const lower = body.toLowerCase();
+            const accepted = lower.includes('submitted') || lower.includes('thanks') || lower.includes('thank you') || lower.includes('review') || lower.includes('published') || lower.includes('listing');
+            const failed = lower.includes('error') || lower.includes('failed') || lower.includes('try again');
+
+            log(`Post-submit URL: ${currentUrl}`);
+            log(`Acceptance-like response observed: ${accepted && !failed}`);
+            log('Post-submit page excerpt:');
+            log('```text');
+            log(body);
+            log('```');
+            if (accepted && !failed) {
+              log('Result: submission sent through the designated free public form. Treat as pending until the listing is independently visible.');
+            } else {
+              log('Result: submission response was ambiguous. Do not count it as accepted and do not automatically resubmit.');
+            }
+            save();
+            await browser.close();
+          })().catch((err) => {
+            fs.writeFileSync('ops/agentsindex-submission.md', `# AgentsIndex acquisition submission audit\n\nResult: browser attempt failed safely; no acceptance is claimed.\nError class: ${err.name}\n`);
+            process.exitCode = 0;
+          });
+          NODE
+          node /tmp/agentsindex.js
+
+      - name: Commit acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/agentsindex-submission.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Record AgentsIndex acquisition submission'
+          git pull --rebase origin main
+          git push
