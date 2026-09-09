@@ -1,0 +1,59 @@
+name: Probe SaaS Scout submission route
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/probe-saasscout.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Inspect public no-login submission surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          page="$(mktemp)"
+          code="$(curl -sS -L -o "$page" -w '%{http_code}' 'https://saasscout.org/submit')"
+          {
+            echo '# SaaS Scout submission-route audit'
+            echo
+            echo "Checked: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'Purpose: verify whether the public no-login submission flow can be used without supplying an email, account, payment, or private identity.'
+            echo
+            echo "HTTP status: $code"
+            echo
+            echo '## Public form / endpoint signals'
+            echo
+            # Keep only structural snippets; do not mirror the whole third-party page.
+            grep -Eio '<form[^>]*>|action="[^"]+"|method="[^"]+"|name="[^"]+"|type="email"|/api/[A-Za-z0-9_/?=&.-]+' "$page" | head -n 120 || true
+            echo
+            echo '## Decision'
+            if grep -Eqi 'type=["'"']?email|name=["'"'][^"'"']*email' "$page"; then
+              echo 'Email field detected in public HTML. No submission was made.'
+            else
+              echo 'No email field was detected in the server-rendered HTML. This is only a probe; no submission was made until the actual POST contract is unambiguous.'
+            fi
+          } > ops/saasscout-submission-route.md
+
+      - name: Commit audit record
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/saasscout-submission-route.md
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'Audit SaaS Scout submission route'
+          git push
