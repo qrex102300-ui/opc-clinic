@@ -28,7 +28,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat > /tmp/agentlane.mjs <<'EOF'
+          cat > agentlane.mjs <<'EOF'
           import { chromium } from 'playwright';
           import fs from 'fs';
           const result={surface:'https://agentlanehq.com/',attempted:true,usedIdentity:false,usedEmail:false,usedPayment:false,submitted:false,acceptedSignal:false,liveSignal:false,error:null,finalUrl:'',bodyText:''};
@@ -78,7 +78,8 @@ jobs:
           await page.close();await browser.close();
           fs.writeFileSync('/tmp/agentlane-result.json',JSON.stringify(result,null,2));
           EOF
-          node /tmp/agentlane.mjs || true
+          node agentlane.mjs || true
+          rm -f agentlane.mjs
       - name: Write audit
         shell: bash
         run: |
