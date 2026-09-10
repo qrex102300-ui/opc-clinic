@@ -1,0 +1,214 @@
+name: Submit OPC Clinic to Textfrog free directory
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-textfrog.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Prepare Playwright with runner browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright@1.55.0
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$browser" ]; then
+            echo 'No preinstalled Chromium-family browser found.' >&2
+            exit 1
+          fi
+          echo "BROWSER_EXECUTABLE=$browser" >> "$GITHUB_ENV"
+
+      - name: Use Textfrog designated free submission flow
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > submit-textfrog.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          import fs from 'fs';
+
+          const projectUrl = 'https://qrex102300-ui.github.io/opc-clinic/';
+          const repoUrl = 'https://github.com/qrex102300-ui/opc-clinic';
+          const result = {
+            surface: 'https://textfrog.com/',
+            projectUrl,
+            attempted: true,
+            usedIdentity: false,
+            usedEmail: false,
+            usedPayment: false,
+            submissionEntryOpened: false,
+            submitted: false,
+            acceptedSignal: false,
+            liveSignal: false,
+            verificationUrl: '',
+            finalUrl: '',
+            bodyText: '',
+            error: null
+          };
+
+          const browser = await chromium.launch({
+            headless: true,
+            executablePath: process.env.BROWSER_EXECUTABLE,
+            args: ['--no-sandbox']
+          });
+          const page = await browser.newPage({ viewport: { width: 1365, height: 1000 } });
+          const blocked = text => /captcha|turnstile|verify you are human|cloudflare challenge/i.test(text);
+
+          try {
+            await page.goto(result.surface, { waitUntil: 'domcontentloaded', timeout: 60000 });
+            await page.waitForTimeout(1800);
+            let body = (await page.locator('body').innerText()).slice(0, 20000);
+            if (blocked(body)) throw new Error('Human-verification challenge detected; stopped without bypassing it.');
+
+            const submitEntry = page.getByRole('link', { name: /submit a link/i }).first();
+            const submitButton = page.getByRole('button', { name: /submit a link/i }).first();
+            if (await submitEntry.count()) {
+              await submitEntry.click({ timeout: 30000 });
+            } else if (await submitButton.count()) {
+              await submitButton.click({ timeout: 30000 });
+            } else {
+              // Use only a same-origin designated submit route if exposed in anchors.
+              const href = await page.locator('a').evaluateAll(as => as.map(a => ({t:(a.textContent||'').trim(), h:a.href})).find(x => /submit/i.test(x.t) && x.h.includes('textfrog.com'))?.h || '');
+              if (!href) throw new Error('Designated free submission entry was not found.');
+              await page.goto(href, { waitUntil: 'domcontentloaded', timeout: 60000 });
+            }
+            result.submissionEntryOpened = true;
+            await page.waitForTimeout(2000);
+
+            body = (await page.locator('body').innerText()).slice(0, 22000);
+            if (blocked(body)) throw new Error('Human-verification challenge detected in submission flow; stopped without bypassing it.');
+
+            // No owner identity, account, email, payment, or private credentials may be supplied.
+            const visibleIdentity = page.locator('input[type="email"], input[name*="email" i], input[placeholder*="email" i], input[name*="contact" i]');
+            for (let i = 0; i < await visibleIdentity.count(); i++) {
+              if (await visibleIdentity.nth(i).isVisible()) throw new Error('Submission requires email/contact identity; stopped without supplying it.');
+            }
+            if (/sign in to submit|login to submit|create an account to submit|payment required/i.test(body)) {
+              throw new Error('Submission requires account or payment; stopped.');
+            }
+
+            const fields = page.locator('input, textarea, select');
+            for (let i = 0; i < await fields.count(); i++) {
+              const el = fields.nth(i);
+              if (!(await el.isVisible())) continue;
+              const tag = await el.evaluate(node => node.tagName.toLowerCase());
+              const type = ((await el.getAttribute('type')) || '').toLowerCase();
+              const name = ((await el.getAttribute('name')) || '').toLowerCase();
+              const ph = ((await el.getAttribute('placeholder')) || '').toLowerCase();
+              const label = ((await el.getAttribute('aria-label')) || '').toLowerCase();
+              const key = `${name} ${ph} ${label}`;
+              if (type === 'email' || /email|contact|founder name|your name/.test(key)) {
+                throw new Error('Visible identity/contact field encountered; stopped.');
+              }
+              if (tag === 'select') {
+                const opts = await el.locator('option').allTextContents();
+                const preferred = opts.find(x => /AI Agents|AI Tools|SaaS|Business|Developer/i.test(x));
+                if (preferred) await el.selectOption({ label: preferred }).catch(() => {});
+                continue;
+              }
+              if (!(await el.isEditable())) continue;
+              const current = await el.inputValue().catch(() => '');
+              if (/url|website|link/.test(key) || type === 'url') await el.fill(projectUrl);
+              else if (/github|repository|repo/.test(key)) await el.fill(repoUrl);
+              else if (/tool name|product name|website name|title/.test(key) && !current) await el.fill('OPC Clinic');
+              else if (/tagline|short description|summary/.test(key) && !current) await el.fill('Evidence-backed AI founder diagnosis for post-launch bottlenecks.');
+              else if (/description|about/.test(key) && !current) await el.fill('OPC Clinic diagnoses why launched products with usage, demos, or positive feedback are not converting into paid customers, then returns a falsifiable bottleneck hypothesis and a measurable 7-day experiment.');
+            }
+
+            body = (await page.locator('body').innerText()).slice(0, 22000);
+            if (blocked(body)) throw new Error('Human-verification challenge detected before final submit; stopped.');
+            if (/required.*email|required.*contact|email.*required|sign in/i.test(body)) throw new Error('Identity/account appears required before final submit; stopped.');
+
+            const submit = page.getByRole('button', { name: /submit( link| website| tool)?|generate.*listing|create.*listing/i }).last();
+            if (!(await submit.count())) throw new Error('Final designated submission button not found.');
+            if (await submit.isDisabled().catch(() => false)) throw new Error('Final submission button remained disabled; no unsafe workaround attempted.');
+            await submit.click({ timeout: 30000 });
+            result.submitted = true;
+            await page.waitForTimeout(6000);
+
+            result.finalUrl = page.url();
+            body = (await page.locator('body').innerText()).slice(0, 24000);
+            result.bodyText = body;
+            if (blocked(body)) throw new Error('Human-verification challenge appeared after submit; no bypass attempted.');
+            result.acceptedSignal = /submitted|submission received|review|queued|added|listing created|published|success/i.test(body)
+              && !/error|failed|invalid|required.*email|required.*payment/i.test(body);
+
+            // Independent verification without resubmitting.
+            for (const candidate of [
+              'https://textfrog.com/?q=OPC%20Clinic',
+              'https://textfrog.com/search?q=OPC%20Clinic',
+              'https://textfrog.com/links/opc-clinic'
+            ]) {
+              const verify = await browser.newPage({ viewport: { width: 1200, height: 900 } });
+              try {
+                const resp = await verify.goto(candidate, { waitUntil: 'domcontentloaded', timeout: 60000 });
+                await verify.waitForTimeout(1500);
+                const text = (await verify.locator('body').innerText()).slice(0, 26000);
+                if ((resp?.status() || 0) < 400 && /OPC Clinic/i.test(text) && /founder diagnosis|post-launch bottleneck|qrex102300-ui/i.test(text)) {
+                  result.liveSignal = true;
+                  result.verificationUrl = candidate;
+                }
+              } catch {}
+              await verify.close();
+              if (result.liveSignal) break;
+            }
+            if (result.liveSignal) result.acceptedSignal = true;
+          } catch (err) {
+            result.error = String(err?.message || err);
+            try {
+              result.finalUrl = page.url();
+              result.bodyText = (await page.locator('body').innerText()).slice(0, 18000);
+            } catch {}
+          } finally {
+            await page.close();
+            await browser.close();
+          }
+
+          fs.writeFileSync('/tmp/textfrog-result.json', JSON.stringify(result, null, 2));
+          EOF
+
+          node submit-textfrog.mjs || true
+          rm -f submit-textfrog.mjs
+
+      - name: Write sanitized acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          {
+            echo '# Textfrog free-directory submission audit'
+            echo
+            echo "Last attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'Surface: https://textfrog.com/ — public website/AI-tool directory whose current homepage advertises a free AI-generated review listing.'
+            echo 'Only public project metadata may be supplied. The workflow stops rather than supplying owner email/identity, signing in, paying, bypassing human verification, or posting in unrelated communities.'
+            echo
+            echo '```json'
+            jq . /tmp/textfrog-result.json
+            echo '```'
+          } > ops/textfrog-submission.md
+
+      - name: Commit acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/textfrog-submission.md
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'Record Textfrog free listing attempt'
+          git pull --rebase origin main
+          git push
