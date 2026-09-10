@@ -70,7 +70,8 @@ jobs:
             body=(await page.locator('body').innerText()).slice(0,15000);
             r.finalUrl=page.url();
             if(/captcha|turnstile|verify you are human|cloudflare challenge|hcaptcha|recaptcha/i.test(body)){r.blockedByHumanVerification=true;throw new Error('Human-verification gate detected; no bypass attempted.');}
-            r.identityFields=await gate();if(r.identityFields.length){r.skippedForIdentity=true;r.bodyText=body;return;}
+            r.identityFields=await gate();
+            if(r.identityFields.length){r.skippedForIdentity=true;r.bodyText=body;throw new Error('Required identity/contact field detected; no submission attempted.');}
 
             await fill([page.getByLabel(/skill name|name of.*skill/i),'input[name*="skill" i][name*="name" i]'],product.name);
             await fill([page.getByLabel(/github|repository|repo url|skill url|source url/i),'input[name*="github" i]','input[name*="repo" i]'],product.repo);
@@ -78,7 +79,8 @@ jobs:
             await fill([page.getByLabel(/description|what.*skill|about.*skill/i),'textarea[name*="description" i]','textarea'],product.description);
             await choose(/business|productivity|workflow|research|other/i);
 
-            r.identityFields=await gate();if(r.identityFields.length){r.skippedForIdentity=true;r.bodyText=(await page.locator('body').innerText()).slice(0,15000);return;}
+            r.identityFields=await gate();
+            if(r.identityFields.length){r.skippedForIdentity=true;r.bodyText=(await page.locator('body').innerText()).slice(0,15000);throw new Error('Required identity/contact field appeared after form progress; no submission attempted.');}
             r.missingRequired=await missing();
             if(r.missingRequired.length)throw new Error('Unknown or consent required fields remain; no guessing/consent bypass attempted.');
 
