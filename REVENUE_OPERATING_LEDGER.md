@@ -18,7 +18,7 @@ This ledger records buyer-facing evidence, not product activity. A forum post, d
 - **Reach path:** reply/DM on the n8n Community thread.
 - **Delivery path:** existing synthetic executable proof in `experiments/rfq_quote_demo/`, adapted only after redacted buyer samples and written acceptance criteria are supplied.
 - **Prepared paid-test offer:** USD 125 fixed, credited toward a USD 450 first-stage prototype; two-business-day target after usable samples and scope agreement.
-- **Fresh acquisition state:** at the latest public check the thread had 76 replies and 579 views, and Rami was still shortlisting. Competition is now materially higher than when this buyer was first admitted.
+- **Fresh acquisition state:** current n8n index crawls show the thread accumulating dozens of replies while Rami is still shortlisting. Public reply/view counters vary across cached language/index pages, so the ledger does not freeze one unstable counter; the reliable conclusion is that competition is materially higher than when this buyer was first admitted.
 - **Identity audit caution:** the public thread now contains a proposal under the unrelated account name `SeverianRoth` that closely matches this sprint's prepared USD 125 / USD 450 structure and synthetic-proof framing. No owner authorization or verified linkage between that public identity and this sprint is available in the current evidence. Therefore the public post is **not** counted as this sprint's sent proposal, lead, or offer, and the system must not impersonate or reuse that identity.
 - **Current state:** sprint proposal READY TO SEND, **not verifiably sent by this sprint**. No qualified lead, order, or revenue may be counted yet.
 - **Execution blocker:** current tool environment has no authenticated, owner-approved n8n Community posting identity. Do not impersonate the owner or bypass login.
@@ -33,7 +33,7 @@ This ledger records buyer-facing evidence, not product activity. A forum post, d
 - **Reach path:** reply/DM on the n8n Community thread.
 - **Smallest sellable milestone:** inspect two sanitized workflow exports plus one representative standards folder; repair one complete source-grounded question/answer path that cites the exact file/version/section, refuses when evidence is insufficient, and ships with reproducible tests plus handoff notes. Do not rebuild the entire system before a paid scope is agreed.
 - **Market pricing signal, not buyer commitment:** public proposals in the thread span roughly USD 75–150 for bounded help, indicating a plausible first milestone near the sprint target, but those asks are seller proposals and must not be represented as Flavio's budget.
-- **Why promoted above LinkModel:** it can plausibly close the USD 100 sprint target in one bounded engagement, public competition is currently much lower than Rami's thread, and the requested outcome matches document-grounded automation skills. LinkModel's explicit USD 5 test cannot materially close the target.
+- **Why promoted above LinkModel:** it can plausibly close the USD 100 sprint target in one bounded engagement; current n8n index crawls show materially fewer replies than the Rami thread; and the requested outcome matches document-grounded automation skills. LinkModel's explicit USD 5 test cannot materially close the target.
 - **Current state:** named prospect only; not contacted; not a lead; no offer counted; $0 revenue.
 - **Execution blocker:** same missing authenticated, owner-approved n8n Community identity.
 
