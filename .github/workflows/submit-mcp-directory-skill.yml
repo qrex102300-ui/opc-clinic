@@ -1,0 +1,163 @@
+name: Submit OPC Clinic Skill to MCP.Directory
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-mcp-directory-skill.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Prepare Playwright with runner browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright@1.55.0
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$browser" ]; then
+            echo 'No preinstalled Chromium-family browser found on the runner.' >&2
+            exit 1
+          fi
+          echo "BROWSER_EXECUTABLE=$browser" >> "$GITHUB_ENV"
+
+      - name: Submit public skill for review
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > submit-mcp-directory.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          import fs from 'fs';
+
+          const result = {
+            surface: 'https://mcp.directory/submit-skill',
+            skillSource: 'https://github.com/qrex102300-ui/opc-clinic/blob/main/skill/SKILL.md',
+            attempted: true,
+            submittedEmail: false,
+            submittedIdentity: false,
+            successSignal: false,
+            blockedByCaptcha: false,
+            finalUrl: '',
+            bodyText: '',
+            error: null
+          };
+
+          const browser = await chromium.launch({
+            headless: true,
+            executablePath: process.env.BROWSER_EXECUTABLE,
+            args: ['--no-sandbox']
+          });
+          const page = await browser.newPage({ viewport: { width: 1365, height: 1000 } });
+
+          async function fillFirst(candidates, value) {
+            for (const locator of candidates) {
+              try {
+                if (await locator.count()) {
+                  const first = locator.first();
+                  if (await first.isVisible() && await first.isEditable()) {
+                    await first.fill(value);
+                    return true;
+                  }
+                }
+              } catch {}
+            }
+            return false;
+          }
+
+          try {
+            await page.goto(result.surface, { waitUntil: 'domcontentloaded', timeout: 60000 });
+            await page.waitForTimeout(1500);
+
+            const initialBody = (await page.locator('body').innerText()).slice(0, 12000);
+            if (/captcha|turnstile|verify you are human|cloudflare challenge/i.test(initialBody)) {
+              result.blockedByCaptcha = true;
+              throw new Error('Human-verification challenge detected; stopped without bypassing it.');
+            }
+
+            const sourceOk = await fillFirst([
+              page.getByLabel(/skill source url/i),
+              page.locator('input[type="url"]'),
+              page.locator('input[placeholder*="github.com" i]')
+            ], result.skillSource);
+
+            if (!sourceOk) throw new Error('Required Skill Source URL field not found.');
+
+            // Optional public metadata only. No email, person name, account, or owner identity is supplied.
+            await fillFirst([
+              page.getByLabel(/^skill name/i),
+              page.locator('input[name*="name" i]')
+            ], 'OPC Clinic');
+
+            await fillFirst([
+              page.getByLabel(/^description/i),
+              page.locator('textarea')
+            ], 'Open-source AI founder diagnosis skill that traces post-launch symptoms to evidence-backed bottlenecks and a testable next experiment.');
+
+            const submit = page.getByRole('button', { name: /submit for review|submit/i }).first();
+            if (!(await submit.count())) throw new Error('Submit button not found.');
+            await submit.click({ timeout: 30000 });
+            await page.waitForTimeout(6000);
+
+            result.finalUrl = page.url();
+            result.bodyText = (await page.locator('body').innerText()).slice(0, 12000);
+            result.blockedByCaptcha = /captcha|turnstile|verify you are human|cloudflare challenge/i.test(result.bodyText);
+            result.successSignal = /submitted|submission received|thanks|thank you|review|success|pending/i.test(result.bodyText)
+              && !/error|failed|invalid|required.*email|email.*required/i.test(result.bodyText)
+              && !result.blockedByCaptcha;
+          } catch (err) {
+            result.error = String(err?.message || err);
+            try {
+              result.finalUrl = page.url();
+              result.bodyText = (await page.locator('body').innerText()).slice(0, 12000);
+            } catch {}
+          } finally {
+            await page.close();
+            await browser.close();
+          }
+
+          fs.writeFileSync('/tmp/mcp-directory-result.json', JSON.stringify(result, null, 2));
+          EOF
+
+          node submit-mcp-directory.mjs || true
+          rm -f submit-mcp-directory.mjs
+
+      - name: Write sanitized acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          {
+            echo '# MCP.Directory Agent Skill submission'
+            echo
+            echo "Last attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'Goal: add OPC Clinic to a high-fit agent-skill discovery surface using the directory’s designated public submission form.'
+            echo 'Only the public SKILL.md URL and public project metadata were supplied. Email/person identity fields were intentionally left blank. No payment, private credential, CAPTCHA bypass, or unrelated community promotion was used.'
+            echo
+            echo '```json'
+            jq . /tmp/mcp-directory-result.json
+            echo '```'
+          } > ops/mcp-directory-submission.md
+
+      - name: Commit acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/mcp-directory-submission.md
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'Record MCP.Directory skill submission'
+          git pull --rebase origin main
+          git push
