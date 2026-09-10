@@ -1,0 +1,116 @@
+name: Submit OPC Clinic to SkillKit
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-skillkit.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Prepare Playwright with runner browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright@1.55.0
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$browser" ]; then
+            echo 'No preinstalled Chromium-family browser found on the runner.' >&2
+            exit 1
+          fi
+          echo "BROWSER_EXECUTABLE=$browser" >> "$GITHUB_ENV"
+
+      - name: Submit designated SkillKit form
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > submit-skillkit.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          import fs from 'fs';
+
+          const result = {
+            surface: 'https://skillkit.io/submit',
+            submittedUrl: 'https://github.com/qrex102300-ui/opc-clinic',
+            attempted: true,
+            finalUrl: '',
+            successSignal: false,
+            bodyText: '',
+            error: null
+          };
+
+          const browser = await chromium.launch({headless:true, executablePath:process.env.BROWSER_EXECUTABLE, args:['--no-sandbox']});
+          const page = await browser.newPage({viewport:{width:1365,height:900}});
+          try {
+            await page.goto(result.surface,{waitUntil:'domcontentloaded',timeout:60000});
+            await page.waitForTimeout(1500);
+            const initial = (await page.locator('body').innerText()).slice(0,12000);
+            if (/captcha|turnstile|verify you are human/i.test(initial)) throw new Error('Human verification gate detected; no bypass attempted.');
+            const input = page.getByLabel(/github repository url/i).first();
+            const fallback = page.locator('input[type="url"], input[placeholder*="github.com" i]').first();
+            const target = (await input.count()) ? input : fallback;
+            if (!(await target.count())) throw new Error('GitHub Repository URL field not found.');
+            await target.fill(result.submittedUrl);
+            const submit = page.getByRole('button',{name:/submit skill/i}).first();
+            if (!(await submit.count())) throw new Error('Submit Skill button not found.');
+            await submit.click({timeout:30000});
+            await page.waitForTimeout(8000);
+            result.finalUrl = page.url();
+            result.bodyText = (await page.locator('body').innerText()).slice(0,12000);
+            result.successSignal = /success|submitted|thank|review|received|pending|added/i.test(result.bodyText)
+              && !/error|failed|invalid|required.*email|sign in/i.test(result.bodyText)
+              && !/captcha|turnstile|verify you are human/i.test(result.bodyText);
+          } catch (err) {
+            result.error = String(err?.message || err);
+            try { result.finalUrl = page.url(); result.bodyText = (await page.locator('body').innerText()).slice(0,12000); } catch {}
+          } finally {
+            await page.close();
+            await browser.close();
+          }
+          fs.writeFileSync('/tmp/skillkit-result.json',JSON.stringify(result,null,2));
+          EOF
+          node submit-skillkit.mjs || true
+          rm -f submit-skillkit.mjs
+
+      - name: Write acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          if [ ! -f /tmp/skillkit-result.json ]; then
+            printf '%s\n' '{"attempted":true,"successSignal":false,"error":"submission runner produced no result file"}' > /tmp/skillkit-result.json
+          fi
+          {
+            echo '# SkillKit submission audit'
+            echo
+            echo "Last attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'SkillKit exposes a designated public skill-submission form whose visible required input is a public GitHub repository URL. This attempt supplied only the public OPC Clinic repository and used no person identity, email, private credential, payment, or unsolicited community message.'
+            echo
+            echo '```json'
+            jq . /tmp/skillkit-result.json
+            echo '```'
+            echo
+            echo 'Counting rule: an acknowledgement is pending/accepted only; SkillKit is counted live only after an independent public directory lookup finds OPC Clinic.'
+          } > ops/skillkit-submission.md
+
+      - name: Commit acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/skillkit-submission.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Record SkillKit submission'
+          git pull --rebase origin main
+          git push
