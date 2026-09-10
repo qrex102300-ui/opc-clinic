@@ -71,7 +71,6 @@ jobs:
             const form = btn.locator('xpath=ancestor::form[1]');
             if (!await form.count()) throw new Error('Project submission form not found.');
 
-            // Guardrail applies only to the project submission form, not unrelated newsletter fields elsewhere on the page.
             const required = form.locator('input[required], textarea[required], select[required]');
             for (let i=0; i<await required.count(); i++) {
               const el = required.nth(i);
@@ -99,16 +98,11 @@ jobs:
               if(idx>=0){await sel.selectOption({index:idx});licenseOk=true;break;}
             }
 
-            // Leave optional Company/honeypot inputs blank. Confirm only the factual license/repository declaration.
+            // The project form exposes one factual declaration: public repo with an open-source license.
             const checkboxes = form.locator('input[type="checkbox"]');
             for (let i=0; i<await checkboxes.count(); i++) {
               const cb=checkboxes.nth(i);
-              if(await cb.isVisible().catch(()=>false) && !await cb.isChecked().catch(()=>true)) {
-                const id=await cb.getAttribute('id');
-                let label='';
-                if(id){const lab=page.locator(`label[for="${id}"]`); if(await lab.count()) label=await lab.innerText();}
-                if(/public repo|open-source license|license/i.test(label) || (await cb.isRequired().catch(()=>false))) await cb.check();
-              }
+              if(await cb.isVisible().catch(()=>false) && !await cb.isChecked().catch(()=>true)) await cb.check();
             }
 
             if(!nameOk || !repoOk || !whatOk || !licenseOk) throw new Error(`Required public project fields incomplete (name=${nameOk}, repo=${repoOk}, what=${whatOk}, license=${licenseOk}).`);
