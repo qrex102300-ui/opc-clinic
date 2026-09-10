@@ -44,7 +44,11 @@ Round 4 tested two identity-free public listing surfaces without spending money 
 - **Share Your Startup** — the `Post it` control remained disabled after all public product fields were filled. The run stopped rather than manipulating page state or bypassing the control. Not submitted and not counted.
 - Fresh screening also found **ListAi.cc** and **ProductReveal** require contact/founder identity in their live submission flows. They were not submitted.
 
-A fifth zero-cost acquisition screening round has been initiated against additional directory surfaces with a strict stop-on-identity/payment/login/human-verification policy. Counts will not move unless an external surface returns observable acceptance or a live listing.
+Round 5 screened three additional zero-cost discovery routes with the same strict stop policy; detailed evidence: [`free-directory-round5.md`](./free-directory-round5.md). No count changed:
+
+- **Master AI Finder** — the GitHub runner received `ERR_SSL_PROTOCOL_ERROR` before a usable submission page loaded. No retry/bypass was attempted in this round.
+- **SwitchTools** — the submit URL returned a browser-check interstitial and no legitimate submit control became available. No anti-bot bypass was attempted.
+- **SEO Web Toolkits** — the live submission form requires both a company contact email and a submitter email. It was skipped before submission because the sprint does not use identity/contact credentials.
 
 ## Other screened but not counted routes
 
