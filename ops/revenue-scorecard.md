@@ -1,13 +1,13 @@
 # OPC Clinic Revenue Sprint — Auditable Scorecard
 
-Last checked: **2026-09-10 08:17 CST**  
+Last checked: **2026-09-10 10:22 CST**  
 Experiment window: **2026-09-09 → 2026-09-15**
 
 This is the canonical operational count for the 7-day revenue sprint. Counts move only on observable evidence. A directory submission is not a lead; a lead is not revenue; only confirmed collected payment counts as revenue.
 
 | Metric | Current | Evidence rule |
 |---|---:|---|
-| Confirmed external listings / referral surfaces | **5** | Public listing or directory/API evidence confirms OPC Clinic is live |
+| Confirmed external listings / referral surfaces | **6** | Public listing or directory/API evidence confirms OPC Clinic is live |
 | Pending external directory / registry reviews | **5** | Submission accepted but not yet confirmed as a default public listing |
 | Inbound free-triage submissions | **0** | A real external user opens a `[Free Triage]` case |
 | Qualified leads | **0** | Launched/tested product + real evidence + near-term decision; case fits deeper diagnosis |
@@ -26,6 +26,7 @@ This is the canonical operational count for the 7-day revenue sprint. Counts mov
 3. **agents-launch** — public no-auth directory returns an existing OPC Clinic record.
 4. **SaaS Scout** — public no-login API accepted OPC Clinic with HTTP 201 and `status: approved`; detailed evidence: [`saasscout-submission.md`](./saasscout-submission.md).
 5. **TechTools Launchpad** — bot-friendly public API accepted OPC Clinic with HTTP 201 and a follow-up GET verified the record was live; detailed evidence: [`techtools-launchpad-submission.md`](./techtools-launchpad-submission.md).
+6. **Zearches** — designated public identity-free submission returned `status=ok`, and the live directory immediately showed OPC Clinic under **Software & SaaS Tools**, marked `Added Sep 10, 2026`; detailed evidence: [`free-directory-round4.md`](./free-directory-round4.md).
 
 ## Pending reviews / accepted submissions
 
@@ -37,15 +38,13 @@ This is the canonical operational count for the 7-day revenue sprint. Counts mov
 
 ## Latest acquisition execution
 
-Round 3 screened five additional public directory routes without spending money or supplying owner identity; detailed evidence: [`free-directory-round3.md`](./free-directory-round3.md).
+Round 4 tested two identity-free public listing surfaces without spending money or supplying owner identity; detailed evidence: [`free-directory-round4.md`](./free-directory-round4.md).
 
-- **Bro Find AI** — first listing is advertised as free and instant, but the live submission flow requires Google sign-in. Not submitted.
-- **IndexOf.AI** — free basic listing is advertised, but the live submit path requires sign-in. Not submitted.
-- **That AI Collection** — live submission is a multi-step flow and the page explicitly discusses paid publishing; no identity-free free submission was completed. Not counted.
-- **ToolPromote** — free standard listing exists, but the form requires submitter name, email, and relationship to the tool. Skipped before submission.
-- **Come AI / iatool.online** — live submission requires email. Skipped before submission.
+- **Zearches** — confirmed live. The first attempt had been rejected by the site's public anti-spam timing rule as `too_fast`; a later single retry respected a nine-second form delay and was accepted without bypassing CAPTCHA, login, identity, payment, or any human-verification mechanism.
+- **Share Your Startup** — the `Post it` control remained disabled after all public product fields were filled. The run stopped rather than manipulating page state or bypassing the control. Not submitted and not counted.
+- Fresh screening also found **ListAi.cc** and **ProductReveal** require contact/founder identity in their live submission flows. They were not submitted.
 
-Round 4 was started against two newly verified identity-free public listing surfaces: **Share Your Startup** (states no account/payment and immediate publishing) and **Zearches** (states no account/payment and direct free submission). The workflow uses only public product facts and is constrained to stop if identity, payment, or human verification appears. No round-4 acceptance evidence exists yet, so neither surface is counted at this checkpoint.
+A fifth zero-cost acquisition screening round has been initiated against additional directory surfaces with a strict stop-on-identity/payment/login/human-verification policy. Counts will not move unless an external surface returns observable acceptance or a live listing.
 
 ## Other screened but not counted routes
 
@@ -54,11 +53,17 @@ Round 4 was started against two newly verified identity-free public listing surf
 - **AIToolsIndex** — GitHub runner hit `DNS_PROBE_FINISHED_NXDOMAIN`; no submission occurred. Do not retry again without new runner/network evidence.
 - **Find AI Tools** — runner received HTTP 403 before the public form loaded; no bypass was attempted.
 - **Alieradox** — anti-bot browser check prevented the product fields from loading; no bypass was attempted.
+- **Bro Find AI** — first listing is advertised as free and instant, but the live submission flow requires Google sign-in. Not submitted.
+- **IndexOf.AI** — free basic listing is advertised, but the live submit path requires sign-in. Not submitted.
+- **That AI Collection** — live submission is a multi-step flow and the page explicitly discusses paid publishing; no identity-free free submission was completed. Not counted.
+- **ToolPromote** — free standard listing exists, but the form requires submitter name, email, and relationship to the tool. Skipped before submission.
+- **Come AI / iatool.online** — live submission requires email. Skipped before submission.
+- **1000.tools** — current submit page now requests email and advertises paid monthly/yearly plans, so it is not treated as an identity-free free acquisition route despite stale directory-aggregator descriptions to the contrary. Not submitted.
 - Third-party GitHub issue/PR submission remains constrained by the connected GitHub account's manual-review restriction; directory-specific public forms/APIs remain the preferred route.
 
 ## Intake check
 
-GitHub Issues check at **2026-09-10 08:17 CST**: **0 issues**. Therefore there are no new free-triage submissions, qualified leads, payment-ready leads, paid orders, or transaction hashes to process at this checkpoint.
+GitHub Issues check at **2026-09-10 10:22 CST**: **0 issues**. Therefore there are no new free-triage submissions, qualified leads, payment-ready leads, paid orders, or transaction hashes to process at this checkpoint.
 
 ## Operating rule
 
