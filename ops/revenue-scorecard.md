@@ -1,6 +1,6 @@
 # OPC Clinic Revenue Sprint — Auditable Scorecard
 
-Last checked: **2026-09-10 15:00 CST**  
+Last checked: **2026-09-10 16:28 CST**  
 Experiment window: **2026-09-09 → 2026-09-15**
 
 This is the canonical operational count for the 7-day revenue sprint. Counts move only on observable evidence. A directory submission is not a lead; a lead is not revenue; only confirmed collected payment counts as revenue.
@@ -39,7 +39,7 @@ This is the canonical operational count for the 7-day revenue sprint. Counts mov
 
 ## Intake / revenue checkpoint
 
-GitHub Issues check at **2026-09-10 15:00 CST**: **0 customer issues**.
+GitHub Issues check at **2026-09-10 16:28 CST**: **0 customer issues**.
 
 - New free-triage submissions: **0**
 - Qualified leads: **0**
@@ -53,9 +53,9 @@ There is therefore no customer case or paid diagnosis to fulfill at this checkpo
 
 ## Latest acquisition checkpoint
 
-The 15:00 CST run remained acquisition-first and made no landing-page, product, pricing, copy, or SEO changes. It screened additional current discovery routes and rejected those requiring submitter/business email, sign-in, private agent credentials, reciprocal backlinks, or a poor fit with the directory's stated rules. The already-counted PromptFrenzy listing remains publicly discoverable; no pending review was promoted to confirmed in this run.
+The 16:28 CST run remained acquisition-first and made no landing-page, product, pricing, copy, or SEO changes. It triggered a legitimate no-account/no-card **AgentsIndex** submission path using only public product fields; that job was still in progress at the checkpoint, so it is not yet counted as accepted or live. It also re-verified **Linkrena** without duplicate submission; the public API still did not show OPC Clinic. Fresh screening rejected Tectalks and ToolScout because sign-in is required, ListAi.cc/AISO Tools/The Next AI because contact email is required, Stork.AI/AI Tool Discovery because the free route requires a reciprocal site badge, and AIListingTool because there is no free tier.
 
-Detailed audit: [`acquisition-run-2026-09-10-1500-cst.md`](./acquisition-run-2026-09-10-1500-cst.md).
+Detailed audit: [`acquisition-run-2026-09-10-1628-cst.md`](./acquisition-run-2026-09-10-1628-cst.md).
 
 ## Operating rule
 
