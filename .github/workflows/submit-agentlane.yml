@@ -1,0 +1,108 @@
+name: Submit OPC Clinic to AgentLane
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-agentlane.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright@1.55.0
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$browser"
+          echo "BROWSER_EXECUTABLE=$browser" >> "$GITHUB_ENV"
+      - name: Submit through designated public review form
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/agentlane.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          import fs from 'fs';
+          const result={surface:'https://agentlanehq.com/',attempted:true,usedIdentity:false,usedEmail:false,usedPayment:false,submitted:false,acceptedSignal:false,liveSignal:false,error:null,finalUrl:'',bodyText:''};
+          const browser=await chromium.launch({headless:true,executablePath:process.env.BROWSER_EXECUTABLE,args:['--no-sandbox']});
+          const page=await browser.newPage({viewport:{width:1365,height:1000}});
+          try{
+            await page.goto(result.surface,{waitUntil:'domcontentloaded',timeout:60000});
+            await page.waitForTimeout(1500);
+            let body=(await page.locator('body').innerText()).slice(0,18000);
+            if(/captcha|turnstile|verify you are human|cloudflare challenge/i.test(body)) throw new Error('Human verification detected; stopped without bypass.');
+            const email=page.locator('input[type="email"],input[name*="email" i],input[placeholder*="email" i]');
+            for(let i=0;i<await email.count();i++) if(await email.nth(i).isVisible()) throw new Error('Email required in submission surface; stopped.');
+            const name=page.locator('input[placeholder*="agent name" i]').first();
+            if(!(await name.count())) throw new Error('Agent name field not found.');
+            await name.fill('OPC Clinic');
+            const selects=page.locator('select');
+            if(await selects.count()){
+              const s=selects.first();
+              const opts=await s.locator('option').allTextContents();
+              const pick=opts.find(x=>/Business|Research|Productivity|Sales/i.test(x));
+              if(pick) await s.selectOption({label:pick});
+            }
+            const url=page.locator('input[placeholder*="GitHub" i],input[placeholder*="project URL" i],input[type="url"]').last();
+            if(!(await url.count())) throw new Error('GitHub/project URL field not found.');
+            await url.fill('https://github.com/qrex102300-ui/opc-clinic');
+            const submit=page.getByRole('button',{name:/submit for review/i}).first();
+            if(!(await submit.count())) throw new Error('Designated submit button not found.');
+            if(await submit.isDisabled().catch(()=>false)) throw new Error('Submit button disabled; stopped without workaround.');
+            await submit.click({timeout:30000});
+            result.submitted=true;
+            await page.waitForTimeout(4500);
+            result.finalUrl=page.url();
+            body=(await page.locator('body').innerText()).slice(0,22000);
+            result.bodyText=body;
+            if(/captcha|turnstile|verify you are human/i.test(body)) throw new Error('Human verification appeared after submit; no bypass attempted.');
+            result.acceptedSignal=/submitted|received|review|thanks|success|queued/i.test(body)&&!/error|failed|invalid/i.test(body);
+            const verify=await browser.newPage();
+            try{
+              await verify.goto('https://agentlanehq.com/',{waitUntil:'domcontentloaded',timeout:60000});
+              await verify.waitForTimeout(1200);
+              const t=(await verify.locator('body').innerText()).slice(0,26000);
+              result.liveSignal=/OPC Clinic/i.test(t)&&/qrex102300-ui|founder diagnosis|post-launch/i.test(t);
+            }catch{}
+            await verify.close();
+            if(result.liveSignal) result.acceptedSignal=true;
+          }catch(e){result.error=String(e?.message||e);try{result.finalUrl=page.url();result.bodyText=(await page.locator('body').innerText()).slice(0,18000)}catch{}}
+          await page.close();await browser.close();
+          fs.writeFileSync('/tmp/agentlane-result.json',JSON.stringify(result,null,2));
+          EOF
+          node /tmp/agentlane.mjs || true
+      - name: Write audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          {
+            echo '# AgentLane submission audit'
+            echo
+            echo "Last attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'AgentLane publicly invites builders to submit an agent for review using agent name, category, and GitHub/project URL. No owner identity, email, private credential, or payment was supplied.'
+            echo
+            echo '```json'
+            jq . /tmp/agentlane-result.json
+            echo '```'
+          } > ops/agentlane-submission.md
+      - name: Commit audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/agentlane-submission.md
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record AgentLane submission'
+          git pull --rebase origin main
+          git push
