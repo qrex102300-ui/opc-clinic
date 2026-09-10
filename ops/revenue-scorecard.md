@@ -1,6 +1,6 @@
 # OPC Clinic Revenue Sprint — Auditable Scorecard
 
-Last checked: **2026-09-10 17:31 CST**  
+Last checked: **2026-09-10 18:00 CST**  
 Experiment window: **2026-09-09 → 2026-09-15**
 
 This is the canonical operational count for the 7-day revenue sprint. Counts move only on observable evidence. A directory submission is not a lead; a lead is not revenue; only confirmed collected payment counts as revenue.
@@ -40,7 +40,7 @@ This is the canonical operational count for the 7-day revenue sprint. Counts mov
 
 ## Intake / revenue checkpoint
 
-GitHub Issues check at **2026-09-10 17:31 CST**: **0 customer issues**.
+GitHub Issues check at **2026-09-10 18:00 CST**: **0 customer issues**.
 
 - New free-triage submissions: **0**
 - Qualified leads: **0**
@@ -54,9 +54,9 @@ There is therefore no customer case or paid diagnosis to fulfill at this checkpo
 
 ## Latest acquisition checkpoint
 
-The 17:31 CST run stayed acquisition-first and made no landing-page, product, pricing, copy, or SEO changes. It added **AgentMRR** as the seventh independently confirmed live discovery surface through an identity-free agent-native path: registration and product submission both returned HTTP 201, and a separate public GET verified the listing as `active`. The earlier **AgentsIndex** browser attempt timed out without acceptance evidence and is therefore not counted or blindly retried. Fresh screening continued to reject routes that require sign-in, contact email, reciprocal badges/backlinks, or payment rather than impersonating the owner or forcing access.
+The 18:00 CST run remained acquisition-first and made no landing-page, pricing, copy, or SEO changes. Fresh discovery focused on high-fit **agent-skill** surfaces rather than adding more generic startup directories. MCP.Directory exposes a public Skill submission route whose required input is only a public skill URL, so an identity-free submission was attempted through GitHub Actions. The post-submit page redirected to the generic **Submit a Server** form and returned no skill-specific receipt or acknowledgement; a broad workflow matcher initially produced a false-positive success signal. The audit was corrected immediately and **MCP.Directory is not counted** as either a live listing or a pending review. The path is not blindly retried to avoid duplicates; detailed evidence: [`mcp-directory-submission.md`](./mcp-directory-submission.md).
 
-Detailed audit: [`acquisition-run-2026-09-10-1731-cst.md`](./acquisition-run-2026-09-10-1731-cst.md).
+A second high-fit route, **anbeime/skill**, provides a designated `skill-submission` GitHub issue template and had no OPC Clinic duplicate in repository/issue search. The connected GitHub integration can read that external repository but returned HTTP 403 when asked to create the submission issue, so no external issue was posted and no owner identity was impersonated. **AgenticSkills** was also screened but its free submission requires both author name and email, so it was not attempted. A fresh search across the six already-pending directories returned no public OPC Clinic listing evidence, so the counts remain 7 confirmed / 6 pending. Acquisition remains the bottleneck.
 
 ## Operating rule
 
