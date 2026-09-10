@@ -1,0 +1,68 @@
+name: Submit OPC Clinic to Qevra
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-qevra.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Submit through public no-key API
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          body="$(mktemp)"
+          payload='{"url":"https://qrex102300-ui.github.io/opc-clinic/","name":"OPC Clinic","tagline":"Evidence-backed startup bottleneck diagnosis for solo founders","category":"AI","board_notes":false}'
+          code="$(curl -sS -L -o "$body" -w '%{http_code}' \
+            -X POST 'https://qevra.app/api/submit' \
+            -H 'Content-Type: application/json' \
+            --data "$payload" || true)"
+
+          {
+            echo '# Qevra acquisition submission audit'
+            echo
+            echo "Last attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'Surface: https://qevra.app/ — public website directory with a documented no-key POST API.'
+            echo 'Authorization basis: OPC Clinic owner explicitly authorized legitimate zero-cost external distribution during the revenue sprint.'
+            echo 'No owner email, personal identity, payment, private credential, ad purchase, or human-verification bypass was supplied.'
+            echo 'Submitted URL: https://qrex102300-ui.github.io/opc-clinic/'
+            echo 'Category: AI'
+            echo 'Board notes / marketing alerts: false'
+            echo
+            echo "HTTP status: $code"
+            echo
+            echo '```json'
+            if jq -e . "$body" >/dev/null 2>&1; then
+              jq . "$body"
+            else
+              head -c 8000 "$body" || true
+            fi
+            echo
+            echo '```'
+          } > ops/qevra-submission.md
+
+      - name: Commit acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/qevra-submission.md
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'Record Qevra directory submission'
+          git pull --rebase origin main
+          git push
