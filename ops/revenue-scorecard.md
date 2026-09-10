@@ -1,6 +1,6 @@
 # OPC Clinic Revenue Sprint — Auditable Scorecard
 
-Last checked: **2026-09-10 21:08 CST**  
+Last checked: **2026-09-10 21:56 CST**  
 Experiment window: **2026-09-09 → 2026-09-15**
 
 This is the canonical operational count for the 7-day revenue sprint. Counts move only on observable evidence. A directory submission is not a lead; a lead is not revenue; only confirmed collected payment counts as revenue.
@@ -21,7 +21,7 @@ This is the canonical operational count for the 7-day revenue sprint. Counts mov
 
 ## Confirmed external discovery surfaces
 
-1. **PromptFrenzy** — verified badge submission; directory PR #61 auto-merged on 2026-09-09.
+1. **PromptFrenzy** — verified badge submission; directory PR #61 auto-merged on 2026-09-09. Its public OPC Clinic directory page was still independently visible on 2026-09-10.
 2. **Agent Directory API** — public no-auth directory already recognizes the `opc-clinic` handle.
 3. **agents-launch** — public no-auth directory returns an existing OPC Clinic record.
 4. **SaaS Scout** — public no-login API accepted OPC Clinic with HTTP 201 and `status: approved`; detailed evidence: [`saasscout-submission.md`](./saasscout-submission.md).
@@ -41,7 +41,7 @@ This is the canonical operational count for the 7-day revenue sprint. Counts mov
 
 ## Intake / revenue checkpoint
 
-GitHub Issues check at **2026-09-10 21:08 CST**: **0 customer issues**.
+GitHub Issues check at **2026-09-10 21:56 CST**: **0 customer issues** (`repo:qrex102300-ui/opc-clinic is:issue` returned `total_count: 0`).
 
 - New free-triage submissions: **0**
 - Qualified leads: **0**
@@ -55,13 +55,18 @@ There is therefore no customer case or paid diagnosis to fulfill at this checkpo
 
 ## Latest acquisition checkpoint
 
-The 20:59–21:08 CST run remained acquisition-first and made **no landing-page, pricing, paid-funnel, copy, or SEO-page changes**.
+The 21:46–21:56 CST run remained acquisition-first and made **no landing-page, pricing, paid-funnel, copy, or SEO-page changes**.
 
-Fresh public research identified **AgentLane** as a high-fit open-agent marketplace with a designated builder submission form. A guarded one-shot workflow supplied only OPC Clinic's public name, a relevant category, and its public GitHub repository URL. The explicit **Submit for review** action completed without an error; the audit recorded `submitted: true`, `acceptedSignal: true`, and no owner identity, email, private credential, or payment. Because the marketplace does not yet independently show OPC Clinic as live, AgentLane is counted as **pending**, moving the score to **7 confirmed / 7 pending**.
+Two freshly researched zero-cost directory surfaces were tested under strict identity-free guardrails:
 
-A second freshly researched surface, **Textfrog**, advertises a free AI-generated review listing. Its designated submission entry was opened under the same guardrails, but no submission completed and no accepted/live evidence was observed. It is therefore classified **UNVERIFIED / DO NOT COUNT** rather than retried or forced. Detailed evidence is in [`agentlane-submission.md`](./agentlane-submission.md), [`textfrog-submission.md`](./textfrog-submission.md), and [`acquisition-run-2026-09-10-2108-cst.md`](./acquisition-run-2026-09-10-2108-cst.md).
+- **Qevra** documents a public no-key API, but the real API returned HTTP 400 with `A valid email is required` when owner email was omitted. **Blocked by required email; not submitted; do not count.** Receipt: [`qevra-submission.md`](./qevra-submission.md).
+- **AllToolsDirectory** advertises free submission with no login, but its form displayed `Please enter a valid email address` after the guarded attempt left contact email blank. No success state or live entry was observed. **Blocked by required email; do not count.** The first-pass heuristic was corrected to avoid a false pending count. Receipt: [`alltoolsdirectory-submission.md`](./alltoolsdirectory-submission.md).
 
-A fresh final issue check still found no inbound triage or paid-order case. Gross and net revenue remain **$0**. Acquisition remains the bottleneck.
+Fresh screening also rejected **IndexOf.AI** (sign-in required), **Agents.NET** (required email), **Future Tools** (required email + CAPTCHA), and **AI NavHub** (email / paid fast-submit path) for this run. Open-source PR directory **aifindr.org** remains legitimate, but the connected GitHub identity has read-only upstream permission and the available connector provides no safe fork action; no unauthorized write was attempted.
+
+PromptFrenzy's public OPC Clinic page was independently still visible. No new evidence justified moving any of the seven pending reviews to confirmed. Counts therefore remain **7 confirmed / 7 pending**, with **0 inbound triage / 0 paid orders / $0 revenue**. Full run evidence: [`acquisition-run-2026-09-10-2156-cst.md`](./acquisition-run-2026-09-10-2156-cst.md).
+
+Acquisition remains the bottleneck.
 
 ## Operating rule
 
