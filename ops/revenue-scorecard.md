@@ -1,6 +1,6 @@
 # OPC Clinic Revenue Sprint — Auditable Scorecard
 
-Last checked: **2026-09-10 18:58 CST**  
+Last checked: **2026-09-10 20:23 CST**  
 Experiment window: **2026-09-09 → 2026-09-15**
 
 This is the canonical operational count for the 7-day revenue sprint. Counts move only on observable evidence. A directory submission is not a lead; a lead is not revenue; only confirmed collected payment counts as revenue.
@@ -40,7 +40,7 @@ This is the canonical operational count for the 7-day revenue sprint. Counts mov
 
 ## Intake / revenue checkpoint
 
-GitHub Issues check at **2026-09-10 18:58 CST**: **0 customer issues**.
+GitHub Issues check at **2026-09-10 20:23 CST**: **0 customer issues**.
 
 - New free-triage submissions: **0**
 - Qualified leads: **0**
@@ -54,11 +54,13 @@ There is therefore no customer case or paid diagnosis to fulfill at this checkpo
 
 ## Latest acquisition checkpoint
 
-The 18:49–18:58 CST run remained acquisition-first. It made **no landing-page, pricing, paid-funnel, or SEO-page changes**. One narrowly scoped interoperability change was made to `skill/SKILL.md` because multiple high-fit agent-skill registries parse the package metadata directly: semantic version `1.0.0`, supported-platform metadata, and a bounded trigger description. This is distribution compatibility for the existing open-source skill, not product polish.
+The 20:13–20:23 CST run remained acquisition-first and made **no landing-page, pricing, paid-funnel, copy, or SEO-page changes**.
 
-Three fresh designated skill-discovery routes were then exercised. **TrustedSkills** documents a zero-cost auto-discovery route for a compatible public skill repo, but its required `openclaw-skill` GitHub-topic update failed with HTTP 403 under the repository Actions token; no private token or identity workaround was used, and the surface is not counted. **Agent-Skills.md** accepted only a public GitHub folder URL in its designated repository-intake form, but the live service returned `Internal server error`; it is not counted and will not be blindly duplicated. **SkillKit** exposes a public GitHub-URL submission page, but the automated visit was stopped by Cloudflare bot verification before the form was available; no CAPTCHA/security bypass was attempted and it is not counted. Detailed evidence is in [`trustedskills-discovery.md`](./trustedskills-discovery.md), [`agent-skills-md-submission.md`](./agent-skills-md-submission.md), [`skillkit-submission.md`](./skillkit-submission.md), and the consolidated [`acquisition-run-2026-09-10-1849-cst.md`](./acquisition-run-2026-09-10-1849-cst.md).
+A fresh identity-free directory route was exercised at **outbidgrow.lol**, which publicly advertises a permanent $0 startup/SaaS listing, no account creation, no credit card for the free route, and an **AI Agents & Infrastructure** category. The corrected browser run used only OPC Clinic's public URL and public project metadata, kept the bid at **$0**, and clicked the site's explicit **Submit Website for Free ($0)** control. No email, personal identity, account, card, payment, private credential, or community promotion was supplied.
 
-A fresh issue check still found no inbound triage or paid-order case. No new directory produced independent live-listing or accepted-review evidence, so the score remains **7 confirmed / 6 pending**. Acquisition remains the bottleneck.
+The form interaction completed without an error, but an immediate independent reload did **not** show the OPC Clinic domain in the public leaderboard. Because the site itself says free listings go live instantly and the sprint requires observable evidence before moving a count, this result is classified **UNVERIFIED / DO NOT COUNT** and will not be blindly re-submitted. Detailed evidence is in [`outbidgrow-submission.md`](./outbidgrow-submission.md) and [`acquisition-run-2026-09-10-2023-cst.md`](./acquisition-run-2026-09-10-2023-cst.md).
+
+Fresh public checks also produced no new approval evidence for the already-pending AIPO.ST, Hype Star, LaunchKit Tools, CurataHub, or OpenSourceChoice submissions. A final issue check still found no inbound triage or paid-order case. The score therefore remains **7 confirmed / 6 pending**, with **$0 gross and net revenue**. Acquisition remains the bottleneck.
 
 ## Operating rule
 
