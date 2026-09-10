@@ -1,0 +1,77 @@
+name: Submit OPC Clinic to Free Directories Round 7
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-free-directories-round7.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Prepare Playwright
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright@1.55.0
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$browser"
+          echo "BROWSER_EXECUTABLE=$browser" >> "$GITHUB_ENV"
+      - name: Submit through designated public forms
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > round7.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          import fs from 'fs';
+          const p={name:'OPC Clinic',url:'https://qrex102300-ui.github.io/opc-clinic/',repo:'https://github.com/qrex102300-ui/opc-clinic',short:'Evidence-backed founder diagnosis for launched products stuck before revenue.',why:'OPC Clinic helps founders distinguish acquisition, activation, conversion, pricing, and ICP bottlenecks, then turns the leading evidence-backed hypothesis into a measurable 7-day pass/fail experiment.'};
+          const browser=await chromium.launch({headless:true,executablePath:process.env.BROWSER_EXECUTABLE,args:['--no-sandbox']});
+          const results=[];
+          const mk=(id,surface)=>({id,surface,attempted:true,submitted:false,successSignal:false,blockedByIdentity:false,blockedByHumanVerification:false,error:null,finalUrl:null,bodyText:''});
+          async function fill(scope,re,v){const x=scope.getByLabel(re).first();if(await x.count()&&await x.isVisible().catch(()=>false)&&await x.isEditable().catch(()=>false)){await x.fill(v);return true;}return false;}
+          async function pick(scope,re,prefs){const x=scope.getByLabel(re).first();if(!await x.count()||!await x.isVisible().catch(()=>false))return false;const os=await x.locator('option').allTextContents();for(const rx of prefs){const i=os.findIndex(t=>rx.test(t));if(i>=0){await x.selectOption({index:i});return true;}}const i=os.findIndex(t=>t.trim()&&!/select|choose/i.test(t));if(i>=0){await x.selectOption({index:i});return true;}return false;}
+          async function guard(page,form,r){const b=await page.locator('body').innerText();if(/captcha|turnstile|hcaptcha|verify you are human|security verification|not a bot|cloudflare challenge/i.test(b)){r.blockedByHumanVerification=true;throw new Error('Human-verification gate detected; no bypass attempted.');}const req=form.locator('input[required],textarea[required],select[required]');for(let i=0;i<await req.count();i++){const e=req.nth(i);const meta=[await e.getAttribute('name'),await e.getAttribute('id'),await e.getAttribute('placeholder'),await e.getAttribute('aria-label'),await e.getAttribute('type')].filter(Boolean).join(' ').toLowerCase();if(/email|e-mail|your name|founder name|owner name|contact name|phone|password|linkedin|twitter/.test(meta)){r.blockedByIdentity=true;throw new Error(`Required personal identity/contact field detected: ${meta}`);}}if(await form.locator('input[type="checkbox"][required]').count())throw new Error('Required consent checkbox detected; no consent accepted on owner behalf.');}
+          async function finish(page,r){r.finalUrl=page.url();r.bodyText=(await page.locator('body').innerText()).slice(0,12000);const c=`${r.finalUrl}\n${r.bodyText}`;const fail=/submission failed|could not submit|something went wrong|error submitting|try again|invalid|required field/i.test(c);r.successSignal=/thank you|submitted|submission received|we'll review|we will review|review queue|success|consider including|evaluation queue/i.test(c)&&!fail;}
+          async function run(id,url,buttonRe,work,which='first'){const r=mk(id,url),page=await browser.newPage({viewport:{width:1365,height:1200}});try{await page.goto(url,{waitUntil:'domcontentloaded',timeout:60000});await page.waitForTimeout(1800);const buttons=page.getByRole('button',{name:buttonRe});if(!await buttons.count())throw new Error('Designated submit button not found.');const btn=which==='last'?buttons.last():buttons.first();const form=btn.locator('xpath=ancestor::form[1]');if(!await form.count())throw new Error('Designated form not found.');await guard(page,form,r);await work(form);if(!await btn.isEnabled().catch(()=>false))throw new Error('Submit control disabled; no bypass attempted.');await btn.click({timeout:30000});await page.waitForTimeout(5000);r.submitted=true;await finish(page,r);}catch(e){r.error=String(e?.message||e);try{await finish(page,r);}catch{}}finally{await page.close();results.push(r);}}
+          await run('shiporskip','https://shiporskip.io/submit',/submit for review/i,async f=>{const a=await fill(f,/tool name/i,p.name),b=await fill(f,/website url/i,p.url);await fill(f,/^category/i,'Startup & Founder Tools');await fill(f,/why should we review/i,p.why);if(!a||!b)throw new Error(`Required public fields incomplete (name=${a},url=${b}).`);});
+          await run('findtoolsguide','https://www.findtoolsguide.com/contact.php',/submit tool/i,async f=>{const a=await fill(f,/tool name/i,p.name),b=await fill(f,/official url/i,p.url);await pick(f,/^category/i,[/business/i,/productivity/i,/ai/i,/other/i]);await fill(f,/tags/i,'startup, founder, diagnosis, revenue, AI');await fill(f,/short description/i,p.short+' Open-source MIT prompt with an optional paid evidence-backed diagnosis.');if(!a||!b)throw new Error(`Required public fields incomplete (name=${a},url=${b}).`);},'last');
+          await run('aiverdalabs','https://aiverdalabs.com/',/submit tool/i,async f=>{const a=await fill(f,/tool name/i,p.name),b=await fill(f,/official website/i,p.url),d=await fill(f,/^description/i,p.why+' Public source: '+p.repo);await fill(f,/developer.*company/i,'OPC Clinic');if(!a||!b||!d)throw new Error(`Required public fields incomplete (name=${a},url=${b},description=${d}).`);});
+          fs.writeFileSync('/tmp/round7.json',JSON.stringify(results,null,2));await browser.close();
+          EOF
+          node round7.mjs || true
+          rm -f round7.mjs
+      - name: Write acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          {
+            echo '# Free directory acquisition round 7'
+            echo
+            echo "Last attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'Only designated public tool-review/submission forms were used. Optional person/email fields were left blank. No account, payment, private credential, unsolicited community comment, consent-checkbox acceptance, or human-verification bypass was used.'
+            echo
+            echo '```json'
+            jq . /tmp/round7.json
+            echo '```'
+          } > ops/free-directory-round7.md
+      - name: Commit audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/free-directory-round7.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Record free directory acquisition round 7'
+          git pull --rebase origin main
+          git push
