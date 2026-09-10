@@ -34,7 +34,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat > /tmp/submit-agent-skills.mjs <<'EOF'
+          cat > submit-agent-skills.mjs <<'EOF'
           import { chromium } from 'playwright';
           import fs from 'fs';
 
@@ -85,13 +85,17 @@ jobs:
 
           fs.writeFileSync('/tmp/agent-skills-md-result.json', JSON.stringify(result, null, 2));
           EOF
-          node /tmp/submit-agent-skills.mjs || true
+          node submit-agent-skills.mjs || true
+          rm -f submit-agent-skills.mjs
 
       - name: Write sanitized acquisition audit
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p ops
+          if [ ! -f /tmp/agent-skills-md-result.json ]; then
+            printf '%s\n' '{"attempted":true,"successSignal":false,"error":"submission runner produced no result file"}' > /tmp/agent-skills-md-result.json
+          fi
           {
             echo '# Agent-Skills.md submission audit'
             echo
