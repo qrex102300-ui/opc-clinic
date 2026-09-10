@@ -1,0 +1,165 @@
+name: Submit OPC Clinic to outbidgrow free directory
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-outbidgrow.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Prepare Playwright with runner browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright@1.55.0
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$browser" ]; then
+            echo 'No preinstalled Chromium-family browser found on the runner.' >&2
+            exit 1
+          fi
+          echo "BROWSER_EXECUTABLE=$browser" >> "$GITHUB_ENV"
+
+      - name: Submit free listing through designated public form
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > submit-outbidgrow.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          import fs from 'fs';
+
+          const projectUrl = 'https://qrex102300-ui.github.io/opc-clinic/';
+          const result = {
+            surface: 'https://outbidgrow.lol/',
+            projectUrl,
+            attempted: true,
+            usedIdentity: false,
+            usedEmail: false,
+            usedPayment: false,
+            freeButtonClicked: false,
+            successSignal: false,
+            liveSignal: false,
+            finalUrl: '',
+            bodyText: '',
+            error: null
+          };
+
+          const browser = await chromium.launch({
+            headless: true,
+            executablePath: process.env.BROWSER_EXECUTABLE,
+            args: ['--no-sandbox']
+          });
+          const page = await browser.newPage({ viewport: { width: 1365, height: 1000 } });
+
+          try {
+            await page.goto(result.surface, { waitUntil: 'domcontentloaded', timeout: 60000 });
+            await page.waitForTimeout(1500);
+            const initial = (await page.locator('body').innerText()).slice(0, 12000);
+            if (/captcha|turnstile|verify you are human|cloudflare challenge/i.test(initial)) {
+              throw new Error('Human-verification challenge detected; stopped without bypassing it.');
+            }
+
+            const input = page.locator('input[placeholder*="product URL" i], input[type="url"], input').first();
+            if (!(await input.count())) throw new Error('Product URL field not found.');
+            await input.fill(projectUrl);
+
+            const selects = page.locator('select');
+            if (await selects.count()) {
+              const sel = selects.first();
+              const options = await sel.locator('option').allTextContents();
+              const ai = options.find(x => /(^|\b)AI(\b|\s|&)|artificial intelligence/i.test(x));
+              const saas = options.find(x => /saas/i.test(x));
+              if (ai) await sel.selectOption({ label: ai });
+              else if (saas) await sel.selectOption({ label: saas });
+            }
+
+            const free = page.getByRole('button', { name: /Free\s*\(\$0\)|Submit Free/i }).first();
+            if (!(await free.count())) throw new Error('Free ($0) submission button not found.');
+            await free.click({ timeout: 30000 });
+            result.freeButtonClicked = true;
+            await page.waitForTimeout(5000);
+
+            result.finalUrl = page.url();
+            result.bodyText = (await page.locator('body').innerText()).slice(0, 15000);
+
+            // If a legitimate second-step modal asks only project metadata, fill public/non-identity fields.
+            if (!/captcha|turnstile|verify you are human|cloudflare challenge/i.test(result.bodyText)) {
+              const tagline = page.locator('input[placeholder*="tagline" i], textarea[placeholder*="tagline" i]').first();
+              if (await tagline.count()) {
+                if (await tagline.isVisible() && await tagline.isEditable()) {
+                  await tagline.fill('Evidence-backed AI founder diagnosis for post-launch bottlenecks.');
+                }
+              }
+              const secondFree = page.getByRole('button', { name: /Submit Free|Free\s*\(\$0\)|Publish Free|List Free/i }).first();
+              if (await secondFree.count()) {
+                if (await secondFree.isVisible() && await secondFree.isEnabled()) {
+                  await secondFree.click({ timeout: 15000 });
+                  await page.waitForTimeout(5000);
+                  result.finalUrl = page.url();
+                  result.bodyText = (await page.locator('body').innerText()).slice(0, 15000);
+                }
+              }
+            }
+
+            const blocked = /captcha|turnstile|verify you are human|cloudflare challenge/i.test(result.bodyText);
+            result.successSignal = !blocked && /success|submitted|listed|live|added|already listed|permanent/i.test(result.bodyText)
+              && !/error|failed|invalid|required.*email|required.*name|payment required/i.test(result.bodyText);
+            result.liveSignal = !blocked && /opc clinic/i.test(result.bodyText) && /listing|leaderboard|live/i.test(result.bodyText);
+          } catch (err) {
+            result.error = String(err?.message || err);
+            try {
+              result.finalUrl = page.url();
+              result.bodyText = (await page.locator('body').innerText()).slice(0, 15000);
+            } catch {}
+          } finally {
+            await page.close();
+            await browser.close();
+          }
+
+          fs.writeFileSync('/tmp/outbidgrow-result.json', JSON.stringify(result, null, 2));
+          EOF
+
+          node submit-outbidgrow.mjs || true
+          rm -f submit-outbidgrow.mjs
+
+      - name: Write sanitized acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          {
+            echo '# outbidgrow free-directory submission audit'
+            echo
+            echo "Last attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'Surface: https://outbidgrow.lol/ — designated startup/SaaS free-listing form advertising a permanent $0 listing with no account creation.'
+            echo 'Only the public project URL and, if requested, public project metadata were supplied. No email, personal identity, account, card, payment, private credential, or unrelated community message was used.'
+            echo
+            echo '```json'
+            jq . /tmp/outbidgrow-result.json
+            echo '```'
+          } > ops/outbidgrow-submission.md
+
+      - name: Commit acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/outbidgrow-submission.md
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'Record outbidgrow free listing attempt'
+          git pull --rebase origin main
+          git push
