@@ -63,7 +63,7 @@ jobs:
                 const el=typeof selector==='string'?page.locator(selector):selector;
                 if (await el.count()) {
                   const first=el.first();
-                  if (await first.isVisible() && await first.isEditable()) { await first.fill(value); return true; }
+                  if (await first.isVisible() && await first.isEditable()) { await first.fill(value); await first.press('Tab').catch(()=>{}); return true; }
                 }
               } catch {}
             }
@@ -74,7 +74,7 @@ jobs:
             const r={id:surface.id,surface:surface.url,attempted:true,submitted:false,successSignal:false,skippedForIdentity:false,identityField:null,blockedByHumanVerification:false,finalUrl:null,error:null,bodyText:''};
             try {
               await page.goto(surface.url,{waitUntil:'domcontentloaded',timeout:60000});
-              await page.waitForTimeout(1500);
+              await page.waitForTimeout(1800);
               let body=(await page.locator('body').innerText()).slice(0,12000);
               if (/captcha|turnstile|verify you are human|cloudflare challenge|hcaptcha/i.test(body)) {r.blockedByHumanVerification=true; throw new Error('Human-verification gate detected; no bypass attempted.');}
               const idField=await requiredIdentity(page);
@@ -86,14 +86,15 @@ jobs:
                 const pitchOk=await fill(page,[page.getByLabel(/one-line pitch|pitch/i),'textarea','input[name*="pitch" i]'],product.pitch);
                 await fill(page,[page.getByLabel(/category/i),'input[name*="category" i]'],'AI tool, SaaS, founder research');
                 if(!nameOk||!urlOk||!pitchOk) throw new Error(`Required startup fields missing (name=${nameOk}, url=${urlOk}, pitch=${pitchOk}).`);
+                await page.waitForTimeout(4000);
                 const btn=page.getByRole('button',{name:/post it/i}).first();
                 if(!(await btn.count())) throw new Error('Post button not found.');
+                if(!(await btn.isEnabled())) throw new Error('Post button remained disabled after all public fields were filled; no bypass attempted.');
                 await btn.click({timeout:30000});
               } else {
                 const urlOk=await fill(page,[page.getByLabel(/website url/i),'input[type="url"]','input[name*="url" i]'],product.url);
                 await fill(page,[page.getByLabel(/website name/i),'input[name*="name" i]'],product.name);
                 const descOk=await fill(page,[page.getByLabel(/short description/i),'textarea','input[name*="description" i]'],product.description);
-                // Honeypot: explicitly leave any field labelled 'Leave this field empty' blank.
                 const inputs=page.locator('input');
                 for(let i=0;i<await inputs.count();i++){
                   const el=inputs.nth(i);
@@ -109,6 +110,8 @@ jobs:
                   if(idx>=0) await sel.selectOption({index:idx});
                 }
                 if(!urlOk||!descOk) throw new Error(`Required website fields missing (url=${urlOk}, desc=${descOk}).`);
+                // Zearches explicitly rejected the first automation as "too fast". Respect that public anti-spam rule rather than bypassing it.
+                await page.waitForTimeout(9000);
                 const btn=page.getByRole('button',{name:/submit website.*free|submit website|submit/i}).first();
                 if(!(await btn.count())) throw new Error('Submit button not found.');
                 await btn.click({timeout:30000});
@@ -117,7 +120,8 @@ jobs:
               await page.waitForTimeout(6000);
               r.submitted=true;r.finalUrl=page.url();r.bodyText=(await page.locator('body').innerText()).slice(0,12000);
               r.blockedByHumanVerification=/captcha|turnstile|verify you are human|cloudflare challenge|hcaptcha/i.test(r.bodyText);
-              r.successSignal=/you.?re live|live immediately|submitted|success|thank|saved|listed|latest submissions/i.test(r.bodyText)&&!/error|failed|invalid|required.*email/i.test(r.bodyText)&&!r.blockedByHumanVerification;
+              const explicitFailure=/status=error|too fast|error|failed|invalid|required.*email/i.test(`${r.finalUrl}\n${r.bodyText}`);
+              r.successSignal=/you.?re live|live immediately|submitted successfully|success|thank you|saved|listed|latest submissions/i.test(r.bodyText)&&!explicitFailure&&!r.blockedByHumanVerification;
             } catch(e){r.error=String(e?.message||e);try{r.finalUrl=page.url();r.bodyText=(await page.locator('body').innerText()).slice(0,12000);}catch{}}
             finally{await page.close();}
             return r;
