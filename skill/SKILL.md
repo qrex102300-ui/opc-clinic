@@ -1,6 +1,9 @@
 ---
 name: opc-clinic
-description: "一个会拷问创业者的 AI 业务诊断官。当用户想诊断自己的创业项目、一人公司或小微业务卡在哪里时使用——尤其是用户描述了某个具体卡点(没人付费、卡住了、涨不上去、不知道方向对不对、转化低、留不住用户等)并想找到真正的病因和行动项时。触发场景包括:'诊断我的项目''我的产品卡住了''帮我看看问题在哪''为什么没人买''我该不该继续做''分析一下我的业务'等。它不给放之四海皆准的通用建议,而是像一个不留情面的诊断官,一层层追问,把症状追到病因。An AI diagnostician for solo founders and small businesses (OPC) stuck at any stage."
+description: "Evidence-first business diagnostician for solo founders and small teams with a launched or tested product that is stuck on conversion, retention, growth, pricing, positioning, or deciding what to do next. It interrogates the founder's own facts, identifies the most plausible bottleneck, and ends with concrete actions instead of generic startup advice."
+version: 1.0.0
+platforms: [openclaw, claude, openai]
+metadata: {"openclaw":{"emoji":"🩺"},"platforms":["openclaw","claude","openai"]}
 license: MIT
 ---
 
