@@ -1,0 +1,30 @@
+name: Test RFQ quote proof
+
+on:
+  push:
+    branches:
+      - revenue-b-rfq-proof-20260910
+    paths:
+      - 'experiments/rfq_quote_demo/**'
+      - '.github/workflows/test-rfq-quote-proof.yml'
+  pull_request:
+    paths:
+      - 'experiments/rfq_quote_demo/**'
+      - '.github/workflows/test-rfq-quote-proof.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: experiments/rfq_quote_demo
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt
+      - run: python -m unittest -v test_rfq_quote.py
