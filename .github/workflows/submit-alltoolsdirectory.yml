@@ -1,0 +1,130 @@
+name: Submit OPC Clinic to AllToolsDirectory
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-alltoolsdirectory.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright@1.55.0
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$browser"
+          echo "BROWSER_EXECUTABLE=$browser" >> "$GITHUB_ENV"
+      - name: Submit through designated public tool form
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > alltools.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          import fs from 'fs';
+          const result={surface:'https://www.alltoolsdirectory.com/submit',attempted:true,usedIdentity:false,usedEmail:false,usedPayment:false,submitted:false,acceptedSignal:false,liveSignal:false,error:null,finalUrl:'',bodyText:''};
+          const browser=await chromium.launch({headless:true,executablePath:process.env.BROWSER_EXECUTABLE,args:['--no-sandbox']});
+          const page=await browser.newPage({viewport:{width:1440,height:1200}});
+          const fillFirst=async(selectors,value)=>{for(const s of selectors){const el=page.locator(s).first();if(await el.count()&&await el.isVisible().catch(()=>false)){await el.fill(value);return true;}}return false;};
+          try{
+            await page.goto(result.surface,{waitUntil:'domcontentloaded',timeout:60000});
+            await page.waitForTimeout(1800);
+            let body=(await page.locator('body').innerText()).slice(0,22000);
+            if(/captcha|turnstile|verify you are human|cloudflare challenge/i.test(body)) throw new Error('Human verification detected; stopped without bypass.');
+            const email=page.locator('input[type="email"],input[name*="email" i],input[placeholder*="email" i]');
+            for(let i=0;i<await email.count();i++){
+              if(await email.nth(i).isVisible().catch(()=>false) && await email.nth(i).getAttribute('required')!==null) throw new Error('Required email field detected; stopped without identity use.');
+            }
+            await fillFirst(['input[name="name"]','input[placeholder*="tool name" i]'],'OPC Clinic');
+            await fillFirst(['input[name*="author" i]','input[name*="organization" i]','input[placeholder*="organization" i]'],'OPC Clinic');
+            await fillFirst(['input[name*="short" i]','input[placeholder*="short description" i]'],'Evidence-backed startup bottleneck diagnosis for solo founders.');
+            const textareas=page.locator('textarea');
+            if(await textareas.count()){
+              const long='OPC Clinic diagnoses the highest-leverage bottleneck in a launched or tested startup using observable evidence, then produces a focused 7-day experiment plan. It offers a free bottleneck triage and an optional $59 evidence-backed diagnosis.';
+              await textareas.first().fill(long);
+            }
+            await fillFirst(['input[name*="website" i]','input[placeholder*="official website" i]','input[type="url"]'],'https://qrex102300-ui.github.io/opc-clinic/');
+            const urls=page.locator('input[type="url"],input[placeholder*="github" i]');
+            for(let i=0;i<await urls.count();i++){
+              const ph=(await urls.nth(i).getAttribute('placeholder')||'');
+              if(/github/i.test(ph)) {await urls.nth(i).fill('https://github.com/qrex102300-ui/opc-clinic'); break;}
+            }
+            const selects=page.locator('select');
+            for(let i=0;i<await selects.count();i++){
+              const s=selects.nth(i); const opts=await s.locator('option').allTextContents();
+              const ai=opts.find(x=>/AI Agent|Artificial Intelligence|AI Tool/i.test(x));
+              const free=opts.find(x=>/Free|Open Source/i.test(x));
+              if(ai) {await s.selectOption({label:ai}).catch(()=>{}); continue;}
+              if(free) await s.selectOption({label:free}).catch(()=>{});
+            }
+            const checkLabels=['Web','Browser'];
+            for(const lbl of checkLabels){const c=page.getByLabel(lbl,{exact:true}).first();if(await c.count()&&await c.isVisible().catch(()=>false)){await c.check().catch(()=>{});break;}}
+            await fillFirst(['input[name*="tag" i]','input[placeholder*="tags" i]'],'startup, solopreneur, diagnosis, AI, experiments');
+            const emailVisible=page.locator('input[type="email"]:visible');
+            if(await emailVisible.count()){
+              // Never populate identity/contact data. Only proceed if the form permits it to stay blank.
+              for(let i=0;i<await emailVisible.count();i++) if(await emailVisible.nth(i).getAttribute('required')!==null) throw new Error('Required email field detected; stopped without identity use.');
+            }
+            const submit=page.getByRole('button',{name:/submit tool|submit/i}).last();
+            if(!(await submit.count())) throw new Error('Designated submit button not found.');
+            if(await submit.isDisabled().catch(()=>false)) throw new Error('Submit button disabled with public fields only; stopped without workaround.');
+            await submit.click({timeout:30000});
+            result.submitted=true;
+            await page.waitForTimeout(5000);
+            result.finalUrl=page.url();
+            body=(await page.locator('body').innerText()).slice(0,26000);
+            result.bodyText=body;
+            if(/captcha|turnstile|verify you are human/i.test(body)) throw new Error('Human verification appeared after submit; no bypass attempted.');
+            result.acceptedSignal=/thank|submitted|received|review|success|24-48/i.test(body)&&!/error|failed|invalid|required/i.test(body);
+            const verify=await browser.newPage();
+            try{
+              await verify.goto('https://www.alltoolsdirectory.com/',{waitUntil:'domcontentloaded',timeout:60000});
+              await verify.waitForTimeout(1200);
+              const t=(await verify.locator('body').innerText()).slice(0,30000);
+              result.liveSignal=/OPC Clinic/i.test(t);
+            }catch{}
+            await verify.close();
+            if(result.liveSignal) result.acceptedSignal=true;
+          }catch(e){result.error=String(e?.message||e);try{result.finalUrl=page.url();result.bodyText=(await page.locator('body').innerText()).slice(0,20000)}catch{}}
+          await page.close();await browser.close();
+          fs.writeFileSync('/tmp/alltools-result.json',JSON.stringify(result,null,2));
+          EOF
+          node alltools.mjs || true
+          rm -f alltools.mjs
+      - name: Write audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          {
+            echo '# AllToolsDirectory submission audit'
+            echo
+            echo "Last attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'The public submission page advertises free submission with no login. The guarded run uses only public OPC Clinic project information and leaves contact email/social fields blank.'
+            echo 'No personal identity, owner email, private credential, payment, CAPTCHA bypass, or unrelated-community promotion is used.'
+            echo
+            echo '```json'
+            jq . /tmp/alltools-result.json
+            echo '```'
+          } > ops/alltoolsdirectory-submission.md
+      - name: Commit audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/alltoolsdirectory-submission.md
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record AllToolsDirectory submission'
+          git pull --rebase origin main
+          git push
