@@ -1,13 +1,13 @@
 # OPC Clinic Revenue Sprint — Auditable Scorecard
 
-Last checked: **2026-09-10 16:28 CST**  
+Last checked: **2026-09-10 17:31 CST**  
 Experiment window: **2026-09-09 → 2026-09-15**
 
 This is the canonical operational count for the 7-day revenue sprint. Counts move only on observable evidence. A directory submission is not a lead; a lead is not revenue; only confirmed collected payment counts as revenue.
 
 | Metric | Current | Evidence rule |
 |---|---:|---|
-| Confirmed external listings / referral surfaces | **6** | Public listing or directory/API evidence confirms OPC Clinic is live |
+| Confirmed external listings / referral surfaces | **7** | Public listing or directory/API evidence confirms OPC Clinic is live |
 | Pending external directory / registry reviews | **6** | Submission accepted but not yet confirmed as a default public listing |
 | Inbound free-triage submissions | **0** | A real external user opens a `[Free Triage]` case |
 | Qualified leads | **0** | Launched/tested product + real evidence + near-term decision; case fits deeper diagnosis |
@@ -27,6 +27,7 @@ This is the canonical operational count for the 7-day revenue sprint. Counts mov
 4. **SaaS Scout** — public no-login API accepted OPC Clinic with HTTP 201 and `status: approved`; detailed evidence: [`saasscout-submission.md`](./saasscout-submission.md).
 5. **TechTools Launchpad** — bot-friendly public API accepted OPC Clinic with HTTP 201 and a follow-up GET verified the record was live; detailed evidence: [`techtools-launchpad-submission.md`](./techtools-launchpad-submission.md).
 6. **Zearches** — designated public identity-free submission returned `status=ok`, and the live directory immediately showed OPC Clinic under **Software & SaaS Tools**, marked `Added Sep 10, 2026`; detailed evidence: [`free-directory-round4.md`](./free-directory-round4.md).
+7. **AgentMRR** — public agent-native registration and product APIs returned HTTP 201, then the public product API independently returned OPC Clinic with `status: active`; no user identity, email, private credential, card, payment, or spend was used. Detailed evidence: [`agentmrr-submission.md`](./agentmrr-submission.md).
 
 ## Pending reviews / accepted submissions
 
@@ -39,7 +40,7 @@ This is the canonical operational count for the 7-day revenue sprint. Counts mov
 
 ## Intake / revenue checkpoint
 
-GitHub Issues check at **2026-09-10 16:28 CST**: **0 customer issues**.
+GitHub Issues check at **2026-09-10 17:31 CST**: **0 customer issues**.
 
 - New free-triage submissions: **0**
 - Qualified leads: **0**
@@ -53,9 +54,9 @@ There is therefore no customer case or paid diagnosis to fulfill at this checkpo
 
 ## Latest acquisition checkpoint
 
-The 16:28 CST run remained acquisition-first and made no landing-page, product, pricing, copy, or SEO changes. It triggered a legitimate no-account/no-card **AgentsIndex** submission path using only public product fields; that job was still in progress at the checkpoint, so it is not yet counted as accepted or live. It also re-verified **Linkrena** without duplicate submission; the public API still did not show OPC Clinic. Fresh screening rejected Tectalks and ToolScout because sign-in is required, ListAi.cc/AISO Tools/The Next AI because contact email is required, Stork.AI/AI Tool Discovery because the free route requires a reciprocal site badge, and AIListingTool because there is no free tier.
+The 17:31 CST run stayed acquisition-first and made no landing-page, product, pricing, copy, or SEO changes. It added **AgentMRR** as the seventh independently confirmed live discovery surface through an identity-free agent-native path: registration and product submission both returned HTTP 201, and a separate public GET verified the listing as `active`. The earlier **AgentsIndex** browser attempt timed out without acceptance evidence and is therefore not counted or blindly retried. Fresh screening continued to reject routes that require sign-in, contact email, reciprocal badges/backlinks, or payment rather than impersonating the owner or forcing access.
 
-Detailed audit: [`acquisition-run-2026-09-10-1628-cst.md`](./acquisition-run-2026-09-10-1628-cst.md).
+Detailed audit: [`acquisition-run-2026-09-10-1731-cst.md`](./acquisition-run-2026-09-10-1731-cst.md).
 
 ## Operating rule
 
