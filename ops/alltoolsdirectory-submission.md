@@ -2,21 +2,30 @@
 
 Last attempted: 2026-09-10T13:54:57Z
 
-The public submission page advertises free submission with no login. The guarded run uses only public OPC Clinic project information and leaves contact email/social fields blank.
-No personal identity, owner email, private credential, payment, CAPTCHA bypass, or unrelated-community promotion is used.
+Surface: https://www.alltoolsdirectory.com/submit
+
+The public page advertises free submission with no login. A guarded browser attempt used only public OPC Clinic project information and left contact email/social fields blank. No personal identity, owner email, private credential, payment, CAPTCHA bypass, or unrelated-community promotion was used.
+
+## Result
+
+**NOT SUBMITTED / DO NOT COUNT.**
+
+The browser reached the designated submit action, but the form then displayed **“Please enter a valid email address”** while remaining on the submission page. That validation is stronger evidence than the first-pass automation heuristic that had marked `acceptedSignal: true` merely because static page copy contained words such as “review”. There was no success/thank-you state, no redirect, and no live OPC Clinic directory entry.
+
+Classification:
 
 ```json
 {
-  "surface": "https://www.alltoolsdirectory.com/submit",
   "attempted": true,
+  "submissionAccepted": false,
+  "live": false,
+  "blockedByRequiredEmail": true,
   "usedIdentity": false,
   "usedEmail": false,
   "usedPayment": false,
-  "submitted": true,
-  "acceptedSignal": true,
-  "liveSignal": false,
-  "error": null,
-  "finalUrl": "https://www.alltoolsdirectory.com/submit",
-  "bodyText": "Skip to main content\nAllToolsDirectory\nMCP Servers\nAI Agents\nDesign Tools\nFigma Plugins\nSubmit Tool\nAllToolsDirectory\nMCP Servers\nDesign Tools\nFigma Plugins\nAI Agents\nBlog\nSubmit Tool\nSubmit Your Tool\n\nJoin our comprehensive directory platform and get discovered by 500K+ monthly users worldwide.\n\n500K+ Users\n\nGet discovered by our massive community of developers and users\n\nQuick Review\n\nWe review and approve submissions within 24-48 hours\n\nFree Submission\n\nSubmit your tool completely free with no hidden costs\n\nTool Information\n\nFill out the details below to submit your tool\n\nWhat Type of Tool Is It?\nAI Agent\nAI Tool\nMCP Server\nVibe Coding Tool\nDesign Tool\nDevelopment Tool\nBasic Information\nTool Name\nAuthor/Organization\nShort Description\nLong Description\nLinks & Documentation\nOfficial Website URL\nGitHub Repository\n\nPaste official website link if you don't have the GitHub repo\n\nClassification\nCategory\nSelect category\nDeveloper Tools\nProductivity\nAI & ML\nData Analysis\nDesign Tool\nCommunication\nSecurity\nFile Management\nWeb Development\nUtilities\nOther\nPricing Model\nSelect pricing model\nFree\nPremium\nFreemium\nOpen-Source\nSupported Platforms\nWeb\nBrowser Extension\nCursor\nClaudeCode\nVS Code Extension\nJetBrains IDEs\nCLI\nAPI\nOther\nTags\nFeatures & Information\nKey Features\nContact Information\nContact Email\n\nPlease enter a valid email address\n\nSocial Profiles\nAdditional Information\nScreenshots/Demo URLs\nAdditional Notes\nSubmit Tool\n2,000+ tools curated\nFree submission — no login\nReviewed within 24–48h\nWhy Submit Your Tool to AllToolsDirectory?\n\nAllToolsDirectory is the most comprehensive platform for discovering developer tools, design resources, AI agents, and MCP servers. With over 500,000 monthly users actively searching for solutions, submitting your tool gives you immediate access to a highly engaged audience of developers, designers, and technology professionals.\n\nOur platform covers four major categories: MCP servers (Model Context Protocol servers for AI applications), design tools (UI/UX tools, prototyping software, and creative applications), AI agents (chatbots, automation tools, and AI assistants), and Figma plugins (design system tools, prototyping extensions, and workflow automation). Each category receives dedicated traffic from users specifically looking for tools in that space.\n\nUnlike other directories that simply list tools with minimal information, we provide comprehensive tool pages that include detailed feature breakdowns, pricing comparisons, integration capabilities, user reviews, and direct comparison tools. Your submission will be featured alongside industry-leading tools, giving you visibility among decision-makers and early adopters who are actively evaluating solutions.\n\nWhat We Accept\nMCP Servers: Protocol servers, AI integrations, context providers\nDesign Tools: UI/UX tools, prototyping software, design systems\nAI Agents: Chatbots, automation tools, AI assistants\nFigma Plugins: Design extensions, workflow tools, integrations\nSubmission Requirements\nActive project with public documentation or website\nClear description of features and use cases\nPricing information (even if free or open source)\nLogo or icon (PNG, SVG, or image URL)\nSubmission Checklist\n\nBefore you send a new listing through the form, review this quick checklist so we can publish your tool faster.\n\nWhat to Include\n\nLink to a live product page or documentation site so editors can validate pricing and capabilities. Repos without usage docs typically require multiple follow-ups.\n\nShare the primary use case, the audience you serve, and the core differentiators. That context helps us place your tool inside the correct filters and comparisons.\n\nTurnaround Expectations\n\nSubmissions with complete information are usually reviewed within 48 hours on business days. If we need clarification, we email from support@alltoolsdirectory.com with specific questions.\n\nHow We Publish\n\nListings go live with feature bullets, integrations, and pricing summaries. We send a confirmation email with the public URL so you can share it with your community.\n\nAllToolsDirectory\n\nDiscover the best tools for developers, designers, and creators. Curated directories of MCP Servers, Design Tools, Figma Plugins, and AI Agents.\n\nDIRECTORIES\nMCP Servers\nDesign Tools\nFigma Plugins\nAI Agents\nRESOURCES\nBlog\nSubmit Tool\nSearch\nCOMPANY\nEditorial Policy\nSTAY UPDATED\n\nGet the latest tools and resources delivered to your inbox.\n\nSubscribe\n\n© 2026 AllToolsDirectory. All rights reserved.\n\nTOOL CATEGORIES\nMCP Servers\nAI Agents\nFigma Plugins\nDesign Tools\nPOPULAR\nTrending MCP Servers\nFree Figma Plugins\nAI Coding Assistants\nAll Collections\nRESOURCES\nBlog & Guides\nSubmit a Tool\nAdvertise\nAbout\nLEGAL\nPrivacy Policy\nTerms of Service\nContact\n\n© 2026 AllToolsDirectory. All rights reserved.\n\nHelping developers and designers find the best tools since 2024."
+  "countAsConfirmedListing": false,
+  "countAsPendingReview": false
 }
 ```
+
+This surface should not be retried during the sprint unless the owner explicitly supplies/authorizes an email identity for directory submissions.
