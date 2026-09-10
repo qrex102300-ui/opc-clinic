@@ -1,6 +1,6 @@
 # OPC Clinic Revenue Sprint — Auditable Scorecard
 
-Last checked: **2026-09-10 18:00 CST**  
+Last checked: **2026-09-10 18:58 CST**  
 Experiment window: **2026-09-09 → 2026-09-15**
 
 This is the canonical operational count for the 7-day revenue sprint. Counts move only on observable evidence. A directory submission is not a lead; a lead is not revenue; only confirmed collected payment counts as revenue.
@@ -40,7 +40,7 @@ This is the canonical operational count for the 7-day revenue sprint. Counts mov
 
 ## Intake / revenue checkpoint
 
-GitHub Issues check at **2026-09-10 18:00 CST**: **0 customer issues**.
+GitHub Issues check at **2026-09-10 18:58 CST**: **0 customer issues**.
 
 - New free-triage submissions: **0**
 - Qualified leads: **0**
@@ -54,9 +54,11 @@ There is therefore no customer case or paid diagnosis to fulfill at this checkpo
 
 ## Latest acquisition checkpoint
 
-The 18:00 CST run remained acquisition-first and made no landing-page, pricing, copy, or SEO changes. Fresh discovery focused on high-fit **agent-skill** surfaces rather than adding more generic startup directories. MCP.Directory exposes a public Skill submission route whose required input is only a public skill URL, so an identity-free submission was attempted through GitHub Actions. The post-submit page redirected to the generic **Submit a Server** form and returned no skill-specific receipt or acknowledgement; a broad workflow matcher initially produced a false-positive success signal. The audit was corrected immediately and **MCP.Directory is not counted** as either a live listing or a pending review. The path is not blindly retried to avoid duplicates; detailed evidence: [`mcp-directory-submission.md`](./mcp-directory-submission.md).
+The 18:49–18:58 CST run remained acquisition-first. It made **no landing-page, pricing, paid-funnel, or SEO-page changes**. One narrowly scoped interoperability change was made to `skill/SKILL.md` because multiple high-fit agent-skill registries parse the package metadata directly: semantic version `1.0.0`, supported-platform metadata, and a bounded trigger description. This is distribution compatibility for the existing open-source skill, not product polish.
 
-A second high-fit route, **anbeime/skill**, provides a designated `skill-submission` GitHub issue template and had no OPC Clinic duplicate in repository/issue search. The connected GitHub integration can read that external repository but returned HTTP 403 when asked to create the submission issue, so no external issue was posted and no owner identity was impersonated. **AgenticSkills** was also screened but its free submission requires both author name and email, so it was not attempted. A fresh search across the six already-pending directories returned no public OPC Clinic listing evidence, so the counts remain 7 confirmed / 6 pending. Acquisition remains the bottleneck.
+Three fresh designated skill-discovery routes were then exercised. **TrustedSkills** documents a zero-cost auto-discovery route for a compatible public skill repo, but its required `openclaw-skill` GitHub-topic update failed with HTTP 403 under the repository Actions token; no private token or identity workaround was used, and the surface is not counted. **Agent-Skills.md** accepted only a public GitHub folder URL in its designated repository-intake form, but the live service returned `Internal server error`; it is not counted and will not be blindly duplicated. **SkillKit** exposes a public GitHub-URL submission page, but the automated visit was stopped by Cloudflare bot verification before the form was available; no CAPTCHA/security bypass was attempted and it is not counted. Detailed evidence is in [`trustedskills-discovery.md`](./trustedskills-discovery.md), [`agent-skills-md-submission.md`](./agent-skills-md-submission.md), [`skillkit-submission.md`](./skillkit-submission.md), and the consolidated [`acquisition-run-2026-09-10-1849-cst.md`](./acquisition-run-2026-09-10-1849-cst.md).
+
+A fresh issue check still found no inbound triage or paid-order case. No new directory produced independent live-listing or accepted-review evidence, so the score remains **7 confirmed / 6 pending**. Acquisition remains the bottleneck.
 
 ## Operating rule
 
