@@ -1,0 +1,121 @@
+name: Submit OPC Clinic to Agent-Skills.md
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-agent-skills-md.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Prepare Playwright with runner browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright@1.55.0
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$browser" ]; then
+            echo 'No preinstalled Chromium-family browser found on the runner.' >&2
+            exit 1
+          fi
+          echo "BROWSER_EXECUTABLE=$browser" >> "$GITHUB_ENV"
+
+      - name: Submit designated repository intake form
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/submit-agent-skills.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          import fs from 'fs';
+
+          const result = {
+            surface: 'https://agent-skills.md/submit',
+            submittedUrl: 'https://github.com/qrex102300-ui/opc-clinic/tree/main/skill',
+            attempted: true,
+            finalUrl: '',
+            successSignal: false,
+            alreadyExists: false,
+            skillsAdded: null,
+            bodyText: '',
+            error: null
+          };
+
+          const browser = await chromium.launch({
+            headless: true,
+            executablePath: process.env.BROWSER_EXECUTABLE,
+            args: ['--no-sandbox']
+          });
+          const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
+
+          try {
+            await page.goto(result.surface, { waitUntil: 'domcontentloaded', timeout: 60000 });
+            const input = page.locator('input[name="repo-url"], #repo-url').first();
+            if (!(await input.count())) throw new Error('Repository URL field not found.');
+            await input.fill(result.submittedUrl);
+            const submit = page.getByRole('button', { name: /submit repository/i }).first();
+            if (!(await submit.count())) throw new Error('Submit repository button not found.');
+            await submit.click({ timeout: 30000 });
+            await page.waitForTimeout(8000);
+            result.finalUrl = page.url();
+            result.bodyText = (await page.locator('body').innerText()).slice(0, 12000);
+            result.alreadyExists = /repo updated|refreshed with/i.test(result.bodyText);
+            result.successSignal = /repo captured|parsed \d+ skills|repo updated|refreshed with/i.test(result.bodyText);
+            const match = result.bodyText.match(/(?:Parsed|refreshed with)\s+(\d+)\s+skills/i);
+            if (match) result.skillsAdded = Number(match[1]);
+          } catch (err) {
+            result.error = String(err?.message || err);
+            try {
+              result.finalUrl = page.url();
+              result.bodyText = (await page.locator('body').innerText()).slice(0, 12000);
+            } catch {}
+          } finally {
+            await page.close();
+            await browser.close();
+          }
+
+          fs.writeFileSync('/tmp/agent-skills-md-result.json', JSON.stringify(result, null, 2));
+          EOF
+          node /tmp/submit-agent-skills.mjs || true
+
+      - name: Write sanitized acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          {
+            echo '# Agent-Skills.md submission audit'
+            echo
+            echo "Last attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'Agent-Skills.md exposes a designated public repository-intake form that asks only for a public GitHub skills-folder URL. This attempt used that form directly and supplied no person identity, email, private credential, payment, or unsolicited community message.'
+            echo
+            echo '```json'
+            jq . /tmp/agent-skills-md-result.json
+            echo '```'
+            echo
+            echo 'Counting rule: treat this as a confirmed external listing only if the public directory can independently find OPC Clinic. A successful intake acknowledgement by itself is recorded as pending/accepted, not live.'
+          } > ops/agent-skills-md-submission.md
+
+      - name: Commit acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/agent-skills-md-submission.md
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'Record Agent-Skills.md submission'
+          git pull --rebase origin main
+          git push
