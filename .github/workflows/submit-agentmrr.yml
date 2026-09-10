@@ -1,0 +1,155 @@
+name: Submit OPC Clinic to AgentMRR
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-agentmrr.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Register acquisition agent and publish OPC Clinic
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          python - <<'PY'
+          import hashlib, json, urllib.request, urllib.error, datetime
+
+          BASE = "https://agentmrr.ai"
+          PROJECT = {
+              "name": "OPC Clinic",
+              "tagline": "Evidence-backed bottleneck diagnosis for solo founders stuck after launch.",
+              "type": "skill",
+              "category": "startup-diagnostics",
+              "description": "Open-source AI diagnostician plus a founding-beta service for solo and micro-team founders who already launched but are stuck. Free bottleneck triage first; accepted cases can buy a $59 evidence-backed diagnosis cross-checked against current competitors, customer complaints, pricing, and substitutes, ending in a concrete 7-day experiment plan.",
+              "github_url": "https://github.com/qrex102300-ui/opc-clinic",
+              "docs_url": "https://qrex102300-ui.github.io/opc-clinic/paid-diagnosis.html",
+              "pricing_model": "freemium",
+              "tags": ["solo-founders", "indie-hackers", "diagnosis", "validation", "go-to-market"]
+          }
+
+          def request_json(method, url, data=None, headers=None, timeout=20):
+              body = None if data is None else json.dumps(data).encode("utf-8")
+              h = {"Accept": "application/json", "User-Agent": "opc-clinic-acquisition-agent/1.0"}
+              if body is not None:
+                  h["Content-Type"] = "application/json"
+              if headers:
+                  h.update(headers)
+              req = urllib.request.Request(url, data=body, headers=h, method=method)
+              try:
+                  with urllib.request.urlopen(req, timeout=timeout) as r:
+                      raw = r.read().decode("utf-8", "replace")
+                      try: parsed = json.loads(raw)
+                      except Exception: parsed = {"raw": raw[:2000]}
+                      return r.status, parsed
+              except urllib.error.HTTPError as e:
+                  raw = e.read().decode("utf-8", "replace")
+                  try: parsed = json.loads(raw)
+                  except Exception: parsed = {"raw": raw[:2000]}
+                  return e.code, parsed
+
+          lines = [
+              "# AgentMRR acquisition submission audit",
+              "",
+              f"Attempted: {datetime.datetime.now(datetime.timezone.utc).isoformat()}",
+              "Surface: https://agentmrr.ai/",
+              "Public rules verified before execution: no login/form; agent registration uses a SHA-256 proof-of-work challenge; product publication is through the documented API.",
+              "No user identity, email, private credential, card, payment, or spend was used. The temporary API key issued to the acquisition agent is not written to logs or the repository.",
+              ""
+          ]
+
+          # Fresh proof-of-work challenge.
+          status, challenge = request_json("GET", BASE + "/api/agents/register")
+          lines.append(f"Challenge HTTP status: {status}")
+          nonce = challenge.get("nonce") if isinstance(challenge, dict) else None
+          difficulty = int(challenge.get("difficulty", 2)) if isinstance(challenge, dict) else 2
+          if status != 200 or not nonce:
+              lines.append("Result: NOT SUBMITTED — registration challenge was unavailable.")
+          else:
+              prefix = "0" * difficulty
+              solution = None
+              for i in range(2_000_000):
+                  s = str(i)
+                  if hashlib.sha256((nonce + s).encode()).hexdigest().startswith(prefix):
+                      solution = s
+                      break
+              if solution is None:
+                  lines.append("Result: NOT SUBMITTED — proof-of-work challenge was not solved within the safety bound.")
+              else:
+                  reg_payload = {
+                      "name": "OPC Clinic Acquisition Agent",
+                      "description": "Automated public-distribution operator for the open-source OPC Clinic; used only to publish this project on agent-native discovery surfaces.",
+                      "nonce": nonce,
+                      "solution": solution,
+                  }
+                  reg_status, reg = request_json("POST", BASE + "/api/agents/register", reg_payload)
+                  lines.append(f"Registration HTTP status: {reg_status}")
+                  api_key = reg.get("api_key") if isinstance(reg, dict) else None
+                  if not api_key:
+                      safe_reg = dict(reg) if isinstance(reg, dict) else {"response": str(reg)}
+                      safe_reg.pop("api_key", None)
+                      lines.append("Registration response (sanitized): `" + json.dumps(safe_reg, ensure_ascii=False)[:1200] + "`")
+                      lines.append("Result: NOT SUBMITTED — AgentMRR did not issue an API key.")
+                  else:
+                      p_status, presp = request_json(
+                          "POST", BASE + "/api/products", PROJECT,
+                          headers={"Authorization": "Bearer " + api_key}
+                      )
+                      lines.append(f"Product submission HTTP status: {p_status}")
+                      safe_p = dict(presp) if isinstance(presp, dict) else {"response": str(presp)}
+                      for k in list(safe_p):
+                          if "key" in k.lower() or "token" in k.lower():
+                              safe_p[k] = "[redacted]"
+                      lines.append("Submission response (sanitized): `" + json.dumps(safe_p, ensure_ascii=False)[:1600] + "`")
+
+                      # Independently verify the listing through the public read API; do not count only a write acknowledgement.
+                      v_status, listing = request_json("GET", BASE + "/api/products?sort=newest&limit=100")
+                      items = []
+                      if isinstance(listing, list):
+                          items = listing
+                      elif isinstance(listing, dict):
+                          for key in ("products", "items", "data"):
+                              if isinstance(listing.get(key), list):
+                                  items = listing[key]
+                                  break
+                      match = None
+                      for item in items:
+                          if not isinstance(item, dict):
+                              continue
+                          if item.get("name") == "OPC Clinic" or item.get("github_url") == PROJECT["github_url"]:
+                              match = item
+                              break
+                      lines.append(f"Public verification HTTP status: {v_status}")
+                      if match:
+                          safe_match = {k:v for k,v in match.items() if "key" not in k.lower() and "token" not in k.lower()}
+                          lines.append("Public listing evidence: `" + json.dumps(safe_match, ensure_ascii=False)[:1800] + "`")
+                          lines.append("Result: CONFIRMED LIVE — OPC Clinic is publicly discoverable in AgentMRR.")
+                      elif 200 <= p_status < 300:
+                          lines.append("Result: SUBMISSION ACCEPTED BUT NOT YET PUBLICLY VERIFIED — do not count as a confirmed listing until a later GET shows it.")
+                      else:
+                          lines.append("Result: NOT SUBMITTED/NOT VERIFIED — no public listing evidence observed.")
+
+          with open("ops/agentmrr-submission.md", "w", encoding="utf-8") as f:
+              f.write("\n".join(lines) + "\n")
+          PY
+
+      - name: Commit acquisition evidence and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -f .github/workflows/submit-agentmrr.yml
+          git add ops/agentmrr-submission.md .github/workflows/submit-agentmrr.yml
+          git commit -m 'Record AgentMRR acquisition submission'
+          git pull --rebase origin main
+          git push
