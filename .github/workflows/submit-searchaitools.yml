@@ -1,0 +1,161 @@
+name: Submit OPC Clinic to SearchAITools
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-searchaitools.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Prepare Playwright
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright@1.55.0
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$browser" ]; then echo 'No Chromium-family browser found.' >&2; exit 1; fi
+          echo "BROWSER_EXECUTABLE=$browser" >> "$GITHUB_ENV"
+
+      - name: Submit public project facts only
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > submit.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          import fs from 'fs';
+
+          const r = {
+            surface: 'https://searchaitool.com/submit',
+            attempted: true,
+            submitted: false,
+            successSignal: false,
+            blockedByIdentity: false,
+            blockedByHumanVerification: false,
+            error: null,
+            finalUrl: null,
+            bodyText: ''
+          };
+
+          const browser = await chromium.launch({headless:true, executablePath:process.env.BROWSER_EXECUTABLE, args:['--no-sandbox']});
+          const page = await browser.newPage({viewport:{width:1365,height:1100}});
+
+          async function fillByLabel(re, value) {
+            const loc = page.getByLabel(re).first();
+            if (await loc.count() && await loc.isVisible().catch(()=>false) && await loc.isEditable().catch(()=>false)) {
+              await loc.fill(value); return true;
+            }
+            return false;
+          }
+
+          async function selectBest(re, preferred) {
+            const loc = page.getByLabel(re).first();
+            if (!await loc.count() || !await loc.isVisible().catch(()=>false)) return false;
+            const opts = await loc.locator('option').allTextContents();
+            for (const rx of preferred) {
+              const i = opts.findIndex(x => rx.test(x));
+              if (i >= 0) { await loc.selectOption({index:i}); return true; }
+            }
+            const i = opts.findIndex(x => x.trim() && !/select|choose/i.test(x));
+            if (i >= 0) { await loc.selectOption({index:i}); return true; }
+            return false;
+          }
+
+          try {
+            await page.goto(r.surface, {waitUntil:'domcontentloaded', timeout:60000});
+            await page.waitForTimeout(1800);
+            const body = await page.locator('body').innerText();
+            if (/captcha|turnstile|hcaptcha|verify you are human|cloudflare challenge/i.test(body)) {
+              r.blockedByHumanVerification = true;
+              throw new Error('Human-verification gate detected; no bypass attempted.');
+            }
+
+            const submit = page.getByRole('button',{name:/submit for review/i}).first();
+            if (!await submit.count()) throw new Error('Submit for review button not found.');
+            const form = submit.locator('xpath=ancestor::form[1]');
+            if (!await form.count()) throw new Error('Submission form not found.');
+
+            const required = form.locator('input[required], textarea[required], select[required]');
+            for (let i=0; i<await required.count(); i++) {
+              const el = required.nth(i);
+              const meta = [await el.getAttribute('name'),await el.getAttribute('id'),await el.getAttribute('placeholder'),await el.getAttribute('aria-label'),await el.getAttribute('type')].filter(Boolean).join(' ').toLowerCase();
+              if (/email|e-mail|your name|founder name|owner name|contact name|phone|password/.test(meta)) {
+                r.blockedByIdentity = true;
+                throw new Error(`Required identity/contact field detected: ${meta}`);
+              }
+            }
+
+            const nameOk = await fillByLabel(/tool name/i, 'OPC Clinic');
+            const taglineOk = await fillByLabel(/tagline/i, 'Evidence-backed founder diagnosis for launched products stuck before revenue');
+            const urlOk = await fillByLabel(/website url/i, 'https://qrex102300-ui.github.io/opc-clinic/');
+            const categoryOk = await selectBest(/category/i, [/business/i,/startup/i,/productivity/i,/other/i]);
+            const pricingOk = await selectBest(/pricing/i, [/freemium/i,/free/i,/paid/i]);
+            await fillByLabel(/^description/i, 'Open-source AI founder diagnostician for launched products that have usage, demos, or positive feedback but weak or zero revenue. It identifies the evidence-backed bottleneck, checks contradictions, and turns the diagnosis into a measurable 7-day experiment. Core prompt is MIT licensed; optional evidence-backed founder diagnosis is a paid service.');
+            await fillByLabel(/logo url/i, 'https://qrex102300-ui.github.io/opc-clinic/');
+            await fillByLabel(/tags/i, 'startup, founder, SaaS, diagnosis, validation, revenue');
+            await fillByLabel(/pros/i, 'Evidence-backed bottleneck diagnosis\nConcrete 7-day pass/fail experiment\nOpen-source MIT prompt');
+            await fillByLabel(/cons/i, 'Best suited to launched products with enough context to diagnose\nPaid deep-dive is not a generic automated validation report');
+
+            if (!nameOk || !taglineOk || !urlOk || !categoryOk || !pricingOk) {
+              throw new Error(`Required public fields incomplete (name=${nameOk}, tagline=${taglineOk}, url=${urlOk}, category=${categoryOk}, pricing=${pricingOk}).`);
+            }
+
+            await page.waitForTimeout(1000);
+            if (!await submit.isEnabled().catch(()=>false)) throw new Error('Submit button remained disabled after required public fields were filled.');
+            await submit.click({timeout:30000});
+            await page.waitForTimeout(5000);
+            r.submitted = true;
+            r.finalUrl = page.url();
+            r.bodyText = (await page.locator('body').innerText()).slice(0,12000);
+            const combined = `${r.finalUrl}\n${r.bodyText}`;
+            const fail = /submission failed|could not submit|invalid|error submitting|try again/i.test(combined);
+            r.successSignal = /thank you|submitted|under review|received|review queue|success|within 48 hours/i.test(combined) && !fail;
+          } catch(e) {
+            r.error = String(e?.message || e);
+            try { r.finalUrl = page.url(); r.bodyText = (await page.locator('body').innerText()).slice(0,12000); } catch {}
+          } finally {
+            fs.writeFileSync('/tmp/searchaitools.json', JSON.stringify(r,null,2));
+            await browser.close();
+          }
+          EOF
+          node submit.mjs || true
+          rm -f submit.mjs
+
+      - name: Write acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          {
+            echo '# SearchAITools acquisition submission'
+            echo
+            echo "Attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'Public project facts only. No account, person/email identity, payment, private credential, unsolicited comment, or human-verification bypass was used.'
+            echo
+            echo '```json'
+            jq . /tmp/searchaitools.json
+            echo '```'
+          } > ops/searchaitools-submission.md
+
+      - name: Commit audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/searchaitools-submission.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Record SearchAITools acquisition submission'
+          git pull --rebase origin main
+          git push
