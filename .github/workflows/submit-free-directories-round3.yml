@@ -1,0 +1,258 @@
+name: Submit OPC Clinic to Free Directories Round 3
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-free-directories-round3.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Prepare Playwright
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright@1.55.0
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$browser" ]; then
+            echo 'No Chromium-family browser found.' >&2
+            exit 1
+          fi
+          echo "BROWSER_EXECUTABLE=$browser" >> "$GITHUB_ENV"
+
+      - name: Attempt designated public free-listing forms
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > submit-round3.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          import fs from 'fs';
+
+          const product = {
+            name: 'OPC Clinic',
+            url: 'https://qrex102300-ui.github.io/opc-clinic/',
+            github: 'https://github.com/qrex102300-ui/opc-clinic',
+            tagline: 'Evidence-backed founder diagnosis for launched products stuck before revenue.',
+            short: 'Evidence-backed founder diagnosis for launched products stuck before revenue.',
+            description: 'OPC Clinic is an open-source AI founder diagnostician for launched products that are stuck before reliable revenue. It traces symptoms to a likely bottleneck, checks the diagnosis against current market evidence, and turns it into a measurable 7-day experiment with a clear continue/kill rule. The core tool is free and MIT licensed; an optional $59 evidence-backed diagnosis is available for founders who want the research and experiment plan done for them.'
+          };
+
+          const surfaces = [
+            { id: 'brofindai', url: 'https://brofindai.com/submit' },
+            { id: 'indexofai', url: 'https://indexof.ai/submit' },
+            { id: 'aicollection', url: 'https://thataicollection.com/submit' },
+            { id: 'toolpromote', url: 'https://toolpromote.com/submit' },
+            { id: 'comeai', url: 'https://www.iatool.online/submit-tool/' }
+          ];
+
+          const browser = await chromium.launch({
+            headless: true,
+            executablePath: process.env.BROWSER_EXECUTABLE,
+            args: ['--no-sandbox']
+          });
+
+          function metaFor(el) {
+            return Promise.all([
+              el.getAttribute('name'), el.getAttribute('id'), el.getAttribute('placeholder'),
+              el.getAttribute('aria-label'), el.getAttribute('type')
+            ]).then(parts => parts.map(x => x || '').join(' ').toLowerCase());
+          }
+
+          async function hasRequiredIdentity(page) {
+            const inputs = page.locator('input[required], textarea[required], select[required]');
+            const n = await inputs.count();
+            for (let i = 0; i < n; i++) {
+              const el = inputs.nth(i);
+              const meta = await metaFor(el);
+              const type = (await el.getAttribute('type') || '').toLowerCase();
+              if (type === 'email' || /contact email|your email|email address|founder email|owner email/.test(meta)) {
+                return { blocked: true, field: meta };
+              }
+              if (/your name|founder name|owner name|contact name|submitted by/.test(meta)) {
+                return { blocked: true, field: meta };
+              }
+            }
+            return { blocked: false, field: null };
+          }
+
+          async function fillFirst(page, candidates, value) {
+            for (const locator of candidates) {
+              try {
+                if (await locator.count()) {
+                  const first = locator.first();
+                  if (await first.isVisible() && await first.isEditable()) {
+                    await first.fill(value);
+                    return true;
+                  }
+                }
+              } catch {}
+            }
+            return false;
+          }
+
+          async function chooseSelect(page, keywords, skip = []) {
+            const selects = page.locator('select');
+            const n = await selects.count();
+            for (let i = 0; i < n; i++) {
+              const sel = selects.nth(i);
+              try {
+                if (!(await sel.isVisible())) continue;
+                const meta = `${await sel.getAttribute('name') || ''} ${await sel.getAttribute('id') || ''} ${await sel.getAttribute('aria-label') || ''}`.toLowerCase();
+                if (skip.some(k => meta.includes(k))) continue;
+                const options = await sel.locator('option').allTextContents();
+                for (const kw of keywords) {
+                  const idx = options.findIndex(t => t.toLowerCase().includes(kw.toLowerCase()));
+                  if (idx >= 0) {
+                    await sel.selectOption({ index: idx });
+                    return options[idx];
+                  }
+                }
+              } catch {}
+            }
+            return null;
+          }
+
+          async function processSurface(surface) {
+            const page = await browser.newPage({ viewport: { width: 1365, height: 1000 } });
+            const result = {
+              id: surface.id,
+              surface: surface.url,
+              attempted: true,
+              submitted: false,
+              skippedForRequiredIdentity: false,
+              requiredIdentityField: null,
+              blockedByHumanVerification: false,
+              categorySelected: null,
+              pricingSelected: null,
+              finalUrl: null,
+              successSignal: false,
+              error: null,
+              bodyText: ''
+            };
+            try {
+              await page.goto(surface.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+              await page.waitForTimeout(1800);
+              const initial = (await page.locator('body').innerText()).slice(0, 14000);
+              if (/captcha|turnstile|verify you are human|cloudflare challenge|hcaptcha/i.test(initial)) {
+                result.blockedByHumanVerification = true;
+                throw new Error('Human-verification gate detected; stopped without bypass.');
+              }
+
+              const identity = await hasRequiredIdentity(page);
+              if (identity.blocked) {
+                result.skippedForRequiredIdentity = true;
+                result.requiredIdentityField = identity.field;
+                result.bodyText = initial;
+                return result;
+              }
+
+              const nameOk = await fillFirst(page, [
+                page.getByLabel(/tool name|product name|site name|app name/i),
+                page.locator('input[name*="tool" i][name*="name" i]'),
+                page.locator('input[name="name"]'),
+                page.locator('input[placeholder*="tool" i][placeholder*="name" i]')
+              ], product.name);
+
+              const urlOk = await fillFirst(page, [
+                page.getByLabel(/website url|tool url|product url|official website|site url|website/i),
+                page.locator('input[type="url"]'),
+                page.locator('input[name*="url" i]')
+              ], product.url);
+
+              const shortOk = await fillFirst(page, [
+                page.getByLabel(/tagline|one.?liner|short description|killer line/i),
+                page.locator('input[name*="tagline" i]'),
+                page.locator('input[name*="short" i]')
+              ], product.short);
+
+              const descOk = await fillFirst(page, [
+                page.getByLabel(/full description|description|about.*tool/i),
+                page.locator('textarea[name*="description" i]'),
+                page.locator('textarea')
+              ], product.description);
+
+              result.categorySelected = await chooseSelect(page, ['business', 'productivity', 'marketing', 'startup', 'research', 'other'], ['pricing']);
+              result.pricingSelected = await chooseSelect(page, ['freemium', 'free', 'paid', 'other'], ['category']);
+
+              if (!nameOk || !urlOk) throw new Error(`Core product fields not found (name=${nameOk}, url=${urlOk}).`);
+              if (!shortOk && !descOk) throw new Error('No writable tagline/description field found.');
+
+              // Re-check after dynamic form progression. Do not provide private email/person identity.
+              const identityAfter = await hasRequiredIdentity(page);
+              if (identityAfter.blocked) {
+                result.skippedForRequiredIdentity = true;
+                result.requiredIdentityField = identityAfter.field;
+                return result;
+              }
+
+              const submit = page.getByRole('button', { name: /submit|list.*tool|add.*tool|send/i }).first();
+              if (!(await submit.count())) throw new Error('Submit button not found.');
+              await submit.click({ timeout: 30000 });
+              await page.waitForTimeout(7000);
+
+              result.submitted = true;
+              result.finalUrl = page.url();
+              result.bodyText = (await page.locator('body').innerText()).slice(0, 14000);
+              result.blockedByHumanVerification = /captcha|turnstile|verify you are human|cloudflare challenge|hcaptcha/i.test(result.bodyText);
+              result.successSignal = /thank|submitted|submission received|success|pending|review|added|published|live/i.test(result.bodyText)
+                && !/required.*email|email.*required|error|failed|invalid/i.test(result.bodyText)
+                && !result.blockedByHumanVerification;
+            } catch (err) {
+              result.error = String(err?.message || err);
+              try {
+                result.finalUrl = page.url();
+                result.bodyText = (await page.locator('body').innerText()).slice(0, 14000);
+              } catch {}
+            } finally {
+              await page.close();
+            }
+            return result;
+          }
+
+          const results = [];
+          for (const surface of surfaces) results.push(await processSurface(surface));
+          fs.writeFileSync('/tmp/free-directory-round3.json', JSON.stringify(results, null, 2));
+          await browser.close();
+          EOF
+          node submit-round3.mjs || true
+          rm -f submit-round3.mjs
+
+      - name: Write sanitized acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          {
+            echo '# Free directory acquisition round 3'
+            echo
+            echo "Last attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'Goal: expand legitimate zero-cost external discovery using only designated public submission forms.'
+            echo 'Guardrails: no unsolicited comments, no paid spend, no private credentials, no owner/person identity, and no CAPTCHA or human-verification bypass. Any surface requiring identity is skipped before submission.'
+            echo
+            echo '```json'
+            jq . /tmp/free-directory-round3.json
+            echo '```'
+          } > ops/free-directory-round3.md
+
+      - name: Commit acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/free-directory-round3.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Record free directory acquisition round 3'
+          git pull --rebase origin main
+          git push
