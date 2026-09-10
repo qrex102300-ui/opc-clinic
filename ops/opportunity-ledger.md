@@ -1,6 +1,7 @@
 # AI Make Money — Revenue Opportunity Ledger
 
-Last scout: **2026-09-10 22:13 CST**
+Last scout: **2026-09-10 22:13 CST**  
+Independent review: **2026-09-10 22:26 CST**
 
 Goal: maximize probability of the first **real collected dollar within 48 hours** and reach **$100+ collected revenue by 2026-09-15**, with **$0 new spend**. This ledger ranks opportunities by buyer pain, distribution access, digital deliverability, automation fit, margin, repeatability, identity/payment friction, and evidence quality. Buildability alone is not a reason to launch.
 
@@ -10,48 +11,50 @@ Goal: maximize probability of the first **real collected dollar within 48 hours*
 2. **Real transactions beat simulated demand.** Anthropic Project Deal showed agents can negotiate and close real transactions autonomously, and stronger models produced better commercial outcomes. The experiment also surfaced security and authorization risks, so any autonomous selling must stay inside explicit limits.
 3. **Outcome-first offer, not generic “AI automation.”** Current freelancer-market evidence shows real demand for narrowly scoped production automations, but supply is crowded. Public practitioner feedback consistently favors a named niche, fixed scope, measurable outcome, turnaround, and receipts over a generic tool list.
 4. **Kill low-liquidity channels quickly.** Algora currently shows zero open bounties; GitProduct's visible open tasks are currently unfunded and its own earn page shows only 7 completed / $72 total. These are not survival-sprint priorities today.
+5. **Category demand is not an activated experiment.** A new live experiment must have a named buyer or named live task plus a legitimate reach path. Marketplace demand evidence alone is not enough.
 
 ## Ranked opportunities
 
 | Rank | Opportunity | 48h first-dollar probability | Why now | Main friction | Decision |
 |---|---|---:|---|---|---|
-| **1** | **24h Production Automation Rescue** — diagnose and harden a broken or fragile n8n/API workflow with an evidence-backed fix + reliability checklist | **Medium** | Freelancer's live workflow-automation market currently includes production n8n/API jobs such as ServiceM8+n8n (~$344 avg bid), a 3-second lead-response system (~$449), and a WhatsApp AI agent (~$560). A recent r/n8n production post describes concrete failure modes that directly cost leads: blocked executions, log growth, rotating webhook URLs, and lost encryption keys. | Buyer acquisition requires a legitimate freelancer-market account/profile or another allowed direct-buyer channel; competition is high. | **PROMOTE to live Experiment B.** Do not build another generic automation site. Package one specific rescue outcome and pursue legitimate buyer-intent surfaces. |
-| **2** | **Agent-native micro-contract worker** — research, QA, code review, integration, and automation tasks sold directly to other agents/marketplaces | **Low–Medium until onboarding is solved** | NEAR Agent Market's current site claims 1,284 agents, 42,118 jobs/week, $1.2M paid to builders, and USDC settlement; AgentHire advertises API-first agent jobs and x402 USDC payments. This is structurally closer to Project Deal than directory traffic because buyers already arrive with task intent. | Requires marketplace registration and a compatible wallet/payment identity. AgentHire hides jobs until registration; NEAR requires account/wallet setup. We must not invent or control the owner's financial identity. | **PROMOTE to Experiment C, BLOCKED on wallet/account authorization.** Validate one real payable task before any product build. |
+| **1** | **24h Production Automation Rescue** — diagnose and harden a broken or fragile n8n/API workflow with an evidence-backed fix + reliability checklist | **Medium only after buyer gate passes** | Freelancer's live workflow-automation market contains production n8n/API jobs and recent practitioner evidence describes concrete failure modes that can lose leads or require manual babysitting. | No named buyer + authenticated legitimate application channel has yet been activated. Competition is high. | **READY / NOT LIVE.** Promote only after one named buyer/job, allowed contact path, bounded scope and payment path are verified. |
+| **2** | **Agent-native micro-contract worker** — research, QA, code review, integration, and automation tasks sold directly to other agents/marketplaces | **Low–Medium until onboarding is solved** | Agent marketplaces advertise API-first work and machine settlement, structurally closer to real transaction intent than directory traffic. | Requires legitimate marketplace registration and compatible wallet/payment identity; real payable task inventory must be verified after onboarding. | **PREP / NOT LIVE, BLOCKED on wallet/account authorization.** Validate one real payable task before any product build. |
 
 ## Existing experiment comparison
 
 ### Experiment A — OPC Clinic founder diagnosis
 
-Current observable state at 21:56 CST: **7 confirmed external listings, 7 pending reviews, 0 inbound triage, 0 qualified leads, 0 paid orders, $0 revenue**. Acquisition remains the bottleneck. Keep it running because the product and fulfillment path already exist, but cap further funnel polishing unless real user behavior identifies a defect.
+Current independently audited state at 22:26 CST: **6 confirmed external listings, 7 pending reviews, 0 inbound triage, 0 qualified leads, 0 paid orders, $0 revenue**. Acquisition remains the bottleneck. Keep it running because the product and fulfillment path already exist, but cap further funnel polishing unless real user behavior identifies a defect. One previously counted Agent Directory API surface was removed from confirmed because a 409 handle collision was not sufficient proof of a matching live record.
 
 ### Experiment B — 24h Production Automation Rescue
 
 **Offer hypothesis:** “Bring one n8n/API workflow that is failing, fragile, losing leads, or requiring manual babysitting. Within 24 hours: failure diagnosis, prioritized fix, production-hardening changes where access is available, and a runbook covering retries, state, logging, webhook stability, credential recovery, and rollback.”
 
-**Buyer:** agencies, SMB operators, and founders already running n8n/API workflows where failures create lost leads, missed appointments, billing errors, or operator time.
+**Buyer gate:** one named buyer or named live job must already have a broken/fragile production workflow and an explicit legitimate application/contact path.
 
-**Why this beats generic automation:** it sells an urgent outcome on an existing system rather than asking a buyer to fund a vague transformation project. It also matches our actual stack: n8n, Python/JS, APIs, GitHub, evaluation, and evidence-based diagnosis.
+**Why this beats generic automation:** it sells an urgent outcome on an existing system rather than asking a buyer to fund a vague transformation project. It also matches the available stack: n8n, Python/JS, APIs, GitHub, evaluation, and evidence-based diagnosis.
 
-**Next execution gate:** locate a buyer-intent surface where applying is explicitly allowed; do not cold-spam communities. If a marketplace account is available, target small fixed-scope jobs first and use a short evidence-based proposal. If no authenticated channel exists, keep the opportunity READY but do not fake outreach.
+**Current state:** READY, **not live**. Current market evidence supports the problem class, but no named buyer + authenticated reach path has yet passed the sprint launch gate. Do not claim outreach, a lead, or an offer until that happens.
 
 ### Experiment C — Agent-native micro-contract worker
 
 **Offer hypothesis:** machine-readable services for research, QA, code review, API integration, and automation debugging, priced per task and fulfilled automatically.
 
-**Why it matters:** it removes much of the human sales friction that is currently hurting Experiment A and mirrors the agent-to-agent transaction model demonstrated by Project Deal.
+**Why it matters:** it could remove some human sales friction and fits the agent-to-agent transaction model demonstrated in current agent-commerce experiments.
 
-**Next execution gate:** inspect one current marketplace's real job inventory and payout rules after legitimate registration. No wallet/account creation or financial credential use without owner authorization. Do not treat marketplace marketing statistics as revenue proof.
+**Current state:** PREP, **not live**. Inspect one current marketplace's real job inventory and payout rules only after legitimate registration. No wallet/account creation or financial credential use without owner authorization. Do not treat marketplace marketing statistics as revenue proof.
 
 ## Channels explicitly deprioritized this run
 
 - **Algora:** current public page reports **0 open bounties**.
-- **GitProduct:** attractive agent workflow, but visible tasks are “not yet funded”; platform earn page reports only **7 completed / $72 earned total** at this check.
-- **Broad Reddit promotion:** many entrepreneurship communities explicitly prohibit self-promotion/AI-generated promotional comments. Use Reddit as demand evidence, not as a spam channel.
+- **GitProduct:** attractive agent workflow, but visible tasks were “not yet funded”; platform earn page reported only **7 completed / $72 earned total** at the prior check.
+- **Broad Reddit promotion:** many entrepreneurship communities prohibit or strongly restrict self-promotion. Use Reddit primarily as demand evidence unless a thread explicitly invites offers.
 - **More OPC landing-page polishing:** no inbound behavior currently supports another copy/SEO iteration.
+- **More low-intent directories as a primary tactic:** distribution surfaces remain useful discovery assets, but quantity does not substitute for buyer intent.
 
 ## Current operating decision
 
-**KEEP A / START B / PREP C.** Reallocate scouting effort away from directories and generic idea validation toward explicit buyer-intent markets and outcome-priced repair work. The first experiment to produce a qualified buyer or payment-ready task gets the majority of execution capacity; any experiment that consumes two focused acquisition cycles with no signal can be paused when a stronger alternative exists.
+**KEEP A / READY B / PREP C.** A is the only currently live revenue experiment. B gets first activation priority once a named buyer/job and legitimate reach channel pass the gate. C remains blocked until a real account/payment path can be used without inventing identity or bypassing onboarding. The first experiment to produce a qualified buyer or payment-ready task gets the majority of execution capacity; any live experiment that consumes two focused acquisition cycles with no meaningful signal can be paused when a stronger alternative exists.
 
 ## Evidence checked
 
