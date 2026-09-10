@@ -1,0 +1,159 @@
+name: Submit OPC Clinic to Free Directories Round 4
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/submit-free-directories-round4.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Prepare Playwright
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright@1.55.0
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$browser" ]; then echo 'No Chromium-family browser found.' >&2; exit 1; fi
+          echo "BROWSER_EXECUTABLE=$browser" >> "$GITHUB_ENV"
+
+      - name: Submit only to public identity-free listing forms
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > round4.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          import fs from 'fs';
+
+          const product = {
+            name: 'OPC Clinic',
+            url: 'https://qrex102300-ui.github.io/opc-clinic/',
+            pitch: 'Evidence-backed founder diagnosis for launched products stuck before revenue.',
+            description: 'Open-source AI founder diagnostician that traces a launched product’s revenue bottleneck to evidence and turns it into a measurable 7-day experiment.'
+          };
+          const surfaces = [
+            {id:'shareyourstartup', url:'https://shareyourstartup.com/submit.html', kind:'startup'},
+            {id:'zearches', url:'https://zearches.com/', kind:'website'}
+          ];
+
+          const browser = await chromium.launch({headless:true, executablePath:process.env.BROWSER_EXECUTABLE, args:['--no-sandbox']});
+
+          async function requiredIdentity(page) {
+            const els = page.locator('input[required], textarea[required], select[required]');
+            for (let i=0;i<await els.count();i++) {
+              const el=els.nth(i);
+              const meta=[await el.getAttribute('name'),await el.getAttribute('id'),await el.getAttribute('placeholder'),await el.getAttribute('aria-label'),await el.getAttribute('type')].filter(Boolean).join(' ').toLowerCase();
+              if (/email|e-mail|your name|founder name|owner name|contact name|submitted by/.test(meta)) return meta;
+            }
+            return null;
+          }
+          async function fill(page, selectors, value) {
+            for (const selector of selectors) {
+              try {
+                const el=typeof selector==='string'?page.locator(selector):selector;
+                if (await el.count()) {
+                  const first=el.first();
+                  if (await first.isVisible() && await first.isEditable()) { await first.fill(value); return true; }
+                }
+              } catch {}
+            }
+            return false;
+          }
+          async function run(surface) {
+            const page=await browser.newPage({viewport:{width:1365,height:1000}});
+            const r={id:surface.id,surface:surface.url,attempted:true,submitted:false,successSignal:false,skippedForIdentity:false,identityField:null,blockedByHumanVerification:false,finalUrl:null,error:null,bodyText:''};
+            try {
+              await page.goto(surface.url,{waitUntil:'domcontentloaded',timeout:60000});
+              await page.waitForTimeout(1500);
+              let body=(await page.locator('body').innerText()).slice(0,12000);
+              if (/captcha|turnstile|verify you are human|cloudflare challenge|hcaptcha/i.test(body)) {r.blockedByHumanVerification=true; throw new Error('Human-verification gate detected; no bypass attempted.');}
+              const idField=await requiredIdentity(page);
+              if (idField) {r.skippedForIdentity=true;r.identityField=idField;r.bodyText=body;return r;}
+
+              if (surface.kind==='startup') {
+                const nameOk=await fill(page,[page.getByLabel(/startup name/i),'input[name*="name" i]'],product.name);
+                const urlOk=await fill(page,[page.getByLabel(/website url/i),'input[type="url"]','input[name*="url" i]'],product.url);
+                const pitchOk=await fill(page,[page.getByLabel(/one-line pitch|pitch/i),'textarea','input[name*="pitch" i]'],product.pitch);
+                await fill(page,[page.getByLabel(/category/i),'input[name*="category" i]'],'AI tool, SaaS, founder research');
+                if(!nameOk||!urlOk||!pitchOk) throw new Error(`Required startup fields missing (name=${nameOk}, url=${urlOk}, pitch=${pitchOk}).`);
+                const btn=page.getByRole('button',{name:/post it/i}).first();
+                if(!(await btn.count())) throw new Error('Post button not found.');
+                await btn.click({timeout:30000});
+              } else {
+                const urlOk=await fill(page,[page.getByLabel(/website url/i),'input[type="url"]','input[name*="url" i]'],product.url);
+                await fill(page,[page.getByLabel(/website name/i),'input[name*="name" i]'],product.name);
+                const descOk=await fill(page,[page.getByLabel(/short description/i),'textarea','input[name*="description" i]'],product.description);
+                // Honeypot: explicitly leave any field labelled 'Leave this field empty' blank.
+                const inputs=page.locator('input');
+                for(let i=0;i<await inputs.count();i++){
+                  const el=inputs.nth(i);
+                  const meta=[await el.getAttribute('name'),await el.getAttribute('placeholder'),await el.getAttribute('aria-label')].filter(Boolean).join(' ').toLowerCase();
+                  if(/leave.*empty|honeypot/.test(meta)){try{await el.fill('');}catch{}}
+                }
+                const selects=page.locator('select');
+                if(await selects.count()){
+                  const sel=selects.first();
+                  const opts=await sel.locator('option').allTextContents();
+                  let idx=opts.findIndex(x=>/software|saas|tools/i.test(x));
+                  if(idx<0) idx=opts.findIndex(x=>/business|general/i.test(x));
+                  if(idx>=0) await sel.selectOption({index:idx});
+                }
+                if(!urlOk||!descOk) throw new Error(`Required website fields missing (url=${urlOk}, desc=${descOk}).`);
+                const btn=page.getByRole('button',{name:/submit website.*free|submit website|submit/i}).first();
+                if(!(await btn.count())) throw new Error('Submit button not found.');
+                await btn.click({timeout:30000});
+              }
+
+              await page.waitForTimeout(6000);
+              r.submitted=true;r.finalUrl=page.url();r.bodyText=(await page.locator('body').innerText()).slice(0,12000);
+              r.blockedByHumanVerification=/captcha|turnstile|verify you are human|cloudflare challenge|hcaptcha/i.test(r.bodyText);
+              r.successSignal=/you.?re live|live immediately|submitted|success|thank|saved|listed|latest submissions/i.test(r.bodyText)&&!/error|failed|invalid|required.*email/i.test(r.bodyText)&&!r.blockedByHumanVerification;
+            } catch(e){r.error=String(e?.message||e);try{r.finalUrl=page.url();r.bodyText=(await page.locator('body').innerText()).slice(0,12000);}catch{}}
+            finally{await page.close();}
+            return r;
+          }
+          const results=[];for(const s of surfaces) results.push(await run(s));
+          fs.writeFileSync('/tmp/round4.json',JSON.stringify(results,null,2));
+          await browser.close();
+          EOF
+          node round4.mjs || true
+          rm -f round4.mjs
+
+      - name: Write acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops
+          {
+            echo '# Free directory acquisition round 4'
+            echo
+            echo "Last attempted: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo 'Only designated public listing forms were used. No account, email/person identity, payment, private credential, unsolicited comment, or human-verification bypass is allowed.'
+            echo
+            echo '```json'
+            jq . /tmp/round4.json
+            echo '```'
+          } > ops/free-directory-round4.md
+
+      - name: Commit audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/free-directory-round4.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Record free directory acquisition round 4'
+          git pull --rebase origin main
+          git push
