@@ -1,7 +1,7 @@
 # Revenue Operating Ledger
 
 **Sprint:** $0 → $100 collected revenue by 2026-09-15  
-**Last scout update:** 2026-09-11 05:46 China Standard Time  
+**Last scout update:** 2026-09-11 10:07 China Standard Time  
 **New spend:** $0  
 **Verified collected revenue:** $0
 
@@ -55,8 +55,14 @@ The earlier UpClaw / CrystalClaw surface remains rejected pending independently 
 
 ## Rejected false positives
 
+- **Claude Builders Bounty #5 — advertised USD 200 n8n + Claude weekly-dev-summary bounty:** canonical GitHub issue verified, but the issue already has roughly 1,124 comments with many `/opire try` claim attempts and multiple submissions. The headline reward clears the sprint target, but the probability of first dollar within 48 hours is materially worse than the two admitted named-buyer paths. **Decision: REJECT for this sprint; do not spend build time on a heavily contested claim.**
+- **`zapix_AI` manufacturing automation pilot — budget under USD 20:** named public buyer signal is real, but the explicitly tiny pilot cannot close the survival target and does not beat Rami or Flavio on expected near-term value. **Decision: REJECT from top-two queue; no new experiment.**
 - High-dollar bounty mirrors in `zhangjiayang6835-cyber/bounty-plaza` are not accepted as payment evidence. One surfaced USD 600 mirror pointed to `Senthemodder/tank-of-mannequins/issues/7`; the GitHub API returned **404 Not Found** for that claimed original source at the time of verification. Do not spend execution time on mirrored bounty amounts unless the canonical original and payout mechanism both verify.
 - Omi issues that say “bounty proposal” are proposals by contributors asking maintainers to approve payment, not funded buyer offers. Do not count those as available bounties until maintainers explicitly approve the reward.
+
+## Latest scout disposition
+
+No newly verified opportunity in this pass beats the current top two on probability of first dollar within 48 hours after accounting for reachability, competition, buyer payment intent, digital deliverability, zero-spend compliance, and acceptance friction. **Rami remains #1; Flavio remains #2.** No additional live experiment is admitted.
 
 ## Benchmark implication
 
