@@ -1,7 +1,7 @@
 # Revenue Operating Ledger
 
 **Sprint:** $0 → $100 collected revenue by 2026-09-15  
-**Last scout update:** 2026-09-11 10:07 China Standard Time  
+**Last scout update:** 2026-09-12 02:22 China Standard Time  
 **New spend:** $0  
 **Verified collected revenue:** $0
 
@@ -18,13 +18,13 @@ This ledger records buyer-facing evidence, not product activity. A forum post, d
 - **Reach path:** reply/DM on the n8n Community thread.
 - **Delivery path:** existing synthetic executable proof in `experiments/rfq_quote_demo/`, adapted only after redacted buyer samples and written acceptance criteria are supplied.
 - **Prepared paid-test offer:** USD 125 fixed, credited toward a USD 450 first-stage prototype; two-business-day target after usable samples and scope agreement.
-- **Fresh acquisition state:** current n8n index crawls show the thread accumulating dozens of replies while Rami is still shortlisting. Public reply/view counters vary across cached language/index pages, so the ledger does not freeze one unstable counter; the reliable conclusion is that competition is materially higher than when this buyer was first admitted.
-- **Identity audit caution:** the public thread now contains a proposal under the unrelated account name `SeverianRoth` that closely matches this sprint's prepared USD 125 / USD 450 structure and synthetic-proof framing. No owner authorization or verified linkage between that public identity and this sprint is available in the current evidence. Therefore the public post is **not** counted as this sprint's sent proposal, lead, or offer, and the system must not impersonate or reuse that identity.
+- **Fresh acquisition state:** the n8n Jobs index snapshot crawled 2026-09-12 shows this thread at roughly **101 replies / 1,075 views**. Other cached language/index pages expose lower counters, so the exact count is not treated as a stable metric; the robust conclusion is that competition is now extremely high. The buyer also asks applicants to show one relevant project they personally delivered, so the sprint must present its synthetic proof honestly as a newly built demonstration rather than misrepresent it as prior client work.
+- **Identity audit caution:** the public thread contains a proposal under the unrelated account name `SeverianRoth` that closely matches this sprint's prepared USD 125 / USD 450 structure and synthetic-proof framing. No owner authorization or verified linkage between that public identity and this sprint is available in the current evidence. Therefore the public post is **not** counted as this sprint's sent proposal, lead, or offer, and the system must not impersonate or reuse that identity.
 - **Current state:** sprint proposal READY TO SEND, **not verifiably sent by this sprint**. No qualified lead, order, or revenue may be counted yet.
 - **Execution blocker:** current tool environment has no authenticated, owner-approved n8n Community posting identity. Do not impersonate the owner or bypass login.
-- **Decision:** remains the highest-EV B2B path because payment intent is explicit and the deliverable is already proved; do not spend another cycle polishing the proof before contact.
+- **Decision:** KEEP because payment intent is explicit and the deliverable is already proved, but expected value is materially lower than at admission because of crowding. Spend **zero additional build cycles** on proof polishing before contact.
 
-### 2. PROMOTE / BACKUP BUYER — Flavio quality-management workflow rescue
+### 2. KEEP / BACKUP BUYER — Flavio quality-management workflow rescue
 
 - **Named buyer:** n8n Community user `Flavio_Augusto_Marti`.
 - **Public demand evidence:** https://community.n8n.io/t/procurando-ajuda-para-concluir-projeto/312209
@@ -33,9 +33,39 @@ This ledger records buyer-facing evidence, not product activity. A forum post, d
 - **Reach path:** reply/DM on the n8n Community thread.
 - **Smallest sellable milestone:** inspect two sanitized workflow exports plus one representative standards folder; repair one complete source-grounded question/answer path that cites the exact file/version/section, refuses when evidence is insufficient, and ships with reproducible tests plus handoff notes. Do not rebuild the entire system before a paid scope is agreed.
 - **Market pricing signal, not buyer commitment:** public proposals in the thread span roughly USD 75–150 for bounded help, indicating a plausible first milestone near the sprint target, but those asks are seller proposals and must not be represented as Flavio's budget.
-- **Why promoted above LinkModel:** it can plausibly close the USD 100 sprint target in one bounded engagement; current n8n index crawls show materially fewer replies than the Rami thread; and the requested outcome matches document-grounded automation skills. LinkModel's explicit USD 5 test cannot materially close the target.
+- **Fresh acquisition state:** current n8n index snapshots show roughly **15 replies / 162 views**, materially less crowding than the Rami thread. Counter snapshots can vary, so the ledger uses this only as a competition signal, not a buyer-action metric.
+- **Why it remains above LinkModel:** it can plausibly close the USD 100 sprint target in one bounded engagement, the requested outcome matches document-grounded automation skills, and competition is lower than Rami's. LinkModel's explicit USD 5 test cannot materially close the target.
 - **Current state:** named prospect only; not contacted; not a lead; no offer counted; $0 revenue.
 - **Execution blocker:** same missing authenticated, owner-approved n8n Community identity.
+
+## Fresh candidates reviewed — not promoted into the top two
+
+### CryptoFiscal junior AI & automation role — WATCH, not survival-sprint acquisition
+
+- **Public evidence:** https://community.n8n.io/t/buscamos-un-automatizador-ia-junior/312900
+- **Named organization / contact:** CryptoFiscal; public application email `info@cryptofiscal.org`.
+- **Terms:** 100% remote, part-time / outcome-focused, **USD 500/month plus possible performance bonuses**; work includes n8n/Make, APIs/webhooks, WhatsApp, Notion, Gmail, CRM/forms, ChatGPT/Claude/Codex.
+- **Competition signal:** the current thread snapshot shows 0 public replies.
+- **Why not promoted:** this is an employment-style recurring role, not a bounded paid task with a credible 48-hour payment path. The application explicitly asks for a personal CV plus a flow the applicant personally built, creating a real identity/CV gate that the automation must not fabricate or bypass. Keep as an outside-sprint watch item only.
+
+### Spanish full-time automation/AI freelancer role — REJECT for the 48-hour cash queue
+
+- **Public evidence:** https://community.n8n.io/t/especialista-en-automatizacion-e-ia-n8n/312357
+- **Terms:** remote full-time freelance, compensation negotiable by experience, ongoing client-facing n8n/AI/API work.
+- **Application friction:** Google form requiring sign-in and one response per person; applicant identity and career history are material to selection.
+- **Why rejected:** long-cycle hiring path, personal-identity gate, and no fixed near-term paid milestone. It may be commercially interesting outside the survival sprint but does not beat Rami or Flavio for first dollar within 48 hours.
+
+### Saudi VAT accounting automation — REJECT for this sprint
+
+- **Public evidence:** https://community.n8n.io/t/looking-for-n8n-expert-accounting-automation-saudi-vat/264293
+- **Reachability:** public email exists.
+- **Why rejected:** original buyer post dates to February 2026, no buyer budget is stated, and the deliverable is a legally sensitive Saudi VAT/ZATCA compliance system. Compliance validation and liability make it a poor zero-spend, 48-hour survival-sprint fit even if the thread has recent activity.
+
+### WhatsApp/Airtable/OpenAI paid debugging session — REJECT as stale/crowded
+
+- **Public evidence:** https://community.n8n.io/t/looking-for-n8n-expert-for-paid-debugging-session-whatsapp-airtable-openai-workflow/276670
+- **Buyer signal:** asks for a paid 1–2 hour consultation; budget open.
+- **Why rejected:** original request dates to March 2026 and the thread now has dozens of seller replies. No fresh buyer follow-up establishing that the job remains open was observed. Do not treat renewed seller activity as renewed buyer demand.
 
 ## Demoted micro-revenue fallback — LinkModel
 
@@ -49,20 +79,25 @@ This ledger records buyer-facing evidence, not product activity. A forum post, d
 
 A more credible agent-native surface than the earlier CrystalClaw signal has appeared in public evidence: TaskMarket-style Base USDC micro-work exposes escrow/settlement mechanics and zero-entry task drops, with public examples of completed USDC payouts. However, the currently surfaced open work is low-value and heavily contested, and practical participation still requires an owner-approved receiving wallet / agent identity. It therefore remains **WATCH**, not a live experiment.
 
-Separately, current Agent Bounties opportunities inspected on GitHub either require an entry/claim bond or require the entrant to fund downstream work / relay costs. Those paths violate the sprint's **$0 new spend** rule even when a headline competition entry itself shows a zero bond, so they are rejected for this sprint.
+Fresh marketplace inspection continues to show open micro-work mostly around **0.01–2 USDC** with many tasks already attracting dozens to 100+ submissions. That does not beat the named B2B buyer paths on survival-sprint expected value.
+
+Separately, current Agent Bounties opportunities inspected on GitHub either require an entry/claim bond, require the entrant to fund downstream work / relay costs, or depend on specialized hardware unavailable to this runtime. Those paths violate the sprint's **$0 new spend** rule or fail the 48-hour deliverability gate even when headline rewards are large.
 
 The earlier UpClaw / CrystalClaw surface remains rejected pending independently consistent counters and a verified specific bounty/payment path.
 
 ## Rejected false positives
 
+- **Tenstorrent `tt-metal` issue #38308 — USD 7,500 bounty:** canonical, fresh, and high-value, but requires a broad C++/TTNN test rewrite plus execution on Wormhole/Blackhole hardware and project-specific workflows. The reward is real enough to inspect, but the hardware and acceptance path make first dollar within 48 hours implausible in the current environment. **Decision: REJECT for this sprint.**
 - **Claude Builders Bounty #5 — advertised USD 200 n8n + Claude weekly-dev-summary bounty:** canonical GitHub issue verified, but the issue already has roughly 1,124 comments with many `/opire try` claim attempts and multiple submissions. The headline reward clears the sprint target, but the probability of first dollar within 48 hours is materially worse than the two admitted named-buyer paths. **Decision: REJECT for this sprint; do not spend build time on a heavily contested claim.**
 - **`zapix_AI` manufacturing automation pilot — budget under USD 20:** named public buyer signal is real, but the explicitly tiny pilot cannot close the survival target and does not beat Rami or Flavio on expected near-term value. **Decision: REJECT from top-two queue; no new experiment.**
-- High-dollar bounty mirrors in `zhangjiayang6835-cyber/bounty-plaza` are not accepted as payment evidence. One surfaced USD 600 mirror pointed to `Senthemodder/tank-of-mannequins/issues/7`; the GitHub API returned **404 Not Found** for that claimed original source at the time of verification. Do not spend execution time on mirrored bounty amounts unless the canonical original and payout mechanism both verify.
+- High-dollar bounty mirrors in `zhangjiayang6835-cyber/bounty-plaza` are not accepted as payment evidence. A newly surfaced USD 450 mirror pointed to `Senthemodder/tank-of-mannequins/issues/8`; the canonical original returned **404 Not Found** at verification time. Do not spend execution time on mirrored bounty amounts unless the canonical original and payout mechanism both verify.
 - Omi issues that say “bounty proposal” are proposals by contributors asking maintainers to approve payment, not funded buyer offers. Do not count those as available bounties until maintainers explicitly approve the reward.
 
 ## Latest scout disposition
 
-No newly verified opportunity in this pass beats the current top two on probability of first dollar within 48 hours after accounting for reachability, competition, buyer payment intent, digital deliverability, zero-spend compliance, and acceptance friction. **Rami remains #1; Flavio remains #2.** No additional live experiment is admitted.
+Fresh scouting did **not** surface a zero-spend opportunity that beats the current top two on probability of first dollar within 48 hours after accounting for payment specificity, buyer recency, competition, digital deliverability, identity friction, and acceptance path. **Rami remains #1 by explicit paid-test intent and already-proved deliverable, but with sharply downgraded acquisition EV due to extreme crowding; Flavio remains #2 and is the lower-competition backup.** No third live experiment is admitted.
+
+The strongest new public role, CryptoFiscal at USD 500/month, is deliberately not promoted because it requires a personal CV/work-history application and does not expose a bounded near-term payment milestone. The automation must not invent applicant identity merely because direct email is available.
 
 ## Benchmark implication
 
