@@ -1,6 +1,6 @@
 # AI Make Money — 7-Day Survival Sprint Ledger
 
-Last strategic review: **2026-09-11 10:18 CST**  
+Last strategic review: **2026-09-11 22:21 CST**  
 Target: **at least $100 in real collected revenue by 2026-09-15**  
 New spend cap: **$0**
 
@@ -20,14 +20,14 @@ This ledger is broader than OPC Clinic. Only observable buyer evidence and colle
 - Net revenue: **$0**
 - Paid acquisition spend / new spend: **$0**
 
-Canonical OPC listing/revenue counts remain in `ops/revenue-scorecard.md`. Detailed prospect evidence remains in `REVENUE_OPERATING_LEDGER.md`. The independent review decision is recorded in `ops/review-board-2026-09-11-1018-cst.md`.
+Canonical OPC listing/revenue counts remain in `ops/revenue-scorecard.md`. Detailed prospect evidence remains in `REVENUE_OPERATING_LEDGER.md`. The latest independent review decision is recorded in `ops/review-board-2026-09-11-2221-cst.md`.
 
 ## Portfolio status
 
 | Experiment | State | Current evidence | Decision |
 |---|---|---|---|
 | A — OPC Clinic $59 post-launch diagnosis | **PASSIVE INBOUND / ACTIVE ACQUISITION PAUSED** | 6 confirmed surfaces, 7 pending reviews, but 0 inbound triage, 0 qualified leads, 0 paid orders, $0 revenue after repeated acquisition cycles | **CHANGE / PAUSE**. Keep pages and intake live; stop new directory/SEO/copy/funnel work unless real user behavior exposes a defect |
-| B — Narrow outcome-based B2B automation | **ACTIVE PRIORITY / CONTACT BLOCKED** | Two named prospects with explicit willingness-to-pay language: Rami (paid-test requirement) and Flavio (explicit willingness to pay for completion). Neither has engaged with this sprint; no proposal verifiably sent | **KEEP / PRIORITIZE**. Contact beats further build work |
+| B — Narrow outcome-based B2B automation | **ACTIVE PRIORITY / CONTACT BLOCKED / EXECUTION LANE OFF** | Two named prospects with explicit willingness-to-pay language: Rami (paid-test requirement) and Flavio (explicit willingness to pay for completion). Neither has engaged with this sprint; no proposal verifiably sent. Dedicated Revenue Executor is currently disabled | **KEEP / PRIORITIZE**. Restore authorized execution capacity, then legitimate contact beats further build work |
 | C — Agent-native micro-contract / paid API work | **SCOUT-ONLY WATCHLIST** | No specific zero-capital task currently beats B; seller/payment identity friction remains; surfaced tasks are low-value and/or contested | **KILL as active sprint experiment**; reactivate only on a verified funded task with strong EV |
 
 ## Experiment B — ranked named prospects
@@ -38,11 +38,12 @@ Canonical OPC listing/revenue counts remain in `ops/revenue-scorecard.md`. Detai
 - **Public brief:** https://community.n8n.io/t/seeking-estimates-n8n-developer-for-a-small-rfq-to-quote-prototype/312281?tl=en
 - **Requested outcome:** fixed-format text PDF → extracted code/description/quantity/unit → buyer-supplied catalogue + approved price matching → human review for uncertainty → Excel quotation draft.
 - **Payment intent:** buyer explicitly says any engagement begins with a separately agreed **paid test** and milestones.
-- **Current buyer state:** requirements are still being validated; buyer is shortlisting; suitable representative files are not yet available. Competition is high.
+- **Current buyer state:** requirements are still being validated; buyer is shortlisting; suitable representative files are not yet available. Competition is high and has continued to increase.
 - **Delivery readiness:** synthetic executable proof exists in `experiments/rfq_quote_demo/`; local tests and GitHub Actions run `34495685087` passed.
 - **Prepared offer:** USD 125 fixed paid test, credited toward USD 450 first-stage prototype.
 - **Commercial state:** **prospect only**. Proposal remains READY TO SEND / NOT VERIFIABLY SENT. No lead, order, or revenue counted.
-- **Blocker:** no authenticated, owner-approved n8n Community posting identity/path is available to the current execution environment.
+- **Channel blocker:** no authenticated, owner-approved n8n Community posting identity/path is available to the current execution environment.
+- **System blocker:** the dedicated Revenue Executor task is disabled, so the intended acquisition executor is not currently operating.
 
 ### Identity audit caution
 
@@ -59,7 +60,8 @@ Because the proof/offer is public and now has a near-clone in the buyer thread, 
 - **Smallest sellable milestone:** inspect two sanitized workflow exports + one representative standards folder; repair one complete source-grounded Q&A path with exact file/version/section citations, fail-closed behavior when evidence is insufficient, reproducible tests, and handoff notes.
 - **Market pricing only, not buyer commitment:** public seller proposals in the thread span roughly USD 45–150 for bounded help.
 - **Commercial state:** **prospect only**; not contacted; no lead or offer counted.
-- **Blocker:** same missing authenticated, owner-approved n8n Community posting identity/path.
+- **Channel blocker:** same missing authenticated, owner-approved n8n Community posting identity/path.
+- **System blocker:** same disabled Revenue Executor lane.
 
 ## Experiment A — OPC Clinic review
 
@@ -97,14 +99,24 @@ Only confirmed collected payment counts as revenue.
 
 The OS has the right policy-level pieces: specialized Scout/Executor/Review roles, deterministic activation gates, durable GitHub evidence, external-content security, evidence hierarchy, and narrow owner escalation. It also documents the production controls it should have: immutable `run_id`, preflight → action → receipt → metric delta, idempotency, role-level least privilege, checkpoint/resume, and trace links.
 
-Actual execution is still mostly narrative Markdown logs. Historical run files do not consistently contain machine-enforced run IDs, idempotency keys, checkpoint objects, role-specific tool ACLs, or resumable state.
+However, the live operating state is currently missing its dedicated execution role: the **Revenue Executor is disabled**, while scouting and independent review continue. This means the system can discover and audit opportunities without a dedicated role actually taking the highest-EV approved revenue action.
 
-**Architecture verdict: POLICY PASS / RUNTIME PARTIAL.**
+Actual run evidence is also still mostly narrative Markdown. Historical run files do not consistently contain machine-enforced run IDs, idempotency keys, checkpoint objects, role-specific tool ACLs, resumable state, or end-to-end trace IDs.
 
-Future executor runs should persist a stable run ID, exact preflight, chosen action, duplicate-prevention key, receipt/commit, metric delta, resulting state/next gate, and safe resume checkpoint for every external action.
+**Architecture verdict: POLICY PASS / EXECUTION RUNTIME DEGRADED.**
 
-## Highest-value owner blocker
+Required recovery discipline:
 
-**Authenticated, owner-approved n8n Community identity / posting capability.** Both current top prospects are reachable there, while the present tool environment has no legitimate authenticated posting path. No identity will be invented, copied, or bypassed.
+1. restore an authorized execution lane before treating the system as autonomous;
+2. every external write should carry a stable run ID and duplicate-prevention rule;
+3. every claimed action must link to an observable receipt or commit;
+4. every run should persist preflight, chosen action, receipt, metric delta, resulting state/next gate, and safe resume checkpoint;
+5. role-level tools should stay least-privilege;
+6. human interrupts should occur only at true identity, payment, spend, private-data, or material-risk gates.
+
+## Highest-value owner blockers
+
+1. **Restore an authorized execution lane for the survival sprint.** The independent Review Board will not silently reactivate a disabled executor because doing so changes operating state outside its audit role.
+2. **Authenticated, owner-approved n8n Community identity / posting capability.** Both current top prospects are reachable there, while the present tool environment has no legitimate authenticated posting path. No identity will be invented, copied, or bypassed.
 
 A payment receiving rail is **secondary, not today's first escalation**: there is no payment-ready lead yet. Escalate payment custody only when a buyer accepts a paid test or requests payment instructions.
