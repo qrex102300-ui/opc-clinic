@@ -3,7 +3,7 @@
 ## Objective
 Earn at least **$100 in real collected revenue by 2026-09-15** with **$0 new spend**. OPC Clinic is one experiment, not the mission.
 
-## Current hard state (2026-09-11 10:18 CST)
+## Current hard state (2026-09-12 09:44 CST)
 - Confirmed external OPC discovery surfaces: 6
 - Pending OPC reviews: 7
 - Named B2B prospects with observable willingness-to-pay language: 2
@@ -50,7 +50,7 @@ Narrative Markdown alone is not sufficient for robust long-running autonomy. Eve
 
 Role-specific tool access should follow least privilege. External content is untrusted input. Human approval interrupts belong only at identity, payment, spend, private-data, or material-risk gates.
 
-**Current architecture grade: POLICY PASS / RUNTIME PARTIAL.** The required production controls are documented, but historical execution is still primarily narrative Markdown and does not yet consistently show machine-enforced run IDs, idempotency records, checkpoint objects, tool ACLs, or resumable state.
+**Current architecture grade: POLICY PASS / EXECUTION RUNTIME DEGRADED.** The required production controls are documented, but historical execution is still primarily narrative Markdown and does not yet consistently show machine-enforced run IDs, idempotency records, checkpoint objects, tool ACLs, resumable state, or end-to-end traces. In addition, the system currently lacks an authorized acquisition execution lane, so scouting and review can continue without a dedicated role taking the highest-EV approved buyer action.
 
 ## Autonomous team
 
@@ -58,7 +58,7 @@ Role-specific tool access should follow least privilege. External content is unt
 Brainstorm first, then benchmark. Scan current web, Reddit/Indie Hackers, GitHub, agent marketplaces/directories, bounties, job/process signals, and public buyer pain. Produce only top evidence-backed opportunities. It may research and rank; it must not claim a new experiment is live without the activation gate.
 
 ### Revenue Executor
-Maintain at most three live experiments, execute the highest expected-value acquisition/offer/fulfillment action, and update durable evidence. No busywork. External actions must be idempotent or safely duplicate-checked.
+Maintain at most three live experiments, execute the highest expected-value acquisition/offer/fulfillment action, and update durable evidence. No busywork. External actions must be idempotent or safely duplicate-checked. This role is only considered operational when an authorized execution lane exists.
 
 ### Review Board
 Independently audit evidence, correct false positives, compare expected value, enforce experiment-state consistency, and issue KEEP / CHANGE / KILL decisions. Review Board corrections override stale executor narratives without rewriting historical records.
@@ -73,17 +73,19 @@ Independently audit evidence, correct false positives, compare expected value, e
 **Prohibited for this sprint unless behavior proves a defect:** new directory rounds, SEO/copy/pricing/funnel polishing.
 
 ### B — Narrow outcome-based B2B automation
-**State:** **ACTIVE PRIORITY / CONTACT BLOCKED.**
+**State:** **ACTIVE PRIORITY / CONTACT BLOCKED / EXECUTION LANE OFF.**
 
-#### B1 — Rami RFQ-to-quote paid test
-Named buyer `Eng_Rami_Sebai` requests a bounded RFQ-to-quote prototype and explicitly says any engagement begins with a separately agreed **paid test**. A synthetic tested proof exists in `experiments/rfq_quote_demo/`; prepared offer is USD 125 fixed, credited toward USD 450 first stage. Proposal is **not verifiably sent**. Buyer is still validating requirements/shortlisting and competition is high.
+#### B1 — Flavio quality-management workflow rescue
+Named buyer `Flavio_Augusto_Marti` asks for help finishing an existing Gemini + OneDrive quality-management automation and explicitly indicates willingness to pay for someone who completes it. No exact buyer budget is confirmed. Public competition is materially lower than on the Rami thread. The smallest sellable milestone is one source-grounded end-to-end Q&A/retrieval path using sanitized workflow exports plus one standards folder, exact file/version/section citations, fail-closed behavior, tests, and handoff notes. Not contacted; prospect only.
 
-#### B2 — Flavio quality-management workflow rescue
-Named buyer `Flavio_Augusto_Marti` requests help finishing an existing Gemini + OneDrive quality-management automation and explicitly indicates willingness to pay for someone who completes it. No exact budget is confirmed. Not contacted; prospect only.
+#### B2 — Rami RFQ-to-quote paid test
+Named buyer `Eng_Rami_Sebai` requests a bounded RFQ-to-quote prototype and explicitly says any engagement begins with a separately agreed **paid test**. A synthetic tested proof exists in `experiments/rfq_quote_demo/`; prepared offer is USD 125 fixed, credited toward USD 450 first stage. Proposal is **not verifiably sent**. Public competition is now extreme, and the buyer asks for one relevant project the applicant personally delivered. The sprint has a purpose-built synthetic demonstration, not a prior personally delivered RFQ client project; that distinction must remain explicit.
 
-**Shared blocker:** current environment lacks an authenticated, owner-approved n8n Community identity/posting path. No identity may be invented or bypassed.
+**Why the order changed:** Rami has stronger paid-test wording, but extreme crowding plus the demonstrated-work fit gap now reduce his probability of conversion below Flavio's lower-competition path. With the survival window closing, first-dollar probability outweighs ticket clarity.
 
-**Execution rule:** contact these named buyers before building any additional generic automation asset. Neither prospect becomes a lead until there is observable engagement with this sprint.
+**Shared blocker:** current environment lacks an authenticated, owner-approved n8n Community identity/posting path and an authorized acquisition execution lane. No identity may be invented or bypassed.
+
+**Execution rule:** contact Flavio first, then Rami, before building any additional generic automation asset. Neither prospect becomes a lead until there is observable engagement with this sprint.
 
 ### C — Agent-native paid microservice / micro-contract work
 **State:** **KILLED AS ACTIVE SURVIVAL-SPRINT EXPERIMENT / SCOUT-ONLY WATCHLIST.**  
@@ -129,6 +131,6 @@ Escalate to the owner only for:
 - material legal/security/private-data risk;
 - any spend > $0.
 
-**Current owner gate:** authenticated, owner-approved n8n Community posting capability. Payment custody is secondary until a buyer accepts a paid test or requests payment instructions.
+**Current owner gates:** (1) an authorized acquisition execution lane; (2) authenticated, owner-approved n8n Community posting capability. Payment custody is secondary until a buyer accepts a paid test or requests payment instructions.
 
-Everything else proceeds autonomously through the existing execution loops.
+Everything else should proceed through auditable, resumable execution only when an authorized lane exists.
