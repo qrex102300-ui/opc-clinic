@@ -1,7 +1,7 @@
 # Revenue Operating Ledger
 
 **Sprint:** $0 → $100 collected revenue by 2026-09-15  
-**Latest scout update:** 2026-09-14 18:14 China Standard Time  
+**Latest scout update:** 2026-09-15 06:00 China Standard Time  
 **New spend:** $0  
 **Verified collected revenue:** $0
 
@@ -34,12 +34,21 @@ This ledger records buyer-facing evidence, not product activity. A forum post, d
 - **Fresh behavioral evidence:** the current thread shows many detailed seller replies and bounded offers (roughly USD 45–150 for initial slices), but no visible public follow-up from Flavio after his original post. Seller proposals are not buyer engagement and are not counted as traction.
 - **Reach path:** reply/DM on the n8n Community thread.
 - **Smallest sellable milestone:** inspect two sanitized workflow exports plus one representative standards folder; repair one complete source-grounded question/answer path that cites exact file/version/section, refuses when evidence is insufficient, and ships with reproducible tests plus handoff notes. Do not rebuild the entire system before a paid scope is agreed.
-- **Why now #2:** lower public competition and strong technical fit remain favorable, but the absence of observable buyer follow-up is a material near-term conversion penalty with less than two days left in the survival window. Rami's direct shortlisting behavior therefore ranks higher despite Rami's heavier competition.
+- **Why now #2:** lower public competition and strong technical fit remain favorable, but the absence of observable buyer follow-up is a material near-term conversion penalty with less than one day left in the survival window. Rami's direct shortlisting behavior therefore ranks higher despite Rami's heavier competition.
 - **Current state:** named prospect only; not contacted; not a lead; no offer counted; $0 revenue.
 - **Execution blocker:** same missing authenticated, owner-approved n8n Community posting identity / buyer-contact execution capability.
 - **Decision:** **KEEP / SECOND CONTACT.** Do not build a generic QMS product before contact.
 
 ## Fresh candidates reviewed — not promoted
+
+### 2026-09-15 pre-deadline scan — NO REPLACEMENT
+
+- **Fresh brainstorm tested:** urgent paid debugging, shutdown/migration rescue, fixed-scope infrastructure paid trials, zero-capital coding bounties, and agent-native micro-contracts.
+- **n8n OpenClaw + VPS paid trial:** real paid-trial language and a digitally deliverable infrastructure task exist, but the original buyer thread is older and now has roughly 90+ replies. Current visible activity is dominated by applicants quoting USD 100–550; no fresher buyer-side shortlisting/payment behavior was found that beats Rami. **Do not promote.**
+- **n8n paid debugging / other Jobs threads:** recent index activity is largely seller replies on older posts. No newly verified buyer action or payment-ready behavior beats the current top two. **Do not count seller activity as traction.**
+- **Tenstorrent USD 35,000 / USD 2,000 bounties:** headline rewards are real issue labels, but the tasks are specialized hardware/model-port work, already show competition/assignees, and are not credible 48-hour zero-spend cash paths for this sprint. **Reject for survival-window expected value.**
+- **AgentBounties live board:** a fresh public report identifies six claimable rows totaling only 4.60 USDC; one requires a bond and the rows are not verification-ready. The board has paid historical settlements, but current tasks still fail the sprint's zero-worker-capital / payout-readiness gate. **WATCH only.**
+- **Project Deal benchmark:** Anthropic's real marketplace experiment reinforces the selection rule: real counterparties, funded budgets, explicit authorization, and completed exchanges matter more than autonomous product creation or marketplace headline volume. This supports keeping Rami/Flavio ahead of speculative agent-native work.
 
 ### Memanto security challenge — REJECT for survival-window cash
 
