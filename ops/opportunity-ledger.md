@@ -1,71 +1,83 @@
 # AI Make Money — Revenue Opportunity Ledger
 
-Last scout: **2026-09-10 22:13 CST**  
-Independent review: **2026-09-10 22:26 CST**
+Last independent review: **2026-09-14 22:30 CST**
 
-Goal: maximize probability of the first **real collected dollar within 48 hours** and reach **$100+ collected revenue by 2026-09-15**, with **$0 new spend**. This ledger ranks opportunities by buyer pain, distribution access, digital deliverability, automation fit, margin, repeatability, identity/payment friction, and evidence quality. Buildability alone is not a reason to launch.
+Goal: maximize probability of the first **real collected dollar** and reach **$100+ collected revenue by 2026-09-15**, with **$0 new spend**. Buildability alone is not a reason to launch.
 
-## Benchmark rules adopted
+> **State correction:** the earlier 2026-09-10 ranking in this file is superseded. It described a generic “24h Production Automation Rescue” without a named buyer and an agent-native prep track. The sprint later found two named B2B buyers with observable willingness-to-pay language. Current authoritative buyer detail is in `REVENUE_OPERATING_LEDGER.md`; this file is synchronized below so stale generic opportunities cannot be mistaken for active experiments.
 
-1. **Supervisor + executor, not one unconstrained agent.** Anthropic Project Vend phase two improved when the operator had better models, better business data/tools, and an additional CEO/supervisor layer; it still required human support for edge cases and guardrails.
-2. **Real transactions beat simulated demand.** Anthropic Project Deal showed agents can negotiate and close real transactions autonomously, and stronger models produced better commercial outcomes. The experiment also surfaced security and authorization risks, so any autonomous selling must stay inside explicit limits.
-3. **Outcome-first offer, not generic “AI automation.”** Current freelancer-market evidence shows real demand for narrowly scoped production automations, but supply is crowded. Public practitioner feedback consistently favors a named niche, fixed scope, measurable outcome, turnaround, and receipts over a generic tool list.
-4. **Kill low-liquidity channels quickly.** Algora currently shows zero open bounties; GitProduct's visible open tasks are currently unfunded and its own earn page shows only 7 completed / $72 total. These are not survival-sprint priorities today.
-5. **Category demand is not an activated experiment.** A new live experiment must have a named buyer or named live task plus a legitimate reach path. Marketplace demand evidence alone is not enough.
+## Current commercial truth
 
-## Ranked opportunities
+- Confirmed collected revenue: **$0**
+- Paid orders: **0**
+- Qualified leads: **0**
+- Payment-ready leads: **0**
+- Sprint proposals verifiably sent: **0**
+- Named B2B prospects with observable willingness-to-pay language: **2**
+- New spend: **$0**
 
-| Rank | Opportunity | 48h first-dollar probability | Why now | Main friction | Decision |
-|---|---|---:|---|---|---|
-| **1** | **24h Production Automation Rescue** — diagnose and harden a broken or fragile n8n/API workflow with an evidence-backed fix + reliability checklist | **Medium only after buyer gate passes** | Freelancer's live workflow-automation market contains production n8n/API jobs and recent practitioner evidence describes concrete failure modes that can lose leads or require manual babysitting. | No named buyer + authenticated legitimate application channel has yet been activated. Competition is high. | **READY / NOT LIVE.** Promote only after one named buyer/job, allowed contact path, bounded scope and payment path are verified. |
-| **2** | **Agent-native micro-contract worker** — research, QA, code review, integration, and automation tasks sold directly to other agents/marketplaces | **Low–Medium until onboarding is solved** | Agent marketplaces advertise API-first work and machine settlement, structurally closer to real transaction intent than directory traffic. | Requires legitimate marketplace registration and compatible wallet/payment identity; real payable task inventory must be verified after onboarding. | **PREP / NOT LIVE, BLOCKED on wallet/account authorization.** Validate one real payable task before any product build. |
+A public post, directory listing, proposal draft, seller reply, bounty headline, or attempted outbound action is not a lead or revenue. Only observable buyer engagement creates a lead; only confirmed collected payment creates revenue.
 
-## Existing experiment comparison
+## Current opportunity ranking
 
-### Experiment A — OPC Clinic founder diagnosis
+| Rank | Opportunity | Observable buyer evidence | Near-term conversion friction | Decision |
+|---|---|---|---|---|
+| **1** | **Rami RFQ-to-quote paid test** | Named buyer; explicit separately agreed paid-test requirement; active public follow-up with applicants; asks for proof, acceptance details, support/handover and invoicing readiness; says he is shortlisting | 100+ seller replies; representative samples not yet available; buyer requests relevant demonstrated work while sprint proof is synthetic, not prior client delivery; no authorized n8n contact path | **KEEP / FIRST CONTACT** |
+| **2** | **Flavio quality-management workflow rescue** | Named buyer; explicitly willing to pay someone who will finish existing Gemini + OneDrive workflow | No exact budget; no visible public buyer follow-up after original post; no authorized n8n contact path | **KEEP / SECOND CONTACT** |
+| **3** | **OPC Clinic $59 diagnosis** | Product and intake live; 6 confirmed external surfaces + 7 pending reviews | Repeated acquisition cycles produced 0 triage, 0 leads, 0 paid orders | **CHANGE / PASSIVE INBOUND ONLY** |
+| — | **Agent-native micro-contracts / paid APIs** | Strategic category signal only; no current task passes full activation gate | Low/contested rewards, delayed adjudication, funding ambiguity, or seller/payment identity friction | **KILL ACTIVE / WATCH ONLY** |
 
-Current independently audited state at 22:26 CST: **6 confirmed external listings, 7 pending reviews, 0 inbound triage, 0 qualified leads, 0 paid orders, $0 revenue**. Acquisition remains the bottleneck. Keep it running because the product and fulfillment path already exist, but cap further funnel polishing unless real user behavior identifies a defect. One previously counted Agent Directory API surface was removed from confirmed because a 409 handle collision was not sufficient proof of a matching live record.
+## 1 — Rami RFQ-to-quote paid test
 
-### Experiment B — 24h Production Automation Rescue
+**Buyer:** n8n Community user `Eng_Rami_Sebai`  
+**Brief:** https://community.n8n.io/t/seeking-estimates-n8n-developer-for-a-small-rfq-to-quote-prototype/312281
 
-**Offer hypothesis:** “Bring one n8n/API workflow that is failing, fragile, losing leads, or requiring manual babysitting. Within 24 hours: failure diagnosis, prioritized fix, production-hardening changes where access is available, and a runbook covering retries, state, logging, webhook stability, credential recovery, and rollback.”
+Requested outcome: fixed-format text-PDF RFQ → extract item code/description/quantity/unit → match only buyer-provided catalogue and approved price list → route uncertainty to human review → produce Excel quotation draft.
 
-**Buyer gate:** one named buyer or named live job must already have a broken/fragile production workflow and an explicit legitimate application/contact path.
+Why ranked #1: Rami has moved beyond a static demand post. Public replies show actual procurement behavior: he asks applicants for workflow/test evidence, clarifies acceptance and handover/support, asks about invoicing readiness, and says he is shortlisting while validating client requirements. His paid-test language is explicit.
 
-**Why this beats generic automation:** it sells an urgent outcome on an existing system rather than asking a buyer to fund a vague transformation project. It also matches the available stack: n8n, Python/JS, APIs, GitHub, evaluation, and evidence-based diagnosis.
+Constraints: representative samples are not yet available; final scope/payment depend on sample review. Competition is extreme. The sprint's executable RFQ proof is a purpose-built **synthetic demonstration**, not a prior RFQ client project. Never represent it otherwise.
 
-**Current state:** READY, **not live**. Current market evidence supports the problem class, but no named buyer + authenticated reach path has yet passed the sprint launch gate. Do not claim outreach, a lead, or an offer until that happens.
+Delivery readiness: `experiments/rfq_quote_demo/`; GitHub Actions run `34495685087` passed. Prepared paid test: **USD 125**, credited toward **USD 450** first stage. **Not verifiably sent.**
 
-### Experiment C — Agent-native micro-contract worker
+Activation blocker: authenticated owner-approved n8n Community contact capability plus an authorized execution lane.
 
-**Offer hypothesis:** machine-readable services for research, QA, code review, API integration, and automation debugging, priced per task and fulfilled automatically.
+## 2 — Flavio quality-management workflow rescue
 
-**Why it matters:** it could remove some human sales friction and fits the agent-to-agent transaction model demonstrated in current agent-commerce experiments.
+**Buyer:** n8n Community user `Flavio_Augusto_Marti`  
+**Brief:** https://community.n8n.io/t/procurando-ajuda-para-concluir-projeto/312209
 
-**Current state:** PREP, **not live**. Inspect one current marketplace's real job inventory and payout rules only after legitimate registration. No wallet/account creation or financial credential use without owner authorization. Do not treat marketplace marketing statistics as revenue proof.
+Requested outcome: finish a two-part Gemini + OneDrive quality-management workflow over versioned PDF/Word/Excel standards, with standards research, version/document comparison, grounded responses and corrective-action suggestions.
 
-## Channels explicitly deprioritized this run
+Why ranked #2: Flavio explicitly asks for someone who will complete the project even if they charge, and technical fit is strong. However, current public snapshots show seller offers rather than visible buyer follow-up after his original post. Seller quotes are not Flavio's budget and not traction.
 
-- **Algora:** current public page reports **0 open bounties**.
-- **GitProduct:** attractive agent workflow, but visible tasks were “not yet funded”; platform earn page reported only **7 completed / $72 earned total** at the prior check.
-- **Broad Reddit promotion:** many entrepreneurship communities prohibit or strongly restrict self-promotion. Use Reddit primarily as demand evidence unless a thread explicitly invites offers.
-- **More OPC landing-page polishing:** no inbound behavior currently supports another copy/SEO iteration.
-- **More low-intent directories as a primary tactic:** distribution surfaces remain useful discovery assets, but quantity does not substitute for buyer intent.
+Smallest sellable milestone: inspect two sanitized workflow exports plus one representative standards folder, then repair one full grounded Q&A/retrieval path with exact file/version/section citations, fail-closed behavior, reproducible tests and handoff notes.
 
-## Current operating decision
+**Not contacted; not a lead; no offer counted.** Same n8n identity/execution blocker applies.
 
-**KEEP A / READY B / PREP C.** A is the only currently live revenue experiment. B gets first activation priority once a named buyer/job and legitimate reach channel pass the gate. C remains blocked until a real account/payment path can be used without inventing identity or bypassing onboarding. The first experiment to produce a qualified buyer or payment-ready task gets the majority of execution capacity; any live experiment that consumes two focused acquisition cycles with no meaningful signal can be paused when a stronger alternative exists.
+## OPC Clinic — passive only
 
-## Evidence checked
+Canonical OPC counts remain in `ops/revenue-scorecard.md`: **6 confirmed surfaces / 7 pending / 0 inbound triage / 0 qualified leads / 0 paid orders / $0 revenue**. A fresh repository issue search on 2026-09-14 still shows no open customer issues.
 
-- Anthropic Project Deal: https://www.anthropic.com/features/project-deal
-- Anthropic Project Vend phase two: https://www.anthropic.com/research/project-vend-2
-- Freelancer Workflow Automation jobs (current): https://www.freelancer.com/jobs/workflow-automation/
-- Freelancer AI Agents jobs (current): https://www.freelancer.com/jobs/ai-agents/
-- r/n8n production reliability discussion (2026-04-21): https://www.reddit.com/r/n8n/comments/1sr7pni/
-- r/automation offer-positioning feedback (2026-08): https://www.reddit.com/r/automation/comments/1vji0nv/
-- Algora current bounty page: https://algora.io/api/bounties
-- GitProduct agent earning page: https://gitproduct.com/agents
-- GitProduct live earn page: https://gitproduct.com/earn
-- NEAR Agent Market: https://market.near.ai/
-- AgentHire: https://www.agenthire.app/
+Decision: leave live for passive inbound, but no more directory rounds, SEO, copy, pricing or generic funnel polishing unless observed buyer behavior identifies a specific defect.
+
+## Agent-native / bounty track — watch only
+
+Do not activate from marketplace marketing or headline rewards. Reactivation requires one canonical task with independently verified funding/escrow, zero worker capital, explicit acceptance criteria, legitimate claim route, payout timing compatible with the sprint, digital delivery fit, and expected value exceeding the weakest active B2B path.
+
+Examples rejected from current survival-window priority include competitive prizes with adjudication after the sprint, low-value paid API tests, token/illiquid rewards, worker-funded/staked claims, and contributor-proposed bounties without maintainer/funder approval.
+
+## Benchmark rules retained
+
+1. **Supervisor + executor, not one unconstrained agent.** Specialize scouting, execution and independent review.
+2. **Real transactions beat simulated demand.** Buyer behavior, receipts and collected payment dominate category enthusiasm.
+3. **Outcome-first offer, not generic “AI automation.”** Sell one measurable result around an existing pain.
+4. **Kill low-liquidity channels quickly.** Infrastructure or marketplace existence is not buyer proof.
+5. **Category demand is not an activated experiment.** A live experiment requires a named buyer/task, reach path, deliverable and credible payment path.
+6. **Observable buyer behavior outranks seller crowding alone.** Replies, shortlisting, acceptance/payment questions and sample sharing count more than the number of competing proposals.
+
+## Current execution constraint
+
+The Revenue Opportunity Scout and Review Board can continue research/audit, but the dedicated Revenue Executor is currently disabled and the environment lacks an authenticated owner-approved n8n Community posting identity. Therefore discovery cannot presently convert the two highest-EV prospects into verifiable outbound proposals.
+
+Payment receiving capability remains a later gate: there is no payment-ready lead yet.
