@@ -1,6 +1,6 @@
 # AI Make Money — 7-Day Survival Sprint Ledger
 
-Last strategic review: **2026-09-12 09:44 CST**  
+Last strategic review: **2026-09-14 22:30 CST**  
 Target: **at least $100 in real collected revenue by 2026-09-15**  
 New spend cap: **$0**
 
@@ -20,45 +20,46 @@ This ledger is broader than OPC Clinic. Only observable buyer evidence and colle
 - Net revenue: **$0**
 - Paid acquisition spend / new spend: **$0**
 
-Canonical OPC listing/revenue counts remain in `ops/revenue-scorecard.md`. Detailed prospect evidence remains in `REVENUE_OPERATING_LEDGER.md`. The latest independent review decision is recorded in `ops/review-board-2026-09-12-0944-cst.md`.
+Canonical OPC listing/revenue counts remain in `ops/revenue-scorecard.md`. Detailed prospect evidence and freshest buyer ranking remain in `REVENUE_OPERATING_LEDGER.md`. The prior Review Board ordering that placed Flavio ahead of Rami is superseded by the 2026-09-14 fresh buyer-behavior review.
 
 ## Portfolio status
 
 | Experiment | State | Current evidence | Decision |
 |---|---|---|---|
 | A — OPC Clinic $59 post-launch diagnosis | **PASSIVE INBOUND / ACTIVE ACQUISITION PAUSED** | 6 confirmed surfaces, 7 pending reviews, but 0 inbound triage, 0 qualified leads, 0 paid orders, $0 revenue after repeated acquisition cycles | **CHANGE / PAUSE**. Keep pages and intake live; stop new directory/SEO/copy/funnel work unless real user behavior exposes a defect |
-| B — Narrow outcome-based B2B automation | **ACTIVE PRIORITY / CONTACT BLOCKED / EXECUTION LANE OFF** | Two named prospects with observable willingness-to-pay language; neither has engaged with this sprint and no proposal is verifiably sent. Flavio now has lower acquisition friction than the heavily crowded Rami thread | **KEEP / PRIORITIZE**. Contact order is now Flavio → Rami; restore authorized execution capacity before any further build work |
-| C — Agent-native micro-contract / paid API work | **SCOUT-ONLY WATCHLIST** | No specific zero-capital task currently beats B; seller/payment identity friction remains; surfaced tasks are low-value and/or contested | **KILL as active sprint experiment**; reactivate only on a verified funded task with strong EV |
+| B — Narrow outcome-based B2B automation | **ACTIVE PRIORITY / CONTACT BLOCKED / EXECUTION LANE OFF** | Two named prospects with observable willingness-to-pay language; neither has engaged with this sprint and no proposal is verifiably sent. Rami now shows stronger observable procurement behavior than Flavio, despite heavier competition | **KEEP / PRIORITIZE**. Contact order is Rami → Flavio; restore authorized execution capacity before any further build work |
+| C — Agent-native micro-contract / paid API work | **SCOUT-ONLY WATCHLIST** | No specific zero-capital task currently beats B; seller/payment identity friction remains; surfaced tasks are low-value, contested, delayed, or insufficiently funded | **KILL as active sprint experiment**; reactivate only on a verified funded task with strong EV |
 
 ## Experiment B — ranked named prospects
 
-### B1 — Flavio quality-management workflow rescue
+### B1 — Rami RFQ-to-quote paid test
+
+- **Named buyer:** Rami / n8n Community user `Eng_Rami_Sebai`.
+- **Public brief:** https://community.n8n.io/t/seeking-estimates-n8n-developer-for-a-small-rfq-to-quote-prototype/312281
+- **Requested outcome:** fixed-format text PDF → extracted code/description/quantity/unit → buyer-supplied catalogue + approved price matching → human review for uncertainty → Excel quotation draft.
+- **Payment intent:** buyer explicitly says any engagement begins with a separately agreed **paid test** and milestones.
+- **Fresh buyer behavior:** Rami has publicly replied to multiple applicants, requested workflow/test evidence, clarified acceptance criteria and handover/support expectations, asked about invoicing readiness, and stated that he is shortlisting developers while validating client requirements. This is buyer-side procurement behavior, not seller-generated noise.
+- **Buyer-side dependency:** representative sample files are not yet available; final scope and payment follow sample review. Money therefore cannot be treated as imminent or guaranteed.
+- **Competition / fit friction:** the thread is extremely crowded (100+ replies in current public indexes), and Rami asks for relevant demonstrated work. The sprint has a newly built synthetic RFQ demonstration, not a prior personally delivered RFQ client project; that distinction must remain explicit.
+- **Delivery readiness:** synthetic executable proof exists in `experiments/rfq_quote_demo/`; GitHub Actions run `34495685087` passed.
+- **Prepared offer:** USD 125 fixed paid test, credited toward USD 450 first-stage prototype.
+- **Commercial state:** **prospect only**. Proposal remains READY TO SEND / NOT VERIFIABLY SENT. No lead, order, or revenue counted.
+- **Channel blocker:** no authenticated, owner-approved n8n Community posting identity/path is available to the current execution environment.
+- **System blocker:** the dedicated Revenue Executor lane is disabled.
+- **Decision:** **KEEP / FIRST CONTACT.** Zero additional proof polishing before legitimate contact.
+
+### B2 — Flavio quality-management workflow rescue
 
 - **Named buyer:** n8n Community user `Flavio_Augusto_Marti`.
 - **Public brief:** https://community.n8n.io/t/procurando-ajuda-para-concluir-projeto/312209
 - **Requested outcome:** finish an existing two-part Gemini + OneDrive quality-management workflow using versioned PDF/Word/Excel standards; support grounded research, version/document comparison, text/corrective-action suggestions, and reliable answers.
 - **Payment intent:** buyer explicitly asks for someone who will complete the project **even if they charge something**. No exact buyer budget is confirmed.
-- **Acquisition state:** current public n8n snapshots show materially less competition than the Rami RFQ thread. Seller quotes are market signals only, not Flavio's budget.
+- **Fresh buyer behavior:** public thread snapshots show many detailed seller replies and bounded offers, but no visible public follow-up from Flavio after the original post. Seller proposals are market signals only and are not buyer engagement.
 - **Smallest sellable milestone:** inspect two sanitized workflow exports + one representative standards folder; repair one complete source-grounded Q&A path with exact file/version/section citations, fail-closed behavior when evidence is insufficient, reproducible tests, and handoff notes.
 - **Commercial state:** **prospect only**; not contacted; no lead or offer counted.
 - **Channel blocker:** no authenticated, owner-approved n8n Community posting identity/path is available to the current execution environment.
-- **System blocker:** the dedicated acquisition execution lane is not operating.
-- **Decision:** **KEEP / PROMOTE TO FIRST CONTACT.** Lower public crowding and no observed prior-client-project gate now outweigh Rami's stronger price specificity for near-term survival-sprint EV.
-
-### B2 — Rami RFQ-to-quote paid test
-
-- **Named buyer:** Rami / n8n Community user `Eng_Rami_Sebai`.
-- **Public brief:** https://community.n8n.io/t/seeking-estimates-n8n-developer-for-a-small-rfq-to-quote-prototype/312281?tl=en
-- **Requested outcome:** fixed-format text PDF → extracted code/description/quantity/unit → buyer-supplied catalogue + approved price matching → human review for uncertainty → Excel quotation draft.
-- **Payment intent:** buyer explicitly says any engagement begins with a separately agreed **paid test** and milestones.
-- **Current buyer state:** requirements are still being validated; buyer is shortlisting; suitable representative files are not yet available. Public snapshots now show roughly 80–95+ replies depending on cache/language view, so competition is extreme.
-- **Fit friction:** the buyer explicitly asks for one relevant project the applicant personally delivered. The sprint has a newly built synthetic RFQ demonstration, not a prior personally delivered RFQ client project; that distinction must remain explicit.
-- **Delivery readiness:** synthetic executable proof exists in `experiments/rfq_quote_demo/`; GitHub Actions run `34495685087` passed.
-- **Prepared offer:** USD 125 fixed paid test, credited toward USD 450 first-stage prototype.
-- **Commercial state:** **prospect only**. Proposal remains READY TO SEND / NOT VERIFIABLY SENT. No lead, order, or revenue counted.
-- **Channel blocker:** no authenticated, owner-approved n8n Community posting identity/path is available to the current execution environment.
-- **System blocker:** the dedicated acquisition execution lane is not operating.
-- **Decision:** **KEEP / DEMOTE TO SECOND CONTACT.** Zero additional proof polishing before contact.
+- **System blocker:** the dedicated Revenue Executor lane is disabled.
+- **Decision:** **KEEP / SECOND CONTACT.** Do not build a generic QMS product before contact.
 
 ### Identity audit caution
 
@@ -66,7 +67,7 @@ The public Rami thread contains a proposal under the unrelated account name `Sev
 
 ## Experiment A — OPC Clinic review
 
-The product/fulfillment surface exists, but distribution volume has not converted into buyer intent. Six confirmed discovery surfaces and seven pending reviews remain **distribution evidence only**. After many acquisition/directory cycles there are still zero inbound triage cases, qualified leads, paid orders, or revenue.
+The product/fulfillment surface exists, but distribution volume has not converted into buyer intent. Six confirmed discovery surfaces and seven pending reviews remain **distribution evidence only**. A fresh repository issue check still shows zero open customer issues. After many acquisition/directory cycles there are still zero inbound triage cases, qualified leads, paid orders, or revenue.
 
 The sprint's own kill discipline says two focused acquisition cycles with no meaningful signal plus a stronger alternative requires CHANGE or KILL. Named paid-intent B2B prospects now dominate expected value.
 
@@ -74,13 +75,15 @@ The sprint's own kill discipline says two focused acquisition cycles with no mea
 
 ## Experiment C — agent-native review
 
-Agent-native commerce remains strategically interesting but is not an active survival-sprint bet. Marketplace existence and settlement rails are not buyer proof. Current surfaced work is low-value and/or heavily contested, while participation still requires owner-approved seller/payment identity or wallet capability.
+Agent-native commerce remains strategically interesting but is not an active survival-sprint bet. Marketplace existence and settlement rails are not buyer proof. Current surfaced work is low-value, contested, delayed, insufficiently funded, or still requires owner-approved seller/payment identity.
 
-**Reactivation gate:** a specific canonical task with independently verified funding/escrow, zero-spend legitimate claim path, acceptance criteria, digital scope that fits available tools, and expected value exceeding the weakest active B2B path.
+**Reactivation gate:** a specific canonical task with independently verified funding/escrow, zero-spend legitimate claim path, acceptance criteria, digital scope that fits available tools, payout timing compatible with the sprint, and expected value exceeding the weakest active B2B path.
 
 ## Rejected / demoted fallbacks
 
 - **LinkModel paid API test:** real US$5 reward, but too small to close the survival target; fallback only after higher-EV contact paths are exhausted.
+- **Memanto USD 100 security challenge:** real headline prize but competitive, review-dependent, and deadline extends beyond the survival sprint; not a higher-probability first-dollar path.
+- **HiphopKR content pipeline:** a prior attempted Gmail send is not counted; fresh Sent-mail search exposes no matching sent receipt.
 - **High-comment GitHub bounties:** reject when competition/claim volume makes first-dollar probability materially worse than named buyer work.
 - **Bounty mirrors without canonical originals/payout proof:** reject.
 - **Seller-proposed “bounty” amounts without maintainer/funder approval:** do not count as funded opportunities.
@@ -100,11 +103,11 @@ Only confirmed collected payment counts as revenue.
 
 The OS has the right policy-level pieces: specialized Scout/Executor/Review roles, deterministic activation gates, durable GitHub evidence, external-content security, evidence hierarchy, and narrow owner escalation. It also documents the production controls it should have: immutable `run_id`, preflight → action → receipt → metric delta, idempotency, role-level least privilege, checkpoint/resume, and trace links.
 
-However, the live operating state currently lacks an authorized acquisition execution lane. This means the system can discover and audit opportunities without a dedicated role actually taking the highest-EV approved revenue action.
+However, the live operating state currently lacks an authorized acquisition execution lane: **Revenue Executor is disabled while Scout and Review remain active.** This means the system can discover and audit opportunities without a dedicated role actually taking the highest-EV approved revenue action.
 
 Actual run evidence is also still mostly narrative Markdown. Historical run files do not consistently contain machine-enforced run IDs, idempotency keys, checkpoint objects, role-specific tool ACLs, resumable state, or end-to-end trace IDs.
 
-**Architecture verdict: POLICY PASS / EXECUTION RUNTIME DEGRADED.**
+**Architecture verdict: POLICY PASS / EXECUTION RUNTIME DEGRADED — DEADLINE CRITICAL.**
 
 Required recovery discipline:
 
