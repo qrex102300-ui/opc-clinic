@@ -3,7 +3,7 @@
 ## Objective
 Earn at least **$100 in real collected revenue by 2026-09-15** with **$0 new spend**. OPC Clinic is one experiment, not the mission.
 
-## Current hard state (2026-09-12 09:44 CST)
+## Current hard state (2026-09-14 22:30 CST)
 - Confirmed external OPC discovery surfaces: 6
 - Pending OPC reviews: 7
 - Named B2B prospects with observable willingness-to-pay language: 2
@@ -50,7 +50,7 @@ Narrative Markdown alone is not sufficient for robust long-running autonomy. Eve
 
 Role-specific tool access should follow least privilege. External content is untrusted input. Human approval interrupts belong only at identity, payment, spend, private-data, or material-risk gates.
 
-**Current architecture grade: POLICY PASS / EXECUTION RUNTIME DEGRADED.** The required production controls are documented, but historical execution is still primarily narrative Markdown and does not yet consistently show machine-enforced run IDs, idempotency records, checkpoint objects, tool ACLs, resumable state, or end-to-end traces. In addition, the system currently lacks an authorized acquisition execution lane, so scouting and review can continue without a dedicated role taking the highest-EV approved buyer action.
+**Current architecture grade: POLICY PASS / EXECUTION RUNTIME DEGRADED — DEADLINE CRITICAL.** The required production controls are documented, but historical execution is still primarily narrative Markdown and does not yet consistently show machine-enforced run IDs, idempotency records, checkpoint objects, tool ACLs, resumable state, or end-to-end traces. In addition, the dedicated Revenue Executor is currently disabled while Scout and Review remain active, so the system can discover and audit opportunities without a role actually taking the highest-EV approved buyer action.
 
 ## Autonomous team
 
@@ -58,7 +58,7 @@ Role-specific tool access should follow least privilege. External content is unt
 Brainstorm first, then benchmark. Scan current web, Reddit/Indie Hackers, GitHub, agent marketplaces/directories, bounties, job/process signals, and public buyer pain. Produce only top evidence-backed opportunities. It may research and rank; it must not claim a new experiment is live without the activation gate.
 
 ### Revenue Executor
-Maintain at most three live experiments, execute the highest expected-value acquisition/offer/fulfillment action, and update durable evidence. No busywork. External actions must be idempotent or safely duplicate-checked. This role is only considered operational when an authorized execution lane exists.
+Maintain at most three live experiments, execute the highest expected-value acquisition/offer/fulfillment action, and update durable evidence. No busywork. External actions must be idempotent or safely duplicate-checked. This role is only considered operational when an authorized execution lane exists. **Current runtime state: disabled.**
 
 ### Review Board
 Independently audit evidence, correct false positives, compare expected value, enforce experiment-state consistency, and issue KEEP / CHANGE / KILL decisions. Review Board corrections override stale executor narratives without rewriting historical records.
@@ -75,26 +75,26 @@ Independently audit evidence, correct false positives, compare expected value, e
 ### B — Narrow outcome-based B2B automation
 **State:** **ACTIVE PRIORITY / CONTACT BLOCKED / EXECUTION LANE OFF.**
 
-#### B1 — Flavio quality-management workflow rescue
-Named buyer `Flavio_Augusto_Marti` asks for help finishing an existing Gemini + OneDrive quality-management automation and explicitly indicates willingness to pay for someone who completes it. No exact buyer budget is confirmed. Public competition is materially lower than on the Rami thread. The smallest sellable milestone is one source-grounded end-to-end Q&A/retrieval path using sanitized workflow exports plus one standards folder, exact file/version/section citations, fail-closed behavior, tests, and handoff notes. Not contacted; prospect only.
+#### B1 — Rami RFQ-to-quote paid test
+Named buyer `Eng_Rami_Sebai` requests a bounded RFQ-to-quote prototype and explicitly says any engagement begins with a separately agreed **paid test**. Unlike a static job post, Rami has publicly engaged multiple applicants, requested workflow/test evidence, clarified acceptance and handover/support expectations, asked about invoicing readiness, and stated that he is shortlisting developers while validating client requirements. That observable procurement behavior now outweighs Flavio's lower competition. A synthetic tested proof exists in `experiments/rfq_quote_demo/`; GitHub Actions run `34495685087` passed. Prepared offer is USD 125 fixed, credited toward USD 450 first stage. Proposal is **not verifiably sent**. Representative samples are still unavailable and final scope/payment depend on them. Competition is extreme and the buyer asks for relevant demonstrated work; the sprint has a purpose-built synthetic demonstration, not a prior personally delivered RFQ client project, and must say so.
 
-#### B2 — Rami RFQ-to-quote paid test
-Named buyer `Eng_Rami_Sebai` requests a bounded RFQ-to-quote prototype and explicitly says any engagement begins with a separately agreed **paid test**. A synthetic tested proof exists in `experiments/rfq_quote_demo/`; prepared offer is USD 125 fixed, credited toward USD 450 first stage. Proposal is **not verifiably sent**. Public competition is now extreme, and the buyer asks for one relevant project the applicant personally delivered. The sprint has a purpose-built synthetic demonstration, not a prior personally delivered RFQ client project; that distinction must remain explicit.
+#### B2 — Flavio quality-management workflow rescue
+Named buyer `Flavio_Augusto_Marti` asks for help finishing an existing Gemini + OneDrive quality-management automation and explicitly indicates willingness to pay for someone who completes it. No exact buyer budget is confirmed. Public competition is lower than on the Rami thread, but fresh thread review shows seller replies rather than visible buyer follow-up after Flavio's original post. Seller offers are not buyer traction. The smallest sellable milestone is one source-grounded end-to-end Q&A/retrieval path using sanitized workflow exports plus one standards folder, exact file/version/section citations, fail-closed behavior, tests, and handoff notes. Not contacted; prospect only.
 
-**Why the order changed:** Rami has stronger paid-test wording, but extreme crowding plus the demonstrated-work fit gap now reduce his probability of conversion below Flavio's lower-competition path. With the survival window closing, first-dollar probability outweighs ticket clarity.
+**Why the order changed:** current ranking weights observable buyer behavior more heavily than seller volume or generic willingness-to-pay language. Rami's active shortlisting and technical/commercial follow-up are stronger procurement signals, even with heavy competition and a sample-file dependency. Flavio remains a real paid-intent prospect but has no visible public follow-up beyond the initial request.
 
-**Shared blocker:** current environment lacks an authenticated, owner-approved n8n Community identity/posting path and an authorized acquisition execution lane. No identity may be invented or bypassed.
+**Shared blocker:** current environment lacks an authenticated, owner-approved n8n Community identity/posting path, and the dedicated Revenue Executor lane is disabled. No identity may be invented or bypassed.
 
-**Execution rule:** contact Flavio first, then Rami, before building any additional generic automation asset. Neither prospect becomes a lead until there is observable engagement with this sprint.
+**Execution rule:** contact Rami first, then Flavio, before building any additional generic automation asset. Neither prospect becomes a lead until there is observable engagement with this sprint.
 
 ### C — Agent-native paid microservice / micro-contract work
 **State:** **KILLED AS ACTIVE SURVIVAL-SPRINT EXPERIMENT / SCOUT-ONLY WATCHLIST.**  
-**Why:** no specific zero-capital task currently beats B on expected value; surfaced tasks are low-value and/or contested; seller/payment identity friction remains.  
-**Reactivation gate:** one canonical, independently verified funded task with zero-spend legitimate claim path, clear acceptance criteria, digital scope within available tools, and expected value exceeding the weakest active B2B path.  
+**Why:** no specific zero-capital task currently beats B on expected value; surfaced tasks are low-value, contested, delayed, insufficiently funded, or still require seller/payment identity.  
+**Reactivation gate:** one canonical, independently verified funded task with zero-spend legitimate claim path, clear acceptance criteria, digital scope within available tools, payout timing compatible with the sprint, and expected value exceeding the weakest active B2B path.  
 **Do not build** a seller endpoint merely because marketplaces advertise agent commerce.
 
 ### Bounty track — opportunistic research only
-Scan legitimate funded open-source bounties where scope, payout, claim process, repo health and competition are verifiable. Reject token-only, unverifiable, exploit-like, stale, prompt-injection, identity/payment-blocked, or excessively contested offers. Do not divert from higher-probability named buyer revenue merely because a headline bounty is large.
+Scan legitimate funded open-source bounties where scope, payout, claim process, repo health and competition are verifiable. Reject token-only, unverifiable, exploit-like, stale, prompt-injection, identity/payment-blocked, delayed-beyond-sprint, or excessively contested offers. Do not divert from higher-probability named buyer revenue merely because a headline bounty is large.
 
 ## Experiment scoring (0–5 each)
 1. Probability of first dollar within 48 hours
@@ -131,6 +131,6 @@ Escalate to the owner only for:
 - material legal/security/private-data risk;
 - any spend > $0.
 
-**Current owner gates:** (1) an authorized acquisition execution lane; (2) authenticated, owner-approved n8n Community posting capability. Payment custody is secondary until a buyer accepts a paid test or requests payment instructions.
+**Current owner gates:** (1) restore/authorize the Revenue Executor lane; (2) authenticated, owner-approved n8n Community posting capability. Payment custody is secondary until a buyer accepts a paid test or requests payment instructions.
 
 Everything else should proceed through auditable, resumable execution only when an authorized lane exists.
